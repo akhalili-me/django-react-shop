@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Montserrat:wght@600&display=swap');
+:root{
+    --light-color: #3d3d3d;
+    --light-color-alt: rgba(0,0,0,.6);
+    --primary-background-color: #fff;
+    --secondary-background-color: #f1f1f1;
+    --hover-light-color: #fff;
+    --hover-dark-color: var(--primary-background-color);
+    --gradient-color: linear-gradient(
+        115deg,#4fcf70,#fad648,#a767e5,#12bcfe,#44ce7b);
+    --transparent-light-color: #7a7b81;
+    --transparent-dark-color: rgba(0,0,0,.1);
+    --font-family: 'Lato', sans-serif;
+    --font-size-xsm: 1.2rem;
+    --font-size-sm: 1.6rem;
+    --font-size-md: 2.4rem;
+    --font-size-lg: 3rem;
+    --font-size-xl: 4rem;
+    --gap: 2rem;
+    --margin-sm: 2rem;
+    --margin-md: 3rem;
+    --item-min-height-sm: 20rem;
+    --item-min-height-md: 30rem;
+}
+
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: var(--font-family);
+    font-size: 1.1rem;
+    color: var(--light-color-alt);
+    background-color: var(--primary-background-color);
+    letter-spacing: 1px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin: auto 20px;
+ }
+
+/* .slider{
+    height: 50px !important; 
+    width: 100%;
+} */
+
+img{
+    height: 450px;
+    width: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+a{
+    color: inherit;
+    text-decoration: none;
+}
+
+.swiper {
+    width: 100%;
+    height: 450px;
+ }
+
+.card button {
+    position: absolute;
+    /* down */
+    /* top: 5rem; */
+    bottom: 0.8rem;
+    /* left: 20rem; */
+    right: 1rem;
+    /* left: 5rem; */
+    z-index: 15;
+
+} 
+
+.card span{
+    position: absolute;
+    z-index: 15;
+    font-size: 1rem;
+    bottom: 1.1rem;
+}
+
+.rating-number {
+    left: 9.5rem;
+}
+.reviews-number{
+    left: 14rem;
+}
+.fa-star{
+    color: rgba(231, 205, 54, 0.901);
+}
+
+.card h3{
+    position: absolute;
+    bottom: 0.4rem;
+    z-index: 15;
+}
+.description{
+    margin-bottom: 50px;
+}
+
+.category{
+    height: 15rem;
+    border-style: none;
+}
+
+.category img {
+    border-radius: 40%;
+    border: rgba(120, 120, 120, 0.26);
+    border-style: solid;
+    border-width: 0.1px;
+}
+
