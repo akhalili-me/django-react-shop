@@ -1,14 +1,16 @@
 import React from 'react'
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import {Link} from 'react-router-dom'
+
 import {truncateString} from '../utility/string_utils'
 
 const Product = ({product}) => {
   return (
     <Card className="h-100">
-      <a href='/'>
+      <Link to={`/product/${product._id}`}>
       <Card.Img variant="top" src={product.image} />
-      </a>
+      </Link>
       <Card.Body>
         <Card.Title>
           <strong>{product.name}</strong>
@@ -19,8 +21,8 @@ const Product = ({product}) => {
         <Card.Text as='h3'>
         ${product.price}
         </Card.Text>
-        <span className='reviews-number'><i class="fa-solid fa-comment"></i>47</span>
-        <span className='rating-number' ><i class="fa-solid fa-star"></i>4.4</span>
+        <span className='reviews-number'><i class="fa-solid fa-comment"></i>{product.numReviews}</span>
+        <span><i class="fa-solid fa-star star_color"></i>{product.rating}</span>
         <Button variant="light"><i class="fa-solid fa-cart-shopping"></i></Button>
       </Card.Body>
     </Card>

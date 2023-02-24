@@ -36,7 +36,7 @@ const products = [
     'price': 929.99,
     'countInStock': 5,
     'rating': 3,
-    'numReviews': 12,
+    'numReviews': 264,
   },
   {
     '_id': '4',

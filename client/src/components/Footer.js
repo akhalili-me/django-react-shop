@@ -2,7 +2,7 @@ import React from 'react'
 
 const footer = () => {
   return (
-      <footer class=" footer d-flex flex-wrap justify-content-between align-items-center py-1 my-4 border-top">
+      <footer class="footer d-flex flex-wrap justify-content-between align-items-center py-1 my-4 border-top">
 
       <p class="col-md-4 mb-0 text-muted">© 2022 Company, Inc</p>
 

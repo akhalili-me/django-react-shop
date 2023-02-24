@@ -1,24 +1,29 @@
+import { BrowserRouter as Router,Route,Routes} from "react-router-dom"
+import Container from 'react-bootstrap/Container'
+
 import Header from './components/Header'
 import Footer from './components/Footer';
-import Container from 'react-bootstrap/Container'
 import Home from './pages/Home';
+import ProductPage from './pages/ProductPage';
 
 function App() {
   return (
-    <div >
+    <Router >
       <Header/>
       
-      <main className='py-3'>
+      <main className='py-3 main'>
         <Container>
-          <Home/>
-          {/* Myapp */}
+          <Routes>
+
+            <Route path="/" element={<Home />}/>
+            <Route path="/product/:id" element={<ProductPage />}/>
+
+          </Routes>
         </Container>
       </main>
      
       <Footer/>
-      <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-element-bundle.min.js"></script>
-    </div>
-    
+    </Router>
   );
 }
 

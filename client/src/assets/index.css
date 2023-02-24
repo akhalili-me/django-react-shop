@@ -36,14 +36,19 @@ body{
     color: var(--light-color-alt);
     background-color: var(--primary-background-color);
     letter-spacing: 1px;
-    min-height: 100vh;
-    display: flex;
+}
+#root{
+    display: flex ;
     flex-direction: column;
+    min-height: 100vh;
+}
+.main {
+    flex: 1 ;
 }
 
 .footer {
-    margin: auto 20px;
- }
+    margin: auto 1.5rem;
+}
 
 /* .slider{
     height: 50px !important; 
@@ -69,30 +74,22 @@ a{
 
 .card button {
     position: absolute;
-    /* down */
-    /* top: 5rem; */
     bottom: 0.8rem;
-    /* left: 20rem; */
     right: 1rem;
-    /* left: 5rem; */
     z-index: 15;
-
 } 
 
 .card span{
     position: absolute;
     z-index: 15;
     font-size: 1rem;
-    bottom: 1.1rem;
+    bottom: 3.3rem;
 }
 
-.rating-number {
-    left: 9.5rem;
-}
 .reviews-number{
-    left: 14rem;
+    left: 4rem;
 }
-.fa-star{
+.star_color{
     color: rgba(231, 205, 54, 0.901);
 }
 
@@ -102,7 +99,7 @@ a{
     z-index: 15;
 }
 .description{
-    margin-bottom: 50px;
+    margin-bottom: 4.5rem;
 }
 
 .category{
@@ -117,3 +114,18 @@ a{
     border-width: 0.1px;
 }
 
+.bold{
+    font-weight: bold;
+}
+
+.buy_box_container{
+    font-size: 1rem;
+}
+.buy_box_container button{
+    width: 100%;
+}
+
+.carousel-control-next-icon,.carousel-control-prev-icon{
+    background-color: rgb(38, 38, 38);
+    border-radius: .2rem;
+}
