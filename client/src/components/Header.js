@@ -5,12 +5,16 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 
+import { LinkContainer } from 'react-router-bootstrap'
 
 const header = () => {
   return (
     <Navbar bg="light" expand="lg">
       <Container>
-        <Navbar.Brand href="/">E-Shop</Navbar.Brand>
+        <LinkContainer to={'/'}>
+          <Navbar.Brand>E-Shop</Navbar.Brand>
+        </LinkContainer>
+        
         <Navbar.Toggle aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll">
           <Nav
@@ -18,9 +22,12 @@ const header = () => {
             style={{ maxHeight: '100px' }}
             navbarScroll
           >
-            <Nav.Link href="#action1"><i className='fa-solid fa-cart-shopping'></i></Nav.Link>
+            <LinkContainer to={'cart'}>
+              <Nav.Link><i className='fa-solid fa-cart-shopping'></i></Nav.Link>
+            </LinkContainer>
             
-            <NavDropdown title=<i class="fa-solid fa-user"></i> id="navbarScrollingDropdown">
+            
+            <NavDropdown id="navbarScrollingDropdown" title=<i class="fa-solid fa-user"></i> >
               <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
               <NavDropdown.Item href="#action4">
                 Another action
@@ -31,11 +38,14 @@ const header = () => {
               </NavDropdown.Item>
             </NavDropdown>
 
-            <Nav.Link href="#action2">Login</Nav.Link>
-            <Nav.Link href="#action2">Categories</Nav.Link>
-            {/* <Nav.Link href="#" disabled>
-              Link
-            </Nav.Link> */}
+            <LinkContainer to={'login'}>
+              <Nav.Link>Login</Nav.Link>
+            </LinkContainer>
+            
+            <LinkContainer to={'categories'}>
+              <Nav.Link>Categories</Nav.Link>
+            </LinkContainer>
+
           </Nav>
           <Form className="d-flex">
             <Form.Control

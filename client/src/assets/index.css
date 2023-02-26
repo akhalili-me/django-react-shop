@@ -129,3 +129,13 @@ a{
     background-color: rgb(38, 38, 38);
     border-radius: .2rem;
 }
+
+.line::after {
+    content: "";
+    display: block;
+    margin: 1rem 0;
+    border: 0;
+    border-top: 1px solid;
+    opacity: .25;
+    color: rgb(145, 141, 141) !important;
+  }

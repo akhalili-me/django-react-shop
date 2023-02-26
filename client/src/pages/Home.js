@@ -1,9 +1,9 @@
 import React from 'react'
 import products from '../products'
-import Carousel from '../components/Carousel'
+import Carousel from '../components/HomeCarousel'
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import Product from '../components/Product';
+import Product from '../components/ProductCard';
 import Category from "../components/Category";
 
 const Home = () => {
