@@ -1,28 +1,40 @@
-import React from 'react'
+import React,{useState,useEffect} from 'react'
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 import ProductPage from '../components/ProductPage'
 import Comment from '../components/Comment'
-import products from '../products';
 
 const Product = () => {
-    const { id } = useParams();
-    const product = products.find((p) => p._id===id)
+    const [product,setProduct] = useState([])
+    const [comments,setComments] = useState([])
 
-    const sample_comments = [
-        {
-            'author': 'Amir khalili',
-            'rate':3,
-            'text':'Very good indeed'
+    const { id } = useParams();
+
+    useEffect(() => {
+        async function getProductInfo() {
+            const [productResponse, commentsResponse] = await Promise.all([
+                axios.get(`http://127.0.0.1:8000/products/${id}`),
+                axios.get(`http://127.0.0.1:8000/products/${id}/comments`)
+            ]);
+
+            const { data: product } = productResponse;
+            const { data: comments } = commentsResponse;
+
+            setProduct(product)            
+            setComments(comments)
+            console.log(product)
         }
-    ]
-  return (
+        
+        getProductInfo()
+    },[id])
+
+ return (
     <>
         <ProductPage product={product}/>
-
         <h2 className='py-4'> Reviews</h2>
         <div className='comment_section'>
-            <Comment comments={sample_comments}/>
+            <Comment comments={comments}/>
         </div>
     </>
   )

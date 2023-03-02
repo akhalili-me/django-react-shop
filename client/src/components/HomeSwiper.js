@@ -7,7 +7,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 
 
-function Carousel() {
+function HomeSwiper() {
     return (
         <Swiper
         // install Swiper modules
@@ -27,6 +27,6 @@ function Carousel() {
   );
 }
 
-export default Carousel;
+export default HomeSwiper;
 
 

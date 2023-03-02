@@ -15,18 +15,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
+    category = serializers.StringRelatedField()
+    num_comments = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id','name','description','category','price','quantity','images']
+        fields = ['id', 'name', 'description', 'category', 'price', 'quantity', 'images', 'rate', 'num_comments']
     
-    def get_category(self, obj):
-        return obj.category.name
-    
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['category'] = self.get_category(instance)
-        return representation
+    @staticmethod
+    def get_num_comments(obj):
+        return obj.comments.count()
     
 
 class CommentSerializer(serializers.ModelSerializer):

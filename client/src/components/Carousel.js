@@ -9,7 +9,7 @@ const _Carousel = ({items}) => {
 
     const carousel_items = items.map((item) =>
         <Carousel.Item key={item.id}>
-            <img className='rounded d-block w-100' alt={item.name} src={item.src}/>
+            <img className='rounded d-block w-100' alt={item.name} src={item.image}/>
         </Carousel.Item>
     )
 

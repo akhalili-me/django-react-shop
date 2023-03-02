@@ -8,18 +8,8 @@ import Rating from '../components/Rating'
 
 
 const ProductPage = ({product}) => {
-    const { _id, name, image, countInStock, price, rating, description } = product;
-    const images = [
-        {
-          'id': _id,
-          'name': name,
-          'src': image,
-        },
-    ]
-    
-
-    const [status, product_price] = countInStock === 0 ? ['Out of Stock', 'Out of Stock'] : ['In Stock', price];
-
+    const {name, quantity, price, rate, description, images } = product;
+    const [status, product_price] = quantity === 0 ? ['Out of Stock', 'Out of Stock'] : ['In Stock', price];
 
   return (
     <Row>
@@ -31,7 +21,7 @@ const ProductPage = ({product}) => {
             <h2 className='bold line'>{name}</h2>
             <Row>
                 <Col md={8} className='info_box_container'>
-                    <div className='line'><Rating value={rating}/></div>
+                    <div className='line'><Rating value={rate}/></div>
                     <div className='line'><strong>Price: {product_price}</strong> </div>
                     <p><strong>Description:</strong> {description}</p>
                 </Col>
@@ -39,7 +29,7 @@ const ProductPage = ({product}) => {
                 <Col md={4} className='buy_box_container'>
                 <ListGroup className='text-center'>
                     <ListGroup.Item key="status">{status}</ListGroup.Item>
-                    {countInStock > 0 && (
+                    {quantity > 0 && (
                         <>
                         <ListGroup.Item key="quantity">
                             <Form.Group controlId="formBasicEmail">
