@@ -3,7 +3,7 @@ import { Carousel } from 'react-bootstrap'
 
 const _Carousel = ({items}) => {
 
-    if (!items) {
+    if (!items || !items.length ) {
         return <p>No items to display</p>
     }
 

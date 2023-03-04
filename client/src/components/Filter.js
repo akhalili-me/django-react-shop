@@ -46,8 +46,8 @@ const Filter = () => {
         <Form.Select aria-label="Default" className='mb-1' onChange={handleSearchParamsChange} value={sort} name='sort'>
           <option>Default</option>
           <option value="popular">Most Liked</option>
-          <option value="2">Price Ascending</option>
-          <option value="3">Price Descending</option>
+          <option value="price_ascending">Price Ascending</option>
+          <option value="price_descending">Price Descending</option>
         </Form.Select>
       </ListGroup.Item>
 
@@ -72,7 +72,7 @@ const Filter = () => {
             type="number"
             placeholder="0"
             value={maxPrice}
-            min={0}
+            min={minPrice}
             onChange={handleSearchParamsChange}
             name="max"
             aria-label="Maximum Price"

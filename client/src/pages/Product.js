@@ -23,7 +23,6 @@ const Product = () => {
 
             setProduct(product)            
             setComments(comments)
-            console.log(product)
         }
         
         getProductInfo()

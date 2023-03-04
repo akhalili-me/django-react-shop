@@ -10,6 +10,7 @@ import ProductCard from '../components/ProductCard';
 
 const Home = () => {
     const [products,setProducts] = useState([])
+    const [categories,setCategories] = useState([])
     const [loading, setLoading] = useState(true)
 
 
@@ -24,9 +25,21 @@ const Home = () => {
  
     },[])
 
+    const fetchCategories = useCallback(async () =>{
+        try {
+            const { data } = await axios.get(`http://127.0.0.1:8000/products/categories`)
+            setCategories(data)
+        } catch (error) {
+            console.error(error);
+        }
+ 
+    },[])
+
+
     useEffect(()=> {
         fetchProducts()
-    },[fetchProducts])
+        fetchCategories()
+    },[fetchProducts,fetchCategories])
 
     const productCards = useMemo(() => {
         return products.map((product) => (
@@ -35,6 +48,17 @@ const Home = () => {
           </Col>
         ));
       }, [products]);
+
+
+    const categoryCards = useMemo(() => {
+        return categories.map((category) => (
+          <Col key={category.id} sm={4} md={4} lg={2} xl={2}>
+            <Category category={category} />
+          </Col>
+        ));
+      }, [categories]);
+
+
 
   return (
     <div>
@@ -53,11 +77,12 @@ const Home = () => {
  
         <h1 className='py-4' >Categories</h1>     
         <Row xs={1} md={2} className="">
-            {products.map(product => (
+            {/* {products.map(product => (
                 <Col key={product.id}  sm={4} md={4} lg={2} xl={2}>
                     <Category product={product} />
                 </Col>
-            ))}
+            ))} */}
+            {categoryCards}
         </Row>
     </div>
   )

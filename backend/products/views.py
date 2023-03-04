@@ -75,10 +75,10 @@ class ProductsFilter(generics.ListAPIView):
         query = Product.objects.filter(category_id=category_id)
 
         #Get url query parameters
-        order = self.request.query_params.get('order','default')
+        sort = self.request.query_params.get('sort','default')
         min_price = self.request.query_params.get('min',0)
         max_price = self.request.query_params.get('max',0)
-        has_selling_stock = self.request.query_params.get('has_selling_stock',0)
+        has_selling_stock = self.request.query_params.get('has_selling_stock',False)
         
         # Price range filter
         if min_price != 0:
@@ -87,16 +87,16 @@ class ProductsFilter(generics.ListAPIView):
             query = query.filter(price__lte=max_price)
 
         #Check for product avaiability
-        if has_selling_stock == '1':
+        if has_selling_stock == 'true':
             query = query.filter(quantity__gte=1)
         
         #Order based filter
-        if order != 'default':
-            if order == 'popular':
+        if sort != 'default':
+            if sort == 'popular':
                 query = query.order_by('-rate',)
-            elif order == 'price_ascending':
+            elif sort == 'price_ascending':
                 query = query.order_by('price')
-            elif order == 'price_descending':
+            elif sort == 'price_descending':
                 query = query.order_by('-price')
    
         
