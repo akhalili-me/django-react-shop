@@ -16,7 +16,7 @@ const Home = () => {
 
     const fetchProducts = useCallback(async () =>{
         try {
-            const { data } = await axios.get(`http://127.0.0.1:8000/products`)
+            const { data } = await axios.get(`/products`)
             setProducts(data)
             setLoading(false);
         } catch (error) {
@@ -27,7 +27,7 @@ const Home = () => {
 
     const fetchCategories = useCallback(async () =>{
         try {
-            const { data } = await axios.get(`http://127.0.0.1:8000/products/categories`)
+            const { data } = await axios.get(`/products/categories`)
             setCategories(data)
         } catch (error) {
             console.error(error);

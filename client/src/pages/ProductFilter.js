@@ -14,7 +14,7 @@ const ProductFilter = () => {
 
   useEffect(() => {
     let params = ''
-    const baseURL = `http://127.0.0.1:8000/products/search/${id}?`;
+    const baseURL = `/products/search/${id}?`;
   
     const min = queryParams.get("min") || 0;
     const max = queryParams.get("max")|| 0;
@@ -40,7 +40,6 @@ const ProductFilter = () => {
     const fetchProducts = async () => {
       const finalURL = baseURL + params
 
-      console.log(`final: ${finalURL}`)
       const { data } = await axios.get(finalURL);
       setProducts(data.results);
     };

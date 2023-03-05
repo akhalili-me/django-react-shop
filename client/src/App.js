@@ -6,6 +6,8 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Product from './pages/Product';
 import ProductFilter from "./pages/ProductFilter";
+import Login from "./pages/Login"
+import Register from "./pages/Register"
 
 function App() {
   return (
@@ -17,8 +19,12 @@ function App() {
           <Routes>
 
             <Route path="/" element={<Home />}/>
+
             <Route path="/product/:id" element={<Product />}/>
             <Route path="/product/filter/:id" element={<ProductFilter />}/>
+
+            <Route path="/login" element={<Login />}/>
+            <Route path="/register" element={<Register />}/>
 
           </Routes>
         </Container>

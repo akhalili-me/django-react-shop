@@ -138,4 +138,24 @@ a{
     border-top: 1px solid;
     opacity: .25;
     color: rgb(145, 141, 141) !important;
-  }
+}
+
+.center_screen{
+    position:absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.login_container{
+    width: 30rem;
+    border-style: solid;
+    padding: 2rem;
+    border-width: .5px;
+    border-radius: 1rem;
+
+}
+
+.login_container button{
+    /* width: 50%; */
+}
