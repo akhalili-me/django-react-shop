@@ -7,6 +7,8 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 
 import { LinkContainer } from 'react-router-bootstrap'
 
+import { isAuthenticated,logout } from '../utility/auth';
+
 const header = () => {
   return (
     <Navbar bg="light" expand="lg">
@@ -38,9 +40,15 @@ const header = () => {
               </NavDropdown.Item>
             </NavDropdown>
 
-            <LinkContainer to={'login'}>
-              <Nav.Link>Login</Nav.Link>
-            </LinkContainer>
+            {  isAuthenticated() ? (
+                  <Nav.Link onClick={logout}>Logout</Nav.Link>
+              ):(
+                <LinkContainer to={'login'}>
+                 <Nav.Link>Login</Nav.Link>
+                </LinkContainer>
+              )
+            }
+
             
             <LinkContainer to={'categories'}>
               <Nav.Link>Categories</Nav.Link>

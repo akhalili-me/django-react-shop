@@ -5,7 +5,6 @@ from .serializers import *
 from rest_framework import generics
 from django.db.models import F
 from rest_framework.pagination import PageNumberPagination
-from itertools import chain
 
 class ProductViewSet(ModelViewSet):
     """
@@ -42,6 +41,7 @@ class CategoryViewSet(ModelViewSet):
     """
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class CommentViewSet(viewsets.ModelViewSet):

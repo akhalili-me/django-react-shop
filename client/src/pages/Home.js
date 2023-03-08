@@ -6,6 +6,8 @@ import Category from "../components/Category";
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 
+import axiosInstance from '../utility/auth';
+
 
 
 const Home = () => {
@@ -27,7 +29,7 @@ const Home = () => {
 
     const fetchCategories = useCallback(async () =>{
         try {
-            const { data } = await axios.get(`/products/categories`)
+            const { data } = await axiosInstance.get(`/products/categories`)
             setCategories(data)
         } catch (error) {
             console.error(error);

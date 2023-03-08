@@ -21,5 +21,5 @@ urlpatterns = [
 
     path('products/', include('products.urls')),
     path('cart/', include('cart.urls')),
-    path('auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('accounts/', include('accounts.urls')),
 ]
