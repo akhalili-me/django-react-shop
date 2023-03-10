@@ -6,6 +6,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 
 import { LinkContainer } from 'react-router-bootstrap'
+import { Link } from 'react-router-dom';
 
 import { isAuthenticated,logout } from '../utility/auth';
 
@@ -28,20 +29,25 @@ const header = () => {
               <Nav.Link><i className='fa-solid fa-cart-shopping'></i></Nav.Link>
             </LinkContainer>
             
-            
-            <NavDropdown id="navbarScrollingDropdown" title=<i class="fa-solid fa-user"></i> >
-              <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action4">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action5">
-                Something else here
-              </NavDropdown.Item>
-            </NavDropdown>
-
             {  isAuthenticated() ? (
+                <>
+                  <NavDropdown id="navbarScrollingDropdown" title=<i class="fa-solid fa-user"></i> >
+
+                    <LinkContainer to={'/profile'}>
+                      <NavDropdown.Item>Amir Khalili</NavDropdown.Item>
+                    </LinkContainer>
+                    
+                    <NavDropdown.Divider />
+                    <LinkContainer to={'/profile/orders'}>
+                      <NavDropdown.Item>Orders</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to={'/profile/comments'}>
+                      <NavDropdown.Item>Comments</NavDropdown.Item>
+                    </LinkContainer>
+               
+                  </NavDropdown>
                   <Nav.Link onClick={logout}>Logout</Nav.Link>
+                </>
               ):(
                 <LinkContainer to={'login'}>
                  <Nav.Link>Login</Nav.Link>

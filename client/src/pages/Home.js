@@ -6,7 +6,7 @@ import Category from "../components/Category";
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 
-import axiosInstance from '../utility/auth';
+import axiosInstance, { isAuthenticated } from '../utility/auth';
 
 
 
@@ -39,6 +39,7 @@ const Home = () => {
 
 
     useEffect(()=> {
+        isAuthenticated()
         fetchProducts()
         fetchCategories()
     },[fetchProducts,fetchCategories])
@@ -79,11 +80,6 @@ const Home = () => {
  
         <h1 className='py-4' >Categories</h1>     
         <Row xs={1} md={2} className="">
-            {/* {products.map(product => (
-                <Col key={product.id}  sm={4} md={4} lg={2} xl={2}>
-                    <Category product={product} />
-                </Col>
-            ))} */}
             {categoryCards}
         </Row>
     </div>

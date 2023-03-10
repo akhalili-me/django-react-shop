@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
-import { Link, Navigate } from 'react-router-dom';
+import { Link,useSearchParams } from 'react-router-dom';
 import { login } from '../utility/auth';
 import Alert from 'react-bootstrap/Alert';
-import { isAuthenticated } from '../utility/auth';
-import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const [queryParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [failedLogin, setFailedLogin] = useState(false);
@@ -43,7 +42,12 @@ const Login = () => {
   );
 
   if (isLoggedIn) {
-    window.location.reload()
+    const back = queryParams.get('back')
+    if (back) {
+      window.location.replace(back)
+    } else{
+      window.location.reload()
+    }
   }
 
   return (

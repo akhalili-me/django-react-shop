@@ -1,5 +1,5 @@
 import axios from "axios"
-import {setToken,getBothTokens,getToken,removeTokens,isTokenExpired,TOKEN_KEY} from './token'
+import {setToken,getBothTokens,getToken,removeTokens,isTokenExpired,TOKEN_KEY,getRefreshToken} from './token'
 
 export const logout = () => {
     removeTokens()
@@ -21,7 +21,14 @@ export const login = async (email,password) => {
     }
 }
 
-const setNewTokenKey = async (refToken) => {
+export const checkAndUpdateTokenKey = () => {
+    const refToken = getRefreshToken()
+    if (isTokenExpired(refToken) === false && refToken) {
+        updateTokenKey(refToken)
+    }
+}
+
+const updateTokenKey = async (refToken) => {
     try {
         const {data} = await axios.post('/accounts/token/refresh',{
             refresh: refToken
@@ -42,7 +49,7 @@ export const isAuthenticated = () => {
     if (!isTokenExpired(token)) {
         return true;
     } else if (!isTokenExpired(refreshToken)) {
-        setNewTokenKey(refreshToken)
+        updateTokenKey(refreshToken)
         return true
     } 
 
