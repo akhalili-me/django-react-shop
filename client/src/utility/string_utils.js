@@ -8,3 +8,10 @@ export const truncateString = (text) => {
     return text
 }
 
+export const jsonErrorstoString = (errors) => {
+    let final = ''
+    Object.keys(errors).forEach(key => {
+        final += `${key}: ${errors[key]} \n`
+    })
+    return final
+}

@@ -21,6 +21,23 @@ export const login = async (email,password) => {
     }
 }
 
+export const register = async (email,username,password) => {
+    try {
+        const response = await axios.post('http://127.0.0.1:8000/accounts/',{
+            email,
+            username,
+            password,
+        })
+
+        return response;
+    } catch (error) {
+        return error.response
+    }
+}
+
+
+
+
 export const checkAndUpdateTokenKey = () => {
     const refToken = getRefreshToken()
     if (isTokenExpired(refToken) === false && refToken) {

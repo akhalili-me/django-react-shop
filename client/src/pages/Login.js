@@ -11,6 +11,8 @@ const Login = () => {
   const [failedLogin, setFailedLogin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const register = queryParams.get('register') || false
+
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
   };
@@ -41,6 +43,12 @@ const Login = () => {
     </Alert>
   );
 
+  const registerSuccess = (
+    <Alert variant={'success'}>
+      You were successfuly registered. Now login.
+    </Alert>
+  )
+
   if (isLoggedIn) {
     const back = queryParams.get('back')
     if (back) {
@@ -52,6 +60,7 @@ const Login = () => {
 
   return (
     <div className="login_container center_screen">
+      {register ? registerSuccess : ''}
       {failedLogin ? error : ''}
       <h2 className="text-center">Login Page</h2>
       <Form onSubmit={handleSubmit} className="login_form">
