@@ -9,9 +9,8 @@ export const truncateString = (text) => {
 }
 
 export const jsonErrorstoString = (errors) => {
-    let final = ''
-    Object.keys(errors).forEach(key => {
-        final += `${key}: ${errors[key]} \n`
-    })
-    return final
-}
+    return Object.keys(errors)
+      .map(key => `${key}: ${errors[key]}`)
+      .join('\n');
+  }
+  

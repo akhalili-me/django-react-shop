@@ -19,21 +19,28 @@ const Register = () => {
         const value = target.value
         const name = target.name
 
-        if (name === 'email') {
-            setEmail(value)
-        } else if(name === 'username') {
-            setUsername(value)
-        } else if(name === 'password'){
-            setPassword(value)
-        } else if (name === 'password_confirm'){
-            setPasswordConfirm(value)
+        switch (name) {
+            case 'email':
+                setEmail(value)
+                break;
+            case 'username':
+                setUsername(value)
+                break;
+            case 'password':
+                setPassword(value)
+                break;
+            case 'password_confirm':
+                setPasswordConfirm(value)
+                break;
+            default:
+                break;
         }
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
         
-        if (password !== passwordConfirm) {
+        if (password !== passwordConfirm && password !== null) {
             setError('Password and Password Confirm must be same.')
             setFailed(true)
         } else{

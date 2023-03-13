@@ -3,8 +3,9 @@ from rest_framework.viewsets import ModelViewSet
 from .models import *
 from .serializers import *
 from rest_framework import generics
-from django.db.models import F
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
+
 
 class ProductViewSet(ModelViewSet):
     """
@@ -72,34 +73,37 @@ class ProductsFilter(generics.ListAPIView):
 
     def get_queryset(self):
         category_id = self.kwargs.get('pk')
-        query = Product.objects.filter(category_id=category_id)
+        queryset = Product.objects.filter(category_id=category_id)
 
         #Get url query parameters
         sort = self.request.query_params.get('sort','default')
         min_price = self.request.query_params.get('min',0)
         max_price = self.request.query_params.get('max',0)
         has_selling_stock = self.request.query_params.get('has_selling_stock',False)
-        
+
+        filter_queries = Q()
         # Price range filter
         if min_price != 0:
-            query = query.filter(price__gte=min_price)
+            filter_queries &= Q(price__gte=min_price)
         if max_price != 0:
-            query = query.filter(price__lte=max_price)
+            filter_queries &= Q(price__lte=max_price)
 
         #Check for product avaiability
-        if has_selling_stock == 'true':
-            query = query.filter(quantity__gte=1)
+        if has_selling_stock:
+            filter_queries &= Q(quantity__gte=1)
         
+        queryset = queryset.filter(filter_queries)
+
         #Order based filter
-        if sort != 'default':
-            if sort == 'popular':
-                query = query.order_by('-rate',)
-            elif sort == 'price_ascending':
-                query = query.order_by('price')
-            elif sort == 'price_descending':
-                query = query.order_by('-price')
-   
+        sort_queries = {
+            'default': queryset,
+            'popular': queryset.order_by('-rate'),
+            'price_ascending': queryset.order_by('price'),
+            'price_descending': queryset.order_by('-price'),
+        }
         
-        return query.select_related('category')
+        queryset = sort_queries.get(sort)
+
+        return queryset
     
 

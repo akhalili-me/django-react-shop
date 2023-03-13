@@ -1,5 +1,28 @@
 from django.db import models
 from django.core.validators import MaxValueValidator
+import os
+from uuid import uuid4
+from django.utils.deconstruct import deconstructible
+
+@deconstructible
+class PathAndRename(object):
+
+    def __init__(self, sub_path):
+        self.path = sub_path
+
+    def __call__(self, instance, filename):
+        ext = filename.split('.')[-1]
+        # set filename as random string
+        filename = '{}.{}'.format(uuid4().hex, ext)
+        # return the whole path to the file
+        return os.path.join(self.path, filename)
+product_image = PathAndRename('images/products')
+category_image = PathAndRename('images/categories')
+
+
+#########################
+#########################
+
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -18,7 +41,7 @@ class Product(models.Model):
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to='product_images/')
+    image = models.ImageField(upload_to=product_image)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -29,7 +52,7 @@ class ProductImage(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=255)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
-    image = models.ImageField(upload_to=None)
+    image = models.ImageField(upload_to=category_image)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

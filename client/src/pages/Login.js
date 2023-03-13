@@ -9,16 +9,23 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [failedLogin, setFailedLogin] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const register = queryParams.get('register') || false
+  const registerSuccess = queryParams.get('register') || false
 
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
-  };
+  const handleFieldChange = (event) => {
+    const value = event.target.value
+    const name = event.target.name
 
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
+    switch (name) {
+      case 'email':
+        setEmail(value)
+        break;
+      case 'password':
+        setPassword(value);
+        break;
+      default:
+        break;
+    }
   };
 
   const handleSubmit = (event) => {
@@ -29,39 +36,39 @@ const Login = () => {
         if (response.status !== 200) {
           setFailedLogin(true);
         } else {
-          setIsLoggedIn(true);
+          redirectAfterLogin()
         }
       })
       .catch((error) => {
         setFailedLogin(true);
       });
   };
+  
+  const redirectAfterLogin = () => {
+    const back = queryParams.get('back')
+    if (back) {
+      window.location.replace(back)
+    } else{
+      window.location.replace('/')
+    }
+  }
 
-  const error = (
+  const errorAlert = (
     <Alert variant={'danger'}>
-      Sorry, we could not find your account.
+      Sorry, login failed. Try again.
     </Alert>
   );
 
-  const registerSuccess = (
+  const registerSuccessAlert = (
     <Alert variant={'success'}>
       You were successfuly registered. Now login.
     </Alert>
   )
 
-  if (isLoggedIn) {
-    const back = queryParams.get('back')
-    if (back) {
-      window.location.replace(back)
-    } else{
-      window.location.reload()
-    }
-  }
-
   return (
     <div className="login_container center_screen">
-      {register ? registerSuccess : ''}
-      {failedLogin ? error : ''}
+      {registerSuccess ? registerSuccessAlert : ''}
+      {failedLogin ? errorAlert : ''}
       <h2 className="text-center">Login Page</h2>
       <Form onSubmit={handleSubmit} className="login_form">
         <Form.Group className="mb-3">
@@ -70,7 +77,8 @@ const Login = () => {
             type="email"
             placeholder="Enter email"
             value={email}
-            onChange={handleEmailChange}
+            name='email'
+            onChange={handleFieldChange}
           />
         </Form.Group>
 
@@ -80,7 +88,8 @@ const Login = () => {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={handlePasswordChange}
+            name='password'
+            onChange={handleFieldChange}
           />
         </Form.Group>
         <Row className="mb-4 m-1">

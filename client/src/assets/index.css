@@ -156,6 +156,20 @@ a{
 
 }
 
-.login_container button{
-    /* width: 50%; */
+.cart_table img {
+    object-fit: contain;
+    height: 5rem;
+}
+.cart_table input[type="number"] {
+    margin: 0 auto;
+    width: 4rem;
+}
+.checkout_sidebar button {
+    width: 100%;
+}
+
+.fa-xmark{
+    cursor: pointer;
+    color: red;
+    font-size: 1.8rem;
 }

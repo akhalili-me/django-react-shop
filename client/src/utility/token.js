@@ -27,8 +27,5 @@ export const removeTokens = () => {
 
 export const isTokenExpired = (token) => {
     const decodedToken = JSON.parse(atob(token.split('.')[1]));
-    if (decodedToken.exp > Date.now() / 1000) {
-        return false
-    }
-    return true
+    return decodedToken.exp <= Date.now() / 1000;
 }

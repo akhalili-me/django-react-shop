@@ -3,7 +3,7 @@ import {setToken,getBothTokens,getToken,removeTokens,isTokenExpired,TOKEN_KEY,ge
 
 export const logout = () => {
     removeTokens()
-    window.location.reload();
+    window.location.replace('/');
 }
 
 export const login = async (email,password) => {
@@ -35,12 +35,9 @@ export const register = async (email,username,password) => {
     }
 }
 
-
-
-
 export const checkAndUpdateTokenKey = () => {
     const refToken = getRefreshToken()
-    if (isTokenExpired(refToken) === false && refToken) {
+    if (refToken && isTokenExpired(refToken) === false) {
         updateTokenKey(refToken)
     }
 }
