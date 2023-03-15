@@ -38,7 +38,7 @@ class UserViewSet(ModelViewSet):
         
     def update(self, request, *args, **kwargs):
         """
-        Update user and hash the password
+        Update user and hash the password.
         """
         partial = kwargs.pop('partial', False)
         instance = self.get_object()

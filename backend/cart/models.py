@@ -1,13 +1,20 @@
 from django.db import models
 
 class ShoppingSession(models.Model):
-    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
-    total = models.DecimalField(max_digits=10, decimal_places=2)
+    user = models.OneToOneField('accounts.User', on_delete=models.CASCADE,related_name='shopping_session')
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def calculate_total(self):
+        total = 0
+        cart_items = CartItem.objects.filter(session=self)
+        for item in cart_items:
+            total += item.product.price * item.quantity
+        return total
+
 class CartItem(models.Model):
-    session = models.ForeignKey(ShoppingSession, null=True, on_delete=models.CASCADE)
+    session = models.ForeignKey(ShoppingSession, null=True, on_delete=models.CASCADE,related_name='cart_items')
     product = models.ForeignKey('products.Product', on_delete=models.CASCADE)
     quantity = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
