@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { fetchCartItems } from '../../utility/cart'
-import { addItemReducer, removeItemReducer } from './cartReducers'
+import { addItemReducer, removeItemReducer, UpdateItemQuantityReducer } from './cartReducers'
 
 export const cartSlice = createSlice({
   name: 'cart',
@@ -8,10 +8,10 @@ export const cartSlice = createSlice({
   reducers: {
     addItem: addItemReducer,
     removeItem: removeItemReducer,
+    updateItem: UpdateItemQuantityReducer,
     clearCart: state =>{
+      state.total = 0
       state.items = [];
-    },
-    updateQuantity: (state,action) => {
     },
   },
   extraReducers: (builder) => {
@@ -23,6 +23,6 @@ export const cartSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { addItem, removeItem, clearCart } = cartSlice.actions
+export const { addItem, removeItem, updateItem , clearCart } = cartSlice.actions
 
 export default cartSlice.reducer
