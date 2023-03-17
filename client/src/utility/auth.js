@@ -1,14 +1,23 @@
 import axios from "axios"
-import {setToken,getBothTokens,getToken,removeTokens,isTokenExpired,TOKEN_KEY,getRefreshToken} from './token'
+import {setToken,getJwtTokens,removeTokens,isTokenExpired,TOKEN_KEY} from './token'
 
-export const logout = () => {
-    removeTokens()
-    window.location.replace('/');
+export const register = async (email,username,password) => {
+    try {
+        const response = await axios.post('http://127.0.0.1:8000/api/accounts/',{
+            email,
+            username,
+            password,
+        })
+
+        return response;
+    } catch (error) {
+        return error.response
+    }
 }
 
 export const login = async (email,password) => {
     try {
-        const response = await axios.post('http://127.0.0.1:8000/accounts/token',{
+        const response = await axios.post('http://127.0.0.1:8000/api/accounts/token',{
             email,
             password,
         })
@@ -21,24 +30,26 @@ export const login = async (email,password) => {
     }
 }
 
-export const register = async (email,username,password) => {
-    try {
-        const response = await axios.post('http://127.0.0.1:8000/accounts/',{
-            email,
-            username,
-            password,
-        })
-
-        return response;
-    } catch (error) {
-        return error.response
-    }
+export const logout = () => {
+    removeTokens()
+    window.location.replace('/');
 }
 
-export const checkAndUpdateTokenKey = () => {
-    const refToken = getRefreshToken()
-    if (refToken && isTokenExpired(refToken) === false) {
-        updateTokenKey(refToken)
+export const isAuthenticated = () => {
+    const { token, refreshToken } = getJwtTokens();
+
+    if (!refreshToken || !token || isTokenExpired(refreshToken)) {
+        return false;
+    }
+
+    return true;
+}
+
+export const updateTokenIfExpired = () => {
+    const { token, refreshToken } = getJwtTokens();
+
+    if (isTokenExpired(token) && isTokenExpired(refreshToken) === false) {
+        updateTokenKey(refreshToken)
     }
 }
 
@@ -53,40 +64,3 @@ const updateTokenKey = async (refToken) => {
     }
 }
 
-export const isAuthenticated = () => {
-    const { token, refreshToken } = getBothTokens();
-
-    if (!refreshToken) {
-        return false
-    }
-
-    if (!isTokenExpired(token)) {
-        return true;
-    } else if (!isTokenExpired(refreshToken)) {
-        updateTokenKey(refreshToken)
-        return true
-    } 
-
-    return false
-}
-
-const axiosInstance = axios.create({
-    timeout: 5000,
-    headers:{
-        'Content-Type': 'application/json',
-        accept: 'application/json',
-    }
-})
-
-axiosInstance.interceptors.request.use(
-(config) => {
-    if (isAuthenticated() === true) {
-        const token = getToken()
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-},
-(error) => Promise.reject(error),
-);
-
-export default axiosInstance;

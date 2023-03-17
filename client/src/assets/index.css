@@ -173,3 +173,15 @@ a{
     color: red;
     font-size: 1.8rem;
 }
+
+.success_alert{
+    position: absolute;
+    width: 100%;
+    left: 50%;
+    top: 2rem;
+    transform: translate(-50%, -50%);
+}
+
+.cart_badge{
+    font-size: 10px;
+}

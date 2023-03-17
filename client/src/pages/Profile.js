@@ -1,11 +1,7 @@
-import React,{useState} from 'react'
-import Button from 'react-bootstrap/Button';
-import Filter from '../components/Filter';
-import {ListGroup,InputGroup,Col,Row} from 'react-bootstrap';
-import Form from 'react-bootstrap/Form';
-import { useSearchParams } from 'react-router-dom'
+import React from 'react'
+import {Col,Row} from 'react-bootstrap';
 import ProfileSidebar from '../components/ProfileSidebar';
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Orders from "../components/Profile/Orders";
 import Comments from "../components/Profile/Comments";
 

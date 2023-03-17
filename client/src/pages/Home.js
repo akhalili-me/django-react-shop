@@ -5,20 +5,23 @@ import Row from 'react-bootstrap/Row';
 import Category from "../components/Category";
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
+import authAxios from '../utility/api';
 
-import axiosInstance, { isAuthenticated } from '../utility/auth';
+import { isAuthenticated } from '../utility/auth';
 
-
+import { useDispatch } from 'react-redux';
+import { fetchCartItems } from '../utility/cart';
+import { updateTokenIfExpired } from '../utility/auth';
 
 const Home = () => {
     const [products,setProducts] = useState([])
     const [categories,setCategories] = useState([])
     const [loading, setLoading] = useState(true)
-
+    const dispatch = useDispatch();
 
     const fetchProducts = useCallback(async () =>{
         try {
-            const { data } = await axios.get(`/products`)
+            const { data } = await axios.get("/products/")
             setProducts(data)
             setLoading(false);
         } catch (error) {
@@ -29,7 +32,7 @@ const Home = () => {
 
     const fetchCategories = useCallback(async () =>{
         try {
-            const { data } = await axiosInstance.get(`/products/categories`)
+            const { data } = await authAxios.get(`/products/categories/`)
             setCategories(data)
         } catch (error) {
             console.error(error);
@@ -39,10 +42,13 @@ const Home = () => {
 
 
     useEffect(()=> {
-        isAuthenticated()
+        if (isAuthenticated()) {
+          updateTokenIfExpired()
+          dispatch(fetchCartItems())
+        }
         fetchProducts()
         fetchCategories()
-    },[fetchProducts,fetchCategories])
+    },[fetchProducts,fetchCategories,dispatch])
 
     const productCards = useMemo(() => {
         return products.map((product) => (

@@ -21,11 +21,11 @@ const ProductFilter = () => {
     const sort = queryParams.get("sort") || 'default';
     const has_selling_stock = queryParams.get("has_selling_stock") || false;
     
-    if (min !== 0 ) {
+    if (min > 0 ) {
       params += `min=${min}&`
     }
   
-    if (max !== 0) {
+    if (max > 0) {
       params += `max=${max}&`
     }
   

@@ -14,7 +14,7 @@ export const getRefreshToken = () => {
   return localStorage.getItem(REFRESH_TOKEN_KEY)
 }
 
-export const getBothTokens = () => {
+export const getJwtTokens = () => {
   const token = getToken();
   const refreshToken = getRefreshToken();
   return { token, refreshToken };

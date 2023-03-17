@@ -14,8 +14,8 @@ const Product = () => {
     useEffect(() => {
         async function getProductInfo() {
             const [productResponse, commentsResponse] = await Promise.all([
-                axios.get(`/products/${id}`),
-                axios.get(`/products/${id}/comments`)
+                axios.get(`/products/${id}/`),
+                axios.get(`/products/${id}/comments/`)
             ]);
 
             const { data: product } = productResponse;

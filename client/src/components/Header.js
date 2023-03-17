@@ -1,16 +1,24 @@
+import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-
+import Badge from 'react-bootstrap/Badge';
 import { LinkContainer } from 'react-router-bootstrap'
-import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import { isAuthenticated,logout } from '../utility/auth';
 
-const header = () => {
+const Header = () => {
+  const [cartBadge, setCartBadge] = useState(0);
+  const cartItemCount = useSelector((state) => state.cart.items.length)
+
+  useEffect(() => {
+    setCartBadge(cartItemCount)
+  },[cartItemCount])
+
   return (
     <Navbar bg="light" expand="lg">
       <Container>
@@ -26,7 +34,7 @@ const header = () => {
             navbarScroll
           >
             <LinkContainer to={'cart'}>
-              <Nav.Link><i className='fa-solid fa-cart-shopping'></i></Nav.Link>
+              <Nav.Link><i className='fa-solid fa-cart-shopping'></i><Badge className='cart_badge' bg="dark">{cartBadge}</Badge></Nav.Link>
             </LinkContainer>
             
             {  isAuthenticated() ? (
@@ -76,4 +84,4 @@ const header = () => {
   )
 }
 
-export default header
+export default Header

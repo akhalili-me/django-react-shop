@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { BrowserRouter,Route,Routes,Navigate,useLocation} from "react-router-dom"
 import Container from 'react-bootstrap/Container'
 
@@ -37,7 +36,6 @@ function App() {
             <Route path="/login" element={isAuthenticated() ? <Navigate to={'/'} /> : <Login />}/>
             <Route path="/register" element={isAuthenticated() ? <Navigate to={'/'} /> : <Register />}/>
             
-
             {/* Protected Routes */}
             <Route path="/profile/*" element={<PrivateRoute component={<Profile />}/>}/>
           </Routes>

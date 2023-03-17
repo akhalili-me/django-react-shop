@@ -2,14 +2,16 @@ import React from 'react'
 import {Col,Row,Button} from 'react-bootstrap'
 import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup'
+import { useSelector, useDispatch } from 'react-redux'
 
 import Carousel from './Carousel';
 import Rating from '../components/Rating'
-
+import { addItem } from '../features/cart/cartSlice';
 
 const ProductPage = ({product}) => {
     const {name, quantity, price, rate, description, images } = product;
     const [status, product_price] = quantity === 0 ? ['Out of Stock', 'Out of Stock'] : ['In Stock', price];
+    const dispatch = useDispatch()
 
   return (
     <Row>
