@@ -20,7 +20,6 @@ const ProductCard = ({product}) => {
       setAlertVariant('success')
       setAlertMsg('Successfully added to cart!')
     } catch (error) {
-      console.log();
       setAlertVariant('danger')
       setAlertMsg(error.message)
     } finally {

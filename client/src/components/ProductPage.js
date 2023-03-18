@@ -1,8 +1,8 @@
 import React from 'react'
 import {Col,Row,Button} from 'react-bootstrap'
-import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup'
-import { useSelector, useDispatch } from 'react-redux'
+import {useDispatch } from 'react-redux'
+import { LinkContainer } from 'react-router-bootstrap'
 
 import Carousel from './Carousel';
 import Rating from '../components/Rating'
@@ -12,6 +12,14 @@ const ProductPage = ({product}) => {
     const {name, quantity, price, rate, description, images } = product;
     const [status, product_price] = quantity === 0 ? ['Out of Stock', 'Out of Stock'] : ['In Stock', price];
     const dispatch = useDispatch()
+
+    const handleAddToCart = () => {
+        try {
+        dispatch(addItem(product))
+            
+        } catch (error) {
+        }
+    }
 
   return (
     <Row>
@@ -33,13 +41,10 @@ const ProductPage = ({product}) => {
                     <ListGroup.Item key="status">{status}</ListGroup.Item>
                     {quantity > 0 && (
                         <>
-                        <ListGroup.Item key="quantity">
-                            <Form.Group controlId="formBasicEmail">
-                            <Form.Control min={1} type="number" placeholder="Quantity" />
-                            </Form.Group>
-                        </ListGroup.Item>
                         <ListGroup.Item key="add-to-cart">
-                            <Button variant="primary">Add to Cart</Button>
+                            <LinkContainer to={'/cart'}>
+                                <Button onClick={() => handleAddToCart()} variant="primary">Add to Cart</Button>
+                            </LinkContainer>
                         </ListGroup.Item>
                         </>
                     )}

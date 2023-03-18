@@ -17,10 +17,6 @@ class CreateCartItems(generics.CreateAPIView):
     serializer_class = CartItemCreateSerializer
     permission_classes = [IsAuthenticated]
 
-    def update_shopping_session(self,shopping_session):
-        shopping_session.total = shopping_session.calculate_total()
-        shopping_session.save()
-
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -34,8 +30,7 @@ class CreateCartItems(generics.CreateAPIView):
             session=shopping_session,
             defaults={'quantity': quantity}
         )
-
-        self.update_shopping_session(shopping_session)
+        shopping_session.update_total()
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data,status=status.HTTP_201_CREATED,headers=headers)
 
@@ -52,8 +47,10 @@ class RDCartItems(generics.RetrieveDestroyAPIView):
         return Response(serilizer.data)
     
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_cart_item_by_product_id(kwargs.get('pk'))
-        self.perform_destroy(instance)
+        cart_item = self.get_cart_item_by_product_id(kwargs.get('pk'))
+        shopping_session = cart_item.session
+        self.perform_destroy(cart_item)
+        shopping_session.update_total()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     def get_cart_item_by_product_id(self, id):
@@ -71,4 +68,16 @@ class CartItemsList(generics.ListAPIView):
     def get_queryset(self):
         session = ShoppingSession.objects.filter(user=self.request.user)
         return session
+    
+
+class DeleteAllCartItems(generics.DestroyAPIView): 
+    """
+    Delete all cart items associated with the authenticated user.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def destroy(self, request, *args, **kwargs):
+        CartItem.objects.filter(session__user=self.request.user).delete()
+        ShoppingSession.objects.get(user=request.user).update_total()
+        return Response(status=status.HTTP_204_NO_CONTENT) 
     

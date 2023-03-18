@@ -6,9 +6,9 @@ export const addItemReducer = (state, action) => {
   const existingItem = state.items.find(i => i.product.id === id);
 
   if (quantity === 0) {
-    throw new Error('Not available in Stock')
+    throw new Error('Not available in stock')
   } else if (existingItem) {
-    throw new Error('Already Avaiable in Stock')
+    throw new Error('Already available in cart')
   }
 
   const serializedItem = {
@@ -54,11 +54,24 @@ export const UpdateItemQuantityReducer = (state,action) => {
   calculateTotal(state)
 }
 
+export const clearAllItmesReducer = (state,action) =>{
+  state.total = 0
+  state.items=[]
+
+  if (isAuthenticated()) {
+    removeAllItemsInDatabase()
+  }
+}
+
 const calculateTotal = (state) => {
   state.total = state.items.reduce( 
     (total, item) => total + item.product.price * item.quantity,
     0
   );
+}
+
+const removeAllItemsInDatabase = async () => {
+  await authAxios.delete('cart/removeall')
 }
 
 const removeItemInDatabase = async (id) => {

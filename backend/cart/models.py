@@ -6,12 +6,13 @@ class ShoppingSession(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def calculate_total(self):
+    def update_total(self):
         total = 0
         cart_items = CartItem.objects.filter(session=self)
         for item in cart_items:
             total += item.product.price * item.quantity
-        return total
+        self.total = total
+        self.save()
 
 class CartItem(models.Model):
     session = models.ForeignKey(ShoppingSession, null=True, on_delete=models.CASCADE,related_name='cart_items')
