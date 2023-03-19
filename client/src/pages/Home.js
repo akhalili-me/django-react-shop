@@ -2,9 +2,9 @@ import React, { useEffect, useState,useCallback, useMemo} from 'react'
 import Carousel from '../components/HomeSwiper'
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import Category from "../components/Category";
+import Category from "../components/product/Category";
 import axios from 'axios';
-import ProductCard from '../components/ProductCard';
+import ProductCard from '../components/product/ProductCard';
 import authAxios from '../utility/api';
 
 import { isAuthenticated } from '../utility/auth';

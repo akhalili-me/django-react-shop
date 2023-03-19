@@ -1,15 +1,14 @@
 import React from 'react'
 import {Col,Row} from 'react-bootstrap';
-import ProfileSidebar from '../components/ProfileSidebar';
+import ProfileSidebar from '../components/profile/ProfileSidebar';
 import { Routes, Route } from "react-router-dom";
-import Orders from "../components/Profile/Orders";
-import Comments from "../components/Profile/Comments";
+import Orders from "../components/profile/Orders";
+import Comments from "../components/profile/Comments";
 
 
 
 
 const Profile = () => {
-    // const [window,setWindow] = useState(false)
 
   return (
     <Row>

@@ -4,40 +4,36 @@ import {Card,Alert} from 'react-bootstrap';
 import {Link} from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 
-import {truncateString} from '../utility/string_utils'
-import { addItem } from '../features/cart/cartSlice';
+import {truncateString} from '../../utility/string_utils'
+import { addItem } from '../../features/cart/cartSlice';
+import { setAlarm } from '../../features/alert/alarmSlice';
+
 
 const ProductCard = ({product}) => {
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMsg, setAlertMsg] = useState('');
-  const [alertVariant, setAlertVariant] = useState('');
   const dispatch = useDispatch()
-
   const handleAddToCart = () => {
 
     try {
       dispatch(addItem(product))
-      setAlertVariant('success')
-      setAlertMsg('Successfully added to cart!')
+      dispatch(setAlarm({
+        message: 'Successfully added to cart!',
+        type: 'success',
+        show: true
+      }))
+
     } catch (error) {
-      setAlertVariant('danger')
-      setAlertMsg(error.message)
-    } finally {
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 2000);
+      dispatch(setAlarm({
+        message: error.message,
+        type: 'danger',
+        show: true
+      }))
+  
     }
   }
   
   return (
     <>
     <Card className="h-100">
-
-      {showAlert && (
-          <Alert className='success_alert text-center' variant={alertVariant}>
-              {alertMsg}
-          </Alert>
-      )}
- 
       <Link to={`/product/${product.id}`}>
       <Card.Img variant="top" src={product.image} />
       </Link>

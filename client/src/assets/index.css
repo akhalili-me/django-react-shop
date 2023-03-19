@@ -185,3 +185,10 @@ a{
 .cart_badge{
     font-size: 10px;
 }
+
+.global_alarm{
+    margin-left: 1rem;
+    position: fixed;
+    bottom:13px;
+    z-index: 999;
+}

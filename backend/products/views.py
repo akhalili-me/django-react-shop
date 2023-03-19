@@ -5,6 +5,8 @@ from .serializers import *
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
+from rest_framework.response import Response
+from rest_framework import status
 
 
 class ProductViewSet(ModelViewSet):
@@ -45,18 +47,34 @@ class CategoryViewSet(ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class ProductCommentsCreateListView(generics.ListCreateAPIView):
     """
-    ViewSet for viewing and editing the comments.
+    ViewSet for viewing and creating product comments.
     """
     serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+
     def get_queryset(self):
         """
-        Return the comments associated with a particular product ID.
+        Return the comments associated with a particular product id.
         """
         product_id = self.kwargs['product_id']
-        return Comment.objects.filter(product_id=product_id)
+        return Comment.objects.filter(product_id=product_id).order_by('-created_at')
     
+    def create(self,request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(product_id=kwargs['product_id'], author=self.request.user)
+        headers = self.get_success_headers(serializer.data)
+        return Response(status=status.HTTP_201_CREATED,headers=headers)
+    
+
+class RUDCommentView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    docstring
+    """
+    pass
 
 class FilterPagination(PageNumberPagination):
     page_size_query_param = 'page_size'

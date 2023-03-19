@@ -19,7 +19,6 @@ class PathAndRename(object):
 product_image = PathAndRename('images/products')
 category_image = PathAndRename('images/categories')
 
-
 #########################
 #########################
 

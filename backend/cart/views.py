@@ -1,14 +1,9 @@
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status, generics
 from .serializers import *
 from .models import ShoppingSession
-from rest_framework.response import Response
-from rest_framework import status
-from django.db import transaction
-from django.shortcuts import get_object_or_404
-from rest_framework import generics
 from .permissions import isCartOwner
-from products.models import Product
-from django.http import Http404
 
 class CreateCartItems(generics.CreateAPIView):
     """
@@ -36,7 +31,7 @@ class CreateCartItems(generics.CreateAPIView):
 
 class RDCartItems(generics.RetrieveDestroyAPIView):
     """
-    View for retrieve and delete cart items.
+    View for retrieve and delete cart item.
     """
     serializer_class = RDCartItemSerializer
     permission_classes = [IsAuthenticated,isCartOwner]

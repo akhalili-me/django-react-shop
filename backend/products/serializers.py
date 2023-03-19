@@ -28,17 +28,18 @@ class ProductSerializer(serializers.ModelSerializer):
     
 
 class CommentSerializer(serializers.ModelSerializer):
-
+    author = serializers.SerializerMethodField()
+    
     class Meta:
         model = Comment
         fields = ['id','text','rate','like','author']
+        extra_kwargs = {
+            'like': {'required': False}
+        }
 
-    def get_author(self,obj):
+    @staticmethod
+    def get_author(obj):
         return obj.author.username
     
-    def to_representation(self,instance):
-        representation = super().to_representation(instance)
-        representation['author'] = self.get_author(instance)
-        return representation
         
 

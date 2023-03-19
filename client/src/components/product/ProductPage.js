@@ -5,8 +5,8 @@ import {useDispatch } from 'react-redux'
 import { LinkContainer } from 'react-router-bootstrap'
 
 import Carousel from './Carousel';
-import Rating from '../components/Rating'
-import { addItem } from '../features/cart/cartSlice';
+import { addItem } from '../../features/cart/cartSlice';
+import Rating from '../common/Rating'
 
 const ProductPage = ({product}) => {
     const {name, quantity, price, rate, description, images } = product;

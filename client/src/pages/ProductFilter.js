@@ -2,9 +2,9 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Col, Row } from "react-bootstrap";
 import Filter from "../components/Filter";
 import axios from "axios";
-import ProductCard from "../components/ProductCard";
 import { useParams} from "react-router-dom";
 import { useSearchParams } from 'react-router-dom'
+import ProductCard from "../components/product/ProductCard";
 
 const ProductFilter = () => {
   const [products, setProducts] = useState([]);

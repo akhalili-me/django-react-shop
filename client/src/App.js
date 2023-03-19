@@ -10,6 +10,7 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
+import Alarm from "./components/common/Alarm";
 
 import { isAuthenticated } from "./utility/auth";
 
@@ -24,7 +25,7 @@ function App() {
   return (
     <BrowserRouter >
       <Header/>
-      
+      <Alarm />
       <main className='py-3 main'>
         <Container>
           <Routes>

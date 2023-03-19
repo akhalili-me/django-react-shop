@@ -2,30 +2,21 @@ import React,{useState,useEffect} from 'react'
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-import ProductPage from '../components/ProductPage'
-import Comment from '../components/Comment'
+import ProductPage from '../components/product/ProductPage'
+import Reviews from '../components/product/Reviews'
 
 const Product = () => {
     const [product,setProduct] = useState([])
-    const [comments,setComments] = useState([])
-
     const { id } = useParams();
 
     useEffect(() => {
-        async function getProductInfo() {
-            const [productResponse, commentsResponse] = await Promise.all([
-                axios.get(`/products/${id}/`),
-                axios.get(`/products/${id}/comments/`)
-            ]);
-
-            const { data: product } = productResponse;
-            const { data: comments } = commentsResponse;
-
+        async function getProducts() {
+            const response = await axios.get(`/products/${id}/`)
+            const { data: product } = response;
             setProduct(product)            
-            setComments(comments)
         }
         
-        getProductInfo()
+        getProducts()
     },[id])
 
  return (
@@ -33,7 +24,7 @@ const Product = () => {
         <ProductPage product={product}/>
         <h2 className='py-4'> Reviews</h2>
         <div className='comment_section'>
-            <Comment comments={comments}/>
+            <Reviews productId={id}/>
         </div>
     </>
   )

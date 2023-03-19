@@ -1,7 +1,7 @@
 import React from 'react'
 import {Button,Col,Row,ListGroup } from 'react-bootstrap';
 import { useSelector,useDispatch} from 'react-redux'
-import CartItems from '../components/CartItems';
+import CartItems from '../components/cart/CartItems';
 import { clearCart } from '../features/cart/cartSlice';
 
 const Cart = () => {

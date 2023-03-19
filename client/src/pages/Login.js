@@ -100,11 +100,7 @@ const Login = () => {
             <Link to={``}>Forgot Password?</Link>
           </Col>
         </Row>
-        <Button
-          variant="primary"
-          type="submit"
-          className="mx-auto d-grid gap-2 col-6"
-        >
+        <Button variant="primary" type="submit" className="mx-auto d-grid gap-2 col-6">
           Login
         </Button>
       </Form>

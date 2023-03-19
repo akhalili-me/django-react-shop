@@ -1,7 +1,7 @@
 import React from 'react'
 import {Table,Form} from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
-import { removeItem,updateItem } from '../features/cart/cartSlice';
+import { removeItem,updateItem } from '../../features/cart/cartSlice';
 
 const CartItems = ({items}) => {
     const dispatch = useDispatch()
