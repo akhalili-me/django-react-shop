@@ -21,7 +21,7 @@ const CartItems = ({items}) => {
     const products = items.map((i,index) => {
         return(
         <tr class="align-middle" >
-            <td>{i.product.image ? <img className='rounded' alt={i.product.image.name} src={i.product.image.image}/> : 'Image not Available'}</td>
+            <td>{i.product.image ? <img className='rounded' alt={i.product.image.name} src={i.product.image.image}/> : 'Image not available'}</td>
             <td>{i.product.name}</td>
             <td>${i.product.price}</td>
             <td> <Form.Control onChange={(event) => handleUpdateQuantity(i.product.id,event.target.value)} type="number" min="1" max={i.product.quantity} defaultValue={i.quantity} className="text-center" /></td>

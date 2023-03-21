@@ -1,9 +1,12 @@
 from rest_framework.viewsets import ModelViewSet
 from .serializers import UserSerializer
 from django.contrib.auth import get_user_model
-from rest_framework import status
+from rest_framework import status,generics
 from rest_framework.response import Response
 from .permissions import IsOwnerOrReadOnly
+from rest_framework.permissions import IsAuthenticated
+from products.serializers import CommentSerializer
+from products.models import Comment
 
 User = get_user_model()
 class UserViewSet(ModelViewSet):
@@ -46,3 +49,24 @@ class UserViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
+    
+class UserCommentsListView(generics.ListAPIView):
+    """
+    Return the comments associated with the authenticated user.
+    """
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Comment.objects.filter(author=self.request.user)
+    
+
+class RUDCommentsView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    View for retrieve, update and destroy comments. 
+    """
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Comment.objects.filter(id=self.kwargs.get('pk'),author=self.request.user)

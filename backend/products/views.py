@@ -69,20 +69,13 @@ class ProductCommentsCreateListView(generics.ListCreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(status=status.HTTP_201_CREATED,headers=headers)
     
-
-class RUDCommentView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    docstring
-    """
-    pass
-
 class FilterPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
     page_size = 9
 
 
-class ProductsFilter(generics.ListAPIView):
+class ProductsFilterListView(generics.ListAPIView):
     """
     Get products by category and apply filters on it.
     """
@@ -119,7 +112,6 @@ class ProductsFilter(generics.ListAPIView):
             'price_ascending': queryset.order_by('price'),
             'price_descending': queryset.order_by('-price'),
         }
-        print(filter_queries)
         queryset = sort_queries.get(sort)
 
         return queryset

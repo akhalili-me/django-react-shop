@@ -2,19 +2,23 @@ import { useEffect,useState,useCallback } from 'react';
 import Rating from '../common/Rating'
 import {isAuthenticated} from '../../utility/auth'
 import CommentForm from './CommentForm';
-import { fetchComments } from '../../utility/comment';
+import { fetchProductComments } from '../../utility/comment';
 import { Link } from 'react-router-dom';
+
+
 const Reviews = ({productId}) => {
     const [comments, setComments] = useState([]);
 
     const getComments = useCallback(async () => {
-        const response = await fetchComments(productId);
+        const response = await fetchProductComments(productId);
         setComments(response.data);
     }, [productId]);
       
+    
     useEffect(() => {
         getComments();
     }, [getComments]);
+
 
     return (
         <>

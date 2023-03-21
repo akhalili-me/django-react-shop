@@ -10,5 +10,5 @@ router.register(r'(?P<product_id>\d+)/images', ProductImageViewSet, basename='pr
 urlpatterns = [
     path('', include(router.urls)),
     path('<int:product_id>/comments',ProductCommentsCreateListView.as_view()),
-    path('search/<int:pk>', ProductsFilter.as_view()),
+    path('search/<int:pk>', ProductsFilterListView.as_view()),
 ]

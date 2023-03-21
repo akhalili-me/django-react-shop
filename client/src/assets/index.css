@@ -192,3 +192,10 @@ a{
     bottom:13px;
     z-index: 999;
 }
+
+.comment_buttons {
+    position: absolute;
+    right: 5px;
+    top: .7rem;
+}
+

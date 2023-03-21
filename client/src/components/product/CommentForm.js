@@ -36,14 +36,19 @@ const CommentForm = ({productId,getComments}) => {
         try {
             await addComment({text: comment,rate: rate},productId)
             getComments()
-            clearFields()
             dispatch(setAlarm({
                 message: 'Comment Added Successfully',
                 type: 'success',
                 show: true
             }))
         } catch (error) {
-            
+            dispatch(setAlarm({
+                message: error.message,
+                type: 'danger',
+                show: true
+            }))
+        } finally {
+            clearFields()
         }
     }
 
