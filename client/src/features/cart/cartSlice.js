@@ -1,6 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { fetchCartItems } from '../../utility/cart'
 import { addItemReducer, removeItemReducer, UpdateItemQuantityReducer,clearAllItmesReducer } from './cartReducers'
+import authAxios from '../../utility/api'
+import { createAsyncThunk } from '@reduxjs/toolkit';
+
+export const fetchCartItems = createAsyncThunk(
+  'cart/fetchCartItems',
+  async () => {
+    const response = await authAxios.get('/cart');
+    return response.data;
+  }
+);
 
 export const cartSlice = createSlice({
   name: 'cart',

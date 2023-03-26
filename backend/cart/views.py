@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from .serializers import *
 from .models import ShoppingSession
-from .permissions import isCartOwner
+from django.http import Http404
 
 class CreateCartItems(generics.CreateAPIView):
     """
@@ -34,8 +34,8 @@ class RDCartItems(generics.RetrieveDestroyAPIView):
     View for retrieve and delete cart item.
     """
     serializer_class = RDCartItemSerializer
-    permission_classes = [IsAuthenticated,isCartOwner]
-    
+    permission_classes = [IsAuthenticated]
+
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_cart_item_by_product_id(kwargs.get('pk'))
         serilizer = self.serializer_class(instance=instance)
@@ -49,7 +49,11 @@ class RDCartItems(generics.RetrieveDestroyAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     def get_cart_item_by_product_id(self, id):
-        cart_item = CartItem.objects.get(product__id=id,session__user=self.request.user)
+        try:
+            cart_item = CartItem.objects.get(product__id=id,session__user=self.request.user)
+        except CartItem.DoesNotExist:
+            raise Http404()
+        
         return cart_item
 
     

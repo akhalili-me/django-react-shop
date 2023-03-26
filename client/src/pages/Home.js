@@ -8,16 +8,12 @@ import ProductCard from '../components/product/ProductCard';
 import authAxios from '../utility/api';
 
 import { isAuthenticated } from '../utility/auth';
-
-import { useDispatch } from 'react-redux';
-import { fetchCartItems } from '../utility/cart';
 import { updateTokenIfExpired } from '../utility/auth';
 
 const Home = () => {
     const [products,setProducts] = useState([])
     const [categories,setCategories] = useState([])
     const [loading, setLoading] = useState(true)
-    const dispatch = useDispatch();
 
     const fetchProducts = useCallback(async () =>{
         try {
@@ -44,11 +40,10 @@ const Home = () => {
     useEffect(()=> {
         if (isAuthenticated()) {
           updateTokenIfExpired()
-          dispatch(fetchCartItems())
         }
         fetchProducts()
         fetchCategories()
-    },[fetchProducts,fetchCategories,dispatch])
+    },[fetchProducts,fetchCategories])
 
     const productCards = useMemo(() => {
         return products.map((product) => (

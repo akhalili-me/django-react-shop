@@ -7,17 +7,24 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Badge from 'react-bootstrap/Badge';
 import { LinkContainer } from 'react-router-bootstrap'
-import { useSelector } from 'react-redux';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { clearCart } from '../features/cart/cartSlice';
 import { isAuthenticated,logout } from '../utility/auth';
 
 const Header = () => {
   const [cartBadge, setCartBadge] = useState(0);
   const cartItemCount = useSelector((state) => state.cart.items.length)
+  const dispatch = useDispatch()
+
 
   useEffect(() => {
     setCartBadge(cartItemCount)
   },[cartItemCount])
+
+  const handleLogout = async () => {
+    logout();
+    dispatch(clearCart());
+  }
 
   return (
     <Navbar bg="light" expand="lg">
@@ -54,7 +61,7 @@ const Header = () => {
                     </LinkContainer>
                
                   </NavDropdown>
-                  <Nav.Link onClick={logout}>Logout</Nav.Link>
+                  <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
                 </>
               ):(
                 <LinkContainer to={'login'}>

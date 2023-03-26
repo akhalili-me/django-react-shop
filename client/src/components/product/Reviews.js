@@ -4,7 +4,7 @@ import {isAuthenticated} from '../../utility/auth'
 import CommentForm from './CommentForm';
 import { fetchProductComments } from '../../utility/comment';
 import { Link } from 'react-router-dom';
-
+import LikeComment from '../common/LikeComment';
 
 const Reviews = ({productId}) => {
     const [comments, setComments] = useState([]);
@@ -20,6 +20,7 @@ const Reviews = ({productId}) => {
     }, [getComments]);
 
 
+
     return (
         <>
             {isAuthenticated() ? <CommentForm productId={productId} getComments={getComments} /> :(
@@ -29,11 +30,11 @@ const Reviews = ({productId}) => {
                 </h2>
             )}
             <div>
-                {comments.map((c) =>
+                {comments.map((comment) =>
                     <div className='comment line'>
-                        <h3>{c.author}</h3>
-                        <Rating value={c.rate}/>
-                        <p>{c.text}</p>
+                        <h3>{comment.author}</h3>
+                        <Rating value={comment.rate} text={<LikeComment comment={comment} getComments={getComments}/>}/>
+                        <p>{comment.text}</p>
                     </div>
                 )}
             </div>

@@ -9,7 +9,7 @@ import { addItem } from '../../features/cart/cartSlice';
 import Rating from '../common/Rating'
 
 const ProductPage = ({product}) => {
-    const {name, quantity, price, rate, description, images } = product;
+    const {name, quantity, price, rate, description, images, num_comments } = product;
     const [status, product_price] = quantity === 0 ? ['Out of Stock', 'Out of Stock'] : ['In Stock', price];
     const dispatch = useDispatch()
 
@@ -31,7 +31,7 @@ const ProductPage = ({product}) => {
             <h2 className='bold line'>{name}</h2>
             <Row>
                 <Col md={8} className='info_box_container'>
-                    <div className='line'><Rating value={rate}/></div>
+                    <div className='line'><Rating value={rate} text={<> of {num_comments} reviews</>}/></div>
                     <div className='line'><strong>Price: {product_price}</strong> </div>
                     <p><strong>Description:</strong> {description}</p>
                 </Col>

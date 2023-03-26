@@ -27,19 +27,50 @@ class ProductSerializer(serializers.ModelSerializer):
         return obj.comments.count()
     
 
-class CommentSerializer(serializers.ModelSerializer):
+class ProductCommentListSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
+    liked_by_current_user = serializers.SerializerMethodField()
     
     class Meta:
         model = Comment
-        fields = ['id','text','rate','like','author']
-        extra_kwargs = {
-            'like': {'required': False}
-        }
+        fields = ['id','text','rate','likes','author','liked_by_current_user']
+
+    
+    @staticmethod
+    def get_author(obj):
+        return obj.author.username
+    
+    @staticmethod
+    def get_likes(obj):
+        return obj.likes.count()
+    
+    def get_liked_by_current_user(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated and obj.likes.filter(user_id=user.id).exists():
+            return True
+        return False
+    
+class ProductCommentCreateSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Comment
+        fields = ['id','text','rate','likes','author']
 
     @staticmethod
     def get_author(obj):
         return obj.author.username
     
+    @staticmethod
+    def get_likes(obj):
+        return obj.likes.count()
+    
+ 
+    
+
+
+ 
         
 

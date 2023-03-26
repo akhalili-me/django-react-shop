@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Rating = ({value}) => {
+const Rating = ({value,text}) => {
     const stars = []
     for (let i = 1; i <= 5; i++) {
         let star = <span>
@@ -13,7 +13,11 @@ const Rating = ({value}) => {
         stars.push(star)
     } 
 
-    return <div className='star_color'>{stars}</div>
+    return (
+        <div className='star_color'>{stars} 
+            <span className='regular_color'>{text}</span>
+        </div>
+    )
 }
 
 export default Rating

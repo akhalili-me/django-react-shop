@@ -3,12 +3,15 @@ import { Form, Button, Col, Row } from 'react-bootstrap';
 import { Link,useSearchParams } from 'react-router-dom';
 import { login } from '../utility/auth';
 import Alert from 'react-bootstrap/Alert';
+import {useDispatch} from 'react-redux'
+import { fetchCartItems } from '../features/cart/cartSlice';
 
 const Login = () => {
   const [queryParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [failedLogin, setFailedLogin] = useState(false);
+  const dispatch = useDispatch()
 
   const registerSuccess = queryParams.get('register') || false
 
@@ -30,19 +33,26 @@ const Login = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
+  
     login(email, password)
       .then((response) => {
         if (response.status !== 200) {
           setFailedLogin(true);
         } else {
-          redirectAfterLogin()
+          dispatch(fetchCartItems())
+            .then(() => {
+              redirectAfterLogin();
+            })
+            .catch((error) => {
+              console.error(error);
+            });
         }
       })
       .catch((error) => {
         setFailedLogin(true);
       });
   };
+  
   
   const redirectAfterLogin = () => {
     const back = queryParams.get('back')

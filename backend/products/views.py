@@ -8,7 +8,6 @@ from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework import status
 
-
 class ProductViewSet(ModelViewSet):
     """
     ViewSet for viewing and editing the products.
@@ -47,14 +46,13 @@ class CategoryViewSet(ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class ProductCommentsCreateListView(generics.ListCreateAPIView):
+class ProductCommentsListView(generics.ListAPIView):
     """
-    ViewSet for viewing and creating product comments.
+    ViewSet for listing product comments.
     """
-    serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = ProductCommentListSerializer
+    permission_classes = []
     
-
     def get_queryset(self):
         """
         Return the comments associated with a particular product id.
@@ -62,13 +60,27 @@ class ProductCommentsCreateListView(generics.ListCreateAPIView):
         product_id = self.kwargs['product_id']
         return Comment.objects.filter(product_id=product_id).order_by('-created_at')
     
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
+class ProductCommentsCreateView(generics.CreateAPIView):
+    """
+    ViewSet for creating product comments.
+    """
+
+    serializer_class = ProductCommentCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
     def create(self,request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(product_id=kwargs['product_id'], author=self.request.user)
         headers = self.get_success_headers(serializer.data)
         return Response(status=status.HTTP_201_CREATED,headers=headers)
-    
+
+
 class FilterPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100

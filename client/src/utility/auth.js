@@ -1,9 +1,10 @@
 import axios from "axios"
 import {setToken,getJwtTokens,removeTokens,isTokenExpired,TOKEN_KEY} from './token'
 
+
 export const register = async (email,username,password) => {
     try {
-        const response = await axios.post('http://127.0.0.1:8000/api/accounts/',{
+        const response = await axios.post('http://127.0.0.1:8000/api/accounts/users',{
             email,
             username,
             password,

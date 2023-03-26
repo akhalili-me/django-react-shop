@@ -199,3 +199,12 @@ a{
     top: .7rem;
 }
 
+.regular_color{
+    font-size: 1rem;
+    color: black;
+    margin-left: .4rem;
+}
+
+/* i {
+    cursor: pointer;
+} */

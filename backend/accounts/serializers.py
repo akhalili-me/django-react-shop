@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from django.core.validators import MinLengthValidator,RegexValidator
+from products.models import CommentLike,Comment
 
 User = get_user_model()
 
@@ -18,3 +19,31 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email','password']
 
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
+
+    
+    class Meta:
+        model = Comment
+        fields = ['id','text','rate','likes','author']
+    
+    @staticmethod
+    def get_author(obj):
+        return obj.author.username
+    
+    @staticmethod
+    def get_likes(obj):
+        return obj.likes.count()
+    
+
+class CommentLikeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CommentLike
+        fields = ['id','comment','user']
+        extra_kwargs = {
+            'user': {'read_only': True},
+            'comment': {'read_only': True}
+        }
+    

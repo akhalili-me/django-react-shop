@@ -84,7 +84,7 @@ const Comments = () => {
             <Row>
               <Col md={10}>
                 <p>{comment.text}</p>
-                <Rating value={comment.rate} />
+                <Rating value={comment.rate} text={<>{comment.likes} <i class="fa-solid fa-thumbs-up"></i></>} />
               </Col>
               <Col md={2}>
                 <ButtonGroup className='comment_buttons'>

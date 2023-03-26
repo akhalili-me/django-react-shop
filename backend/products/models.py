@@ -47,7 +47,6 @@ class ProductImage(models.Model):
     def __str__(self):
         return f"{self.image.url}"
 
-
 class Category(models.Model):
     name = models.CharField(max_length=255)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
@@ -63,13 +62,22 @@ class Comment(models.Model):
     author = models.ForeignKey('accounts.User',on_delete=models.CASCADE)
     text = models.TextField(max_length=500)
     rate = models.IntegerField(validators=[MaxValueValidator(5)])
-    like = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.text}'
     
+class CommentLike(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey('accounts.User',on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'comment'], name='unique_comment_like')
+        ]
+
 
 class Feature(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')
@@ -80,3 +88,5 @@ class Feature(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+    
+
