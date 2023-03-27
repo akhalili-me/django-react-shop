@@ -36,3 +36,4 @@ local_settings.py
 /media/
 
 product_images/
+.vscode/ 
