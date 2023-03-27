@@ -4,14 +4,15 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('products', '0008_remove_comment_like_commentlike'),
+        ("products", "0008_remove_comment_like_commentlike"),
     ]
 
     operations = [
         migrations.AddConstraint(
-            model_name='commentlike',
-            constraint=models.UniqueConstraint(fields=('user', 'comment'), name='unique_comment_like'),
+            model_name="commentlike",
+            constraint=models.UniqueConstraint(
+                fields=("user", "comment"), name="unique_comment_like"
+            ),
         ),
     ]

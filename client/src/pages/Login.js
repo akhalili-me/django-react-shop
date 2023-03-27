@@ -1,29 +1,29 @@
-import React, {useState } from 'react';
-import { Form, Button, Col, Row } from 'react-bootstrap';
-import { Link,useSearchParams } from 'react-router-dom';
-import { login } from '../utility/auth';
-import Alert from 'react-bootstrap/Alert';
-import {useDispatch} from 'react-redux'
-import { fetchCartItems } from '../features/cart/cartSlice';
+import React, { useState } from "react";
+import { Form, Button, Col, Row } from "react-bootstrap";
+import { Link, useSearchParams } from "react-router-dom";
+import { login } from "../utility/auth";
+import Alert from "react-bootstrap/Alert";
+import { useDispatch } from "react-redux";
+import { fetchCartItems } from "../features/cart/cartSlice";
 
 const Login = () => {
   const [queryParams] = useSearchParams();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [failedLogin, setFailedLogin] = useState(false);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const registerSuccess = queryParams.get('register') || false
+  const registerSuccess = queryParams.get("register") || false;
 
   const handleFieldChange = (event) => {
-    const value = event.target.value
-    const name = event.target.name
+    const value = event.target.value;
+    const name = event.target.name;
 
     switch (name) {
-      case 'email':
-        setEmail(value)
+      case "email":
+        setEmail(value);
         break;
-      case 'password':
+      case "password":
         setPassword(value);
         break;
       default:
@@ -33,7 +33,7 @@ const Login = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-  
+
     login(email, password)
       .then((response) => {
         if (response.status !== 200) {
@@ -52,33 +52,30 @@ const Login = () => {
         setFailedLogin(true);
       });
   };
-  
-  
+
   const redirectAfterLogin = () => {
-    const back = queryParams.get('back')
+    const back = queryParams.get("back");
     if (back) {
-      window.location.replace(back)
-    } else{
-      window.location.replace('/')
+      window.location.replace(back);
+    } else {
+      window.location.replace("/");
     }
-  }
+  };
 
   const errorAlert = (
-    <Alert variant={'danger'}>
-      Sorry, login failed. Try again.
-    </Alert>
+    <Alert variant={"danger"}>Sorry, login failed. Try again.</Alert>
   );
 
   const registerSuccessAlert = (
-    <Alert variant={'success'}>
+    <Alert variant={"success"}>
       You were successfuly registered. Now login.
     </Alert>
-  )
+  );
 
   return (
     <div className="login_container center_screen">
-      {registerSuccess ? registerSuccessAlert : ''}
-      {failedLogin ? errorAlert : ''}
+      {registerSuccess ? registerSuccessAlert : ""}
+      {failedLogin ? errorAlert : ""}
       <h2 className="text-center">Login Page</h2>
       <Form onSubmit={handleSubmit} className="login_form">
         <Form.Group className="mb-3">
@@ -87,7 +84,7 @@ const Login = () => {
             type="email"
             placeholder="Enter email"
             value={email}
-            name='email'
+            name="email"
             onChange={handleFieldChange}
           />
         </Form.Group>
@@ -98,7 +95,7 @@ const Login = () => {
             type="password"
             placeholder="Password"
             value={password}
-            name='password'
+            name="password"
             onChange={handleFieldChange}
           />
         </Form.Group>
@@ -110,12 +107,16 @@ const Login = () => {
             <Link to={``}>Forgot Password?</Link>
           </Col>
         </Row>
-        <Button variant="primary" type="submit" className="mx-auto d-grid gap-2 col-6">
+        <Button
+          variant="primary"
+          type="submit"
+          className="mx-auto d-grid gap-2 col-6"
+        >
           Login
         </Button>
       </Form>
       <div className="text-center mt-4">
-        Not a member? <Link to={'/register'}>Register</Link>{' '}
+        Not a member? <Link to={"/register"}>Register</Link>{" "}
       </div>
     </div>
   );

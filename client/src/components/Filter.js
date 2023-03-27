@@ -1,49 +1,64 @@
-import React, { useState, useCallback } from 'react'
-import {ListGroup,InputGroup} from 'react-bootstrap';
-import Form from 'react-bootstrap/Form';
-import { useSearchParams } from 'react-router-dom'
+import React, { useState, useCallback } from "react";
+import { ListGroup, InputGroup } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
+import { useSearchParams } from "react-router-dom";
 
 const Filter = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  
-  const [sort, setSort] = useState(searchParams.get('sort') || 'Default');
-  const [minPrice, setMinPrice] = useState(searchParams.get('min') || 0);
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('max') || '');
-  const [onlyAvailableProducts, setOnlyAvailableProducts] = useState(searchParams.get('has_selling_stock') || false);
 
-  const handleSearchParamsChange = useCallback((event) => {
-    const target = event.target;
-    const name = target.name;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
+  const [sort, setSort] = useState(searchParams.get("sort") || "Default");
+  const [minPrice, setMinPrice] = useState(searchParams.get("min") || 0);
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("max") || "");
+  const [onlyAvailableProducts, setOnlyAvailableProducts] = useState(
+    searchParams.get("has_selling_stock") || false
+  );
 
-    setSearchParams(prevSearchParams => {
-      const allSearchParams = new URLSearchParams(prevSearchParams)
+  const handleSearchParamsChange = useCallback(
+    (event) => {
+      const target = event.target;
+      const name = target.name;
+      const value = target.type === "checkbox" ? target.checked : target.value;
 
-      if (!allSearchParams.has(name)) {
-        allSearchParams.append(name, value);
-      }else{
-        allSearchParams.set(name, value);
-      }
-      
-      return allSearchParams
-    })
+      setSearchParams((prevSearchParams) => {
+        const allSearchParams = new URLSearchParams(prevSearchParams);
 
-    if (name === 'sort') {
-      setSort(value);
-    } else if (name === 'min') {
-      setMinPrice(value);
-    } else if (name === 'max') {
-      setMaxPrice(value);
-    } else if(name === 'has_selling_stock')
-      setOnlyAvailableProducts(value);
+        if (!allSearchParams.has(name)) {
+          allSearchParams.append(name, value);
+        } else {
+          allSearchParams.set(name, value);
+        }
 
-  }, [setSearchParams, setSort, setMinPrice, setMaxPrice,setOnlyAvailableProducts]);
+        return allSearchParams;
+      });
+
+      if (name === "sort") {
+        setSort(value);
+      } else if (name === "min") {
+        setMinPrice(value);
+      } else if (name === "max") {
+        setMaxPrice(value);
+      } else if (name === "has_selling_stock") setOnlyAvailableProducts(value);
+    },
+    [
+      setSearchParams,
+      setSort,
+      setMinPrice,
+      setMaxPrice,
+      setOnlyAvailableProducts,
+    ]
+  );
 
   return (
     <ListGroup>
       <ListGroup.Item>
         <Form.Label>Sort by:</Form.Label>
-        <Form.Select aria-label="Default" className='mb-1' onChange={handleSearchParamsChange} value={sort} name='sort'>
+        <Form.Select
+          aria-label="Default"
+          className="mb-1"
+          onChange={handleSearchParamsChange}
+          value={sort}
+          name="sort"
+        >
           <option>Default</option>
           <option value="popular">Most Liked</option>
           <option value="price_ascending">Price Ascending</option>
@@ -79,7 +94,6 @@ const Filter = () => {
             aria-describedby="max-price-label"
           />
         </InputGroup>
-
       </ListGroup.Item>
 
       <ListGroup.Item>
@@ -89,11 +103,11 @@ const Filter = () => {
           label="Only available products"
           checked={onlyAvailableProducts}
           onChange={handleSearchParamsChange}
-          name='has_selling_stock'
+          name="has_selling_stock"
         />
       </ListGroup.Item>
     </ListGroup>
-  )
-}
+  );
+};
 
 export default Filter;

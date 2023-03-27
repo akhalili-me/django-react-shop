@@ -1,67 +1,77 @@
-import axios from "axios"
-import {setToken,getJwtTokens,removeTokens,isTokenExpired,TOKEN_KEY} from './token'
+import axios from "axios";
+import {
+  setToken,
+  getJwtTokens,
+  removeTokens,
+  isTokenExpired,
+  TOKEN_KEY,
+} from "./token";
 
+export const register = async (email, username, password) => {
+  try {
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/accounts/users",
+      {
+        email,
+        username,
+        password,
+      }
+    );
 
-export const register = async (email,username,password) => {
-    try {
-        const response = await axios.post('http://127.0.0.1:8000/api/accounts/users',{
-            email,
-            username,
-            password,
-        })
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 
-        return response;
-    } catch (error) {
-        return error.response
-    }
-}
+export const login = async (email, password) => {
+  try {
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/accounts/token",
+      {
+        email,
+        password,
+      }
+    );
 
-export const login = async (email,password) => {
-    try {
-        const response = await axios.post('http://127.0.0.1:8000/api/accounts/token',{
-            email,
-            password,
-        })
+    setToken(response.data);
 
-        setToken(response.data)
-
-        return response;
-    } catch (error) {
-        return error.response
-    }
-}
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 
 export const logout = () => {
-    removeTokens()
-    window.location.replace('/');
-}
+  removeTokens();
+  window.location.replace("/");
+};
 
 export const isAuthenticated = () => {
-    const { token, refreshToken } = getJwtTokens();
+  const { token, refreshToken } = getJwtTokens();
 
-    if (!refreshToken || !token || isTokenExpired(refreshToken)) {
-        return false;
-    }
+  if (!refreshToken || !token || isTokenExpired(refreshToken)) {
+    return false;
+  }
 
-    return true;
-}
+  return true;
+};
 
 export const updateTokenIfExpired = () => {
-    const { token, refreshToken } = getJwtTokens();
+  const { token, refreshToken } = getJwtTokens();
 
-    if (isTokenExpired(token) && isTokenExpired(refreshToken) === false) {
-        updateTokenKey(refreshToken)
-    }
-}
+  if (isTokenExpired(token) && isTokenExpired(refreshToken) === false) {
+    updateTokenKey(refreshToken);
+  }
+};
 
 const updateTokenKey = async (refToken) => {
-    try {
-        const {data} = await axios.post('/accounts/token/refresh',{
-            refresh: refToken
-        })
-        localStorage.setItem(TOKEN_KEY, data.access)
-    } catch (error) {
-        return error.response
-    }
-}
-
+  try {
+    const { data } = await axios.post("/accounts/token/refresh", {
+      refresh: refToken,
+    });
+    localStorage.setItem(TOKEN_KEY, data.access);
+  } catch (error) {
+    return error.response;
+  }
+};

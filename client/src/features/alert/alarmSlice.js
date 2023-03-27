@@ -1,15 +1,15 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { setAlertReducer,hideAlertReducer } from './alarmReducers'
+import { createSlice } from "@reduxjs/toolkit";
+import { setAlertReducer, hideAlertReducer } from "./alarmReducers";
 
 export const alarmSlice = createSlice({
-  name: 'alarm',
-  initialState: { message: '', type:'', show: false } ,
+  name: "alarm",
+  initialState: { message: "", type: "", show: false },
   reducers: {
     setAlarm: setAlertReducer,
-    hideAlarm: hideAlertReducer
+    hideAlarm: hideAlertReducer,
   },
-})
+});
 
-export const { setAlarm,hideAlarm } = alarmSlice.actions
+export const { setAlarm, hideAlarm } = alarmSlice.actions;
 
-export default alarmSlice.reducer
+export default alarmSlice.reducer;

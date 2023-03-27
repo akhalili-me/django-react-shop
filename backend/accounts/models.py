@@ -3,8 +3,9 @@ from django.db import models
 from accounts.managers import UserManager
 from django.utils import timezone
 
+
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True,db_index=True)
+    email = models.EmailField(unique=True, db_index=True)
     username = models.CharField(max_length=30)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -13,10 +14,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
 
     def __str__(self):
         return self.email
-    
-    

@@ -5,20 +5,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('products', '0002_comment_delete_reviews'),
+        ("products", "0002_comment_delete_reviews"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='comment',
-            old_name='likes',
-            new_name='like',
+            model_name="comment",
+            old_name="likes",
+            new_name="like",
         ),
         migrations.AlterField(
-            model_name='product',
-            name='rate',
-            field=models.DecimalField(decimal_places=1, default=0, max_digits=2, validators=[django.core.validators.MaxValueValidator(5)]),
+            model_name="product",
+            name="rate",
+            field=models.DecimalField(
+                decimal_places=1,
+                default=0,
+                max_digits=2,
+                validators=[django.core.validators.MaxValueValidator(5)],
+            ),
         ),
     ]

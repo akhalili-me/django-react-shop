@@ -1,19 +1,24 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { addItemReducer, removeItemReducer, UpdateItemQuantityReducer,clearAllItmesReducer } from './cartReducers'
-import authAxios from '../../utility/api'
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  addItemReducer,
+  removeItemReducer,
+  UpdateItemQuantityReducer,
+  clearAllItmesReducer,
+} from "./cartReducers";
+import authAxios from "../../utility/api";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchCartItems = createAsyncThunk(
-  'cart/fetchCartItems',
+  "cart/fetchCartItems",
   async () => {
-    const response = await authAxios.get('/cart');
+    const response = await authAxios.get("/cart");
     return response.data;
   }
 );
 
 export const cartSlice = createSlice({
-  name: 'cart',
-  initialState: { total:0, items:[] } ,
+  name: "cart",
+  initialState: { total: 0, items: [] },
   reducers: {
     addItem: addItemReducer,
     removeItem: removeItemReducer,
@@ -21,14 +26,14 @@ export const cartSlice = createSlice({
     clearCart: clearAllItmesReducer,
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchCartItems.fulfilled,(state,action) => {
+    builder.addCase(fetchCartItems.fulfilled, (state, action) => {
       state.total = action.payload[0].total;
       state.items = action.payload[0].cart_items;
-    })
-  }
-})
+    });
+  },
+});
 
 // Action creators are generated for each case reducer function
-export const { addItem, removeItem, updateItem , clearCart } = cartSlice.actions
+export const { addItem, removeItem, updateItem, clearCart } = cartSlice.actions;
 
-export default cartSlice.reducer
+export default cartSlice.reducer;

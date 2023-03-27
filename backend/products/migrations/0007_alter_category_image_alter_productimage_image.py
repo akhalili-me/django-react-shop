@@ -5,20 +5,23 @@ import products.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('products', '0006_category_image'),
+        ("products", "0006_category_image"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='category',
-            name='image',
-            field=models.ImageField(upload_to=products.models.PathAndRename('images/categories')),
+            model_name="category",
+            name="image",
+            field=models.ImageField(
+                upload_to=products.models.PathAndRename("images/categories")
+            ),
         ),
         migrations.AlterField(
-            model_name='productimage',
-            name='image',
-            field=models.ImageField(upload_to=products.models.PathAndRename('images/products')),
+            model_name="productimage",
+            name="image",
+            field=models.ImageField(
+                upload_to=products.models.PathAndRename("images/products")
+            ),
         ),
     ]

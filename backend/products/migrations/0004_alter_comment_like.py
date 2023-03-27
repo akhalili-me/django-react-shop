@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('products', '0003_rename_likes_comment_like_alter_product_rate'),
+        ("products", "0003_rename_likes_comment_like_alter_product_rate"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='comment',
-            name='like',
+            model_name="comment",
+            name="like",
             field=models.IntegerField(default=0),
         ),
     ]

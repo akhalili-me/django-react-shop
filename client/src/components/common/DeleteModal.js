@@ -1,32 +1,31 @@
-import React from 'react'
-import {Modal,Button} from 'react-bootstrap';
+import React from "react";
+import { Modal, Button } from "react-bootstrap";
 
-const DeleteModal = ({show,message,onClose,onSubmit}) => {
+const DeleteModal = ({ show, message, onClose, onSubmit }) => {
+  const handleClose = () => {
+    onClose();
+  };
 
-    const handleClose = () => {
-        onClose()
-    };
-
-    const handleSubmit = async () => {
-        await onSubmit()
-    }
+  const handleSubmit = async () => {
+    await onSubmit();
+  };
 
   return (
     <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
+      <Modal.Header closeButton>
         <Modal.Title>Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{message}</Modal.Body>
-        <Modal.Footer>
+      </Modal.Header>
+      <Modal.Body>{message}</Modal.Body>
+      <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
-            Close
+          Close
         </Button>
         <Button variant="danger" onClick={handleSubmit}>
-            Delete
+          Delete
         </Button>
-        </Modal.Footer>
+      </Modal.Footer>
     </Modal>
-  )
-}
+  );
+};
 
-export default DeleteModal
+export default DeleteModal;

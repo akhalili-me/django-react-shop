@@ -1,19 +1,19 @@
-import React from 'react'
-import Pagination from 'react-bootstrap/Pagination';
+import React from "react";
+import Pagination from "react-bootstrap/Pagination";
 
 const _Pagination = ({}) => {
-//     // let active = 2;
-//     let items = [];
-//     for (let number = 1; number <= 5; number++) {
-//     items.push(
-//         <Pagination.Item key={number} active={number === active}>
-//         {number}
-//         </Pagination.Item>,
-//   );
-// }
+  //     // let active = 2;
+  //     let items = [];
+  //     for (let number = 1; number <= 5; number++) {
+  //     items.push(
+  //         <Pagination.Item key={number} active={number === active}>
+  //         {number}
+  //         </Pagination.Item>,
+  //   );
+  // }
   return (
     <Pagination>
-              <Pagination.First />
+      <Pagination.First />
       <Pagination.Prev />
       <Pagination.Item>{1}</Pagination.Item>
       <Pagination.Ellipsis />
@@ -29,7 +29,7 @@ const _Pagination = ({}) => {
       <Pagination.Next />
       <Pagination.Last />
     </Pagination>
-  )
-}
+  );
+};
 
-export default _Pagination
+export default _Pagination;

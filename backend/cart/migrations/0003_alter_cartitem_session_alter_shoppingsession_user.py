@@ -6,21 +6,27 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('cart', '0002_alter_orderitem_product'),
+        ("cart", "0002_alter_orderitem_product"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cartitem',
-            name='session',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='cart_items', to='cart.shoppingsession'),
+            model_name="cartitem",
+            name="session",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="cart_items",
+                to="cart.shoppingsession",
+            ),
         ),
         migrations.AlterField(
-            model_name='shoppingsession',
-            name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="shoppingsession",
+            name="user",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

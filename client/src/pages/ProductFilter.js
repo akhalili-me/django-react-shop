@@ -2,51 +2,49 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Col, Row } from "react-bootstrap";
 import Filter from "../components/Filter";
 import axios from "axios";
-import { useParams} from "react-router-dom";
-import { useSearchParams } from 'react-router-dom'
+import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/product/ProductCard";
 
 const ProductFilter = () => {
   const [products, setProducts] = useState([]);
   const [queryParams] = useSearchParams();
   const { id } = useParams();
-  
 
   useEffect(() => {
-    let params = ''
+    let params = "";
     const baseURL = `/products/search/${id}?`;
-  
+
     const min = queryParams.get("min") || 0;
-    const max = queryParams.get("max")|| 0;
-    const sort = queryParams.get("sort") || 'default';
+    const max = queryParams.get("max") || 0;
+    const sort = queryParams.get("sort") || "default";
     const has_selling_stock = queryParams.get("has_selling_stock") || false;
-    
-    if (min > 0 ) {
-      params += `min=${min}&`
+
+    if (min > 0) {
+      params += `min=${min}&`;
     }
-  
+
     if (max > 0) {
-      params += `max=${max}&`
+      params += `max=${max}&`;
     }
-  
-    if (sort !== 'default') {
-      params += `sort=${sort}&`
+
+    if (sort !== "default") {
+      params += `sort=${sort}&`;
     }
 
     if (has_selling_stock !== false) {
-      params += `has_selling_stock=${has_selling_stock}&`
+      params += `has_selling_stock=${has_selling_stock}&`;
     }
 
     const fetchProducts = async () => {
-      const finalURL = baseURL + params
+      const finalURL = baseURL + params;
 
       const { data } = await axios.get(finalURL);
       setProducts(data.results);
     };
-  
+
     fetchProducts();
   }, [id, queryParams]);
-  
 
   const productCards = useMemo(
     () =>

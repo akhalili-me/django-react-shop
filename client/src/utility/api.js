@@ -1,15 +1,15 @@
-import axios from 'axios';
-import { getToken } from './token';
-import {isAuthenticated,updateTokenIfExpired } from './auth';
+import axios from "axios";
+import { getToken } from "./token";
+import { isAuthenticated, updateTokenIfExpired } from "./auth";
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api/';
+const API_BASE_URL = "http://127.0.0.1:8000/api/";
 
 const authAxios = axios.create({
   baseURL: API_BASE_URL,
   timeout: 5000,
   headers: {
-    'Content-Type': 'application/json',
-    accept: 'application/json',
+    "Content-Type": "application/json",
+    accept: "application/json",
   },
 });
 
@@ -22,7 +22,7 @@ authAxios.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
-export default authAxios
+export default authAxios;
