@@ -3,10 +3,12 @@ from rest_framework.viewsets import ModelViewSet
 from .models import *
 from .serializers import *
 from rest_framework import generics
-from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
+from .pagination import ProductListPagination
+from .permissions import SuperuserEditOnly
 
 
 class ProductViewSet(ModelViewSet):
@@ -15,15 +17,11 @@ class ProductViewSet(ModelViewSet):
     """
 
     serializer_class = ProductSerializer
-    queryset = Product.objects.none()  # set an empty default queryset
+    pagination_class = ProductListPagination
+    permission_classes = [SuperuserEditOnly]
 
     def get_queryset(self):
-        queryset = Product.objects.order_by("-created_at")[:9]
-        if self.action == "retrieve":
-            # retrieve single product by id
-            queryset = Product.objects.filter(id=self.kwargs["pk"])
-
-        return queryset.select_related("category")
+        return Product.objects.all().order_by("-created_at")
 
 
 class ProductImageViewSet(ModelViewSet):
@@ -40,6 +38,17 @@ class ProductImageViewSet(ModelViewSet):
         """
         product_id = self.kwargs["product_id"]
         return ProductImage.objects.filter(product_id=product_id)
+
+
+class ProductFeatureListView(generics.ListAPIView):
+    """
+    Return features associated with a particular product id.
+    """
+
+    serializer_class = FeatureListSerilizer
+
+    def get_queryset(self):
+        return Feature.objects.filter(product_id=self.kwargs["product_id"])
 
 
 class CategoryViewSet(ModelViewSet):
@@ -84,15 +93,11 @@ class ProductCommentsCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(product_id=kwargs["product_id"], author=self.request.user)
+        product = get_object_or_404(Product, id=kwargs["product_id"])
+        serializer.save(product=product, author=self.request.user)
+        product.update_rate()
         headers = self.get_success_headers(serializer.data)
         return Response(status=status.HTTP_201_CREATED, headers=headers)
-
-
-class FilterPagination(PageNumberPagination):
-    page_size_query_param = "page_size"
-    max_page_size = 100
-    page_size = 9
 
 
 class ProductsFilterListView(generics.ListAPIView):
@@ -101,7 +106,7 @@ class ProductsFilterListView(generics.ListAPIView):
     """
 
     serializer_class = ProductSerializer
-    pagination_class = FilterPagination
+    pagination_class = ProductListPagination
 
     def get_queryset(self):
         category_id = self.kwargs.get("pk")
@@ -130,8 +135,9 @@ class ProductsFilterListView(generics.ListAPIView):
         sort_queries = {
             "default": queryset,
             "popular": queryset.order_by("-rate"),
-            "price_ascending": queryset.order_by("price"),
-            "price_descending": queryset.order_by("-price"),
+            "cheapest": queryset.order_by("price"),
+            "most_expensive": queryset.order_by("-price"),
+            "newest": queryset.order_by("-created_at"),
         }
         queryset = sort_queries.get(sort)
 

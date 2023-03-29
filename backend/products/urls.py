@@ -11,6 +11,7 @@ router.register(
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("<int:product_id>/features", ProductFeatureListView.as_view()),
     path("<int:product_id>/comments", ProductCommentsListView.as_view()),
     path("<int:product_id>/comments/create", ProductCommentsCreateView.as_view()),
     path("search/<int:pk>", ProductsFilterListView.as_view()),

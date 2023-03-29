@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum, F
 
 
 class ShoppingSession(models.Model):
@@ -10,10 +11,12 @@ class ShoppingSession(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def update_total(self):
-        total = 0
-        cart_items = CartItem.objects.filter(session=self)
-        for item in cart_items:
-            total += item.product.price * item.quantity
+        total = (
+            self.cart_items.aggregate(
+                total_price=Sum(F("product__price") * F("quantity"))
+            )["total_price"]
+            or 0
+        )
         self.total = total
         self.save()
 

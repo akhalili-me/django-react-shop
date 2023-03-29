@@ -36,6 +36,12 @@ class ProductSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_num_comments(obj):
         return obj.comments.count()
+    
+
+class FeatureListSerilizer(serializers.ModelSerializer):
+    class Meta: 
+        model = Feature
+        fields = ['name','description']
 
 
 class ProductCommentListSerializer(serializers.ModelSerializer):

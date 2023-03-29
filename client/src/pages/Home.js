@@ -6,7 +6,9 @@ import Category from "../components/product/Category";
 import axios from "axios";
 import ProductCard from "../components/product/ProductCard";
 import authAxios from "../utility/api";
+import Spinner from "react-bootstrap/Spinner";
 
+import { fetchLatestProducts } from "../utility/product";
 import { isAuthenticated } from "../utility/auth";
 import { updateTokenIfExpired } from "../utility/auth";
 
@@ -14,16 +16,6 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const fetchProducts = useCallback(async () => {
-    try {
-      const { data } = await axios.get("/products/");
-      setProducts(data);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -35,12 +27,18 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    const getProducts = async () => {
+      const { data } = await fetchLatestProducts();
+      setProducts(data.results);
+      setLoading(false)
+    };
+
     if (isAuthenticated()) {
       updateTokenIfExpired();
     }
-    fetchProducts();
+    getProducts();
     fetchCategories();
-  }, [fetchProducts, fetchCategories]);
+  }, [fetchCategories]);
 
   const productCards = useMemo(() => {
     return products.map((product) => (
@@ -64,7 +62,7 @@ const Home = () => {
       <h1 className="py-4">Latest Products</h1>
 
       {loading ? (
-        <h4>Loading...</h4>
+        <Spinner />
       ) : (
         <>
           <Row xs={1} md={2} className="g-4">

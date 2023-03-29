@@ -3,7 +3,7 @@ from django.core.validators import MaxValueValidator
 import os
 from uuid import uuid4
 from django.utils.deconstruct import deconstructible
-
+from django.db.models import Avg
 
 @deconstructible
 class PathAndRename(object):
@@ -42,6 +42,10 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def update_rate(self):
+        comment_rates = self.comments.filter(rate__gt=0).aggregate(Avg("rate"))
+        self.rate = comment_rates["rate__avg"] or 0
+        self.save()
 
 class ProductImage(models.Model):
     product = models.ForeignKey(
