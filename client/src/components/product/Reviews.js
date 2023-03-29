@@ -19,7 +19,7 @@ const Reviews = ({ productId }) => {
   }, [getComments]);
 
   return (
-    <>
+    <div className="py-4">
       {isAuthenticated() ? (
         <CommentForm productId={productId} getComments={getComments} />
       ) : (
@@ -40,7 +40,7 @@ const Reviews = ({ productId }) => {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

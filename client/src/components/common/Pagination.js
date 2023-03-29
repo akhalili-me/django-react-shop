@@ -1,33 +1,72 @@
-import React from "react";
+import React, {useMemo, useCallback } from "react";
 import Pagination from "react-bootstrap/Pagination";
+import {useSearchParams } from "react-router-dom";
+import { addNewParam } from "../../utility/queryParams";
 
-const _Pagination = ({}) => {
-  //     // let active = 2;
-  //     let items = [];
-  //     for (let number = 1; number <= 5; number++) {
-  //     items.push(
-  //         <Pagination.Item key={number} active={number === active}>
-  //         {number}
-  //         </Pagination.Item>,
-  //   );
-  // }
+const PAGE_RANGE_DISPLAYED = 3;
+
+const generatePaginateItems = (currentPage, lastActivePage,handlePaginateItemClick) => {
+  const paginateItems = [];
+
+  for (
+    let page = currentPage;
+    page < currentPage + PAGE_RANGE_DISPLAYED;
+    page++
+  ) {
+    if (page > 1 && page <= lastActivePage) {
+      paginateItems.push(
+        <Pagination.Item key={page} active={page === currentPage} onClick={() => handlePaginateItemClick(page)}>
+          {page}
+        </Pagination.Item>
+      );
+    }
+  }
+
+  return paginateItems;
+};
+
+const _Pagination = ({ count, paginateBy }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const lastActivePage = useMemo(
+    () => Math.ceil(count / paginateBy),
+    [count, paginateBy]
+  );
+
+  const currentPage = parseInt(searchParams.get("page")) || 1;
+
+  const handleNext = useCallback(() => {
+    addNewParam(setSearchParams, "page", currentPage + 1);
+  }, [setSearchParams, currentPage]);
+
+  const handlePrev = useCallback(() => {
+    addNewParam(setSearchParams, "page", currentPage - 1);
+  }, [setSearchParams, currentPage]);
+
+  const handlePaginateItemClick = (page) => {
+    addNewParam(setSearchParams, "page", page);
+  }
+
+  const paginateItems = generatePaginateItems(currentPage, lastActivePage, handlePaginateItemClick);
+
   return (
-    <Pagination>
-      <Pagination.First />
-      <Pagination.Prev />
-      <Pagination.Item>{1}</Pagination.Item>
-      <Pagination.Ellipsis />
+    <Pagination className="d-flex justify-content-center py-4">
+      <Pagination.Prev disabled={currentPage === 1} onClick={handlePrev}>
+        Prev
+      </Pagination.Prev>
 
-      <Pagination.Item>{10}</Pagination.Item>
-      <Pagination.Item>{11}</Pagination.Item>
-      <Pagination.Item active>{12}</Pagination.Item>
-      <Pagination.Item>{13}</Pagination.Item>
-      <Pagination.Item disabled>{14}</Pagination.Item>
+      <Pagination.Item key={1} active={currentPage === 1} onClick={() => handlePaginateItemClick(1)}>
+        {1}
+      </Pagination.Item>
 
-      <Pagination.Ellipsis />
-      <Pagination.Item>{20}</Pagination.Item>
-      <Pagination.Next />
-      <Pagination.Last />
+      {paginateItems}
+
+      <Pagination.Next
+        disabled={currentPage === lastActivePage}
+        onClick={handleNext}
+      >
+        Next
+      </Pagination.Next>
     </Pagination>
   );
 };

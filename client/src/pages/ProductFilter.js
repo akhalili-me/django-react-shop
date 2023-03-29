@@ -5,9 +5,11 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/product/ProductCard";
+import Pagination from "../components/common/Pagination";
 
 const ProductFilter = () => {
   const [products, setProducts] = useState([]);
+  const [count, setCount] = useState('');
   const [queryParams] = useSearchParams();
   const { id } = useParams();
 
@@ -15,11 +17,17 @@ const ProductFilter = () => {
     let params = "";
     const baseURL = `/products/search/${id}?`;
 
+    const page = queryParams.get("page") || 1;
+    // filters
     const min = queryParams.get("min") || 0;
     const max = queryParams.get("max") || 0;
     const sort = queryParams.get("sort") || "default";
     const has_selling_stock = queryParams.get("has_selling_stock") || false;
 
+    if (page > 1) {
+      params += `page=${page}&`;
+    }
+ 
     if (min > 0) {
       params += `min=${min}&`;
     }
@@ -41,6 +49,7 @@ const ProductFilter = () => {
 
       const { data } = await axios.get(finalURL);
       setProducts(data.results);
+      setCount(data.count)
     };
 
     fetchProducts();
@@ -57,16 +66,20 @@ const ProductFilter = () => {
   );
 
   return (
-    <Row>
-      <Col md={9}>
-        <Row xs={1} md={2} className="g-4">
-          {productCards}
-        </Row>
-      </Col>
-      <Col md={3}>
-        <Filter />
-      </Col>
-    </Row>
+    <>
+      <Row>
+        <Col md={9}>
+          <Row xs={1} md={2} className="g-4">
+            {productCards}
+          </Row>
+        </Col>
+        <Col md={3}>
+          <Filter />
+        </Col>
+      </Row>
+
+      <Pagination count={count} paginateBy={2}/>
+    </>
   );
 };
 

@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import { ListGroup, InputGroup } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { useSearchParams } from "react-router-dom";
+import { addNewParam } from "../utility/queryParams";
 
 const Filter = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,18 +19,8 @@ const Filter = () => {
       const target = event.target;
       const name = target.name;
       const value = target.type === "checkbox" ? target.checked : target.value;
-
-      setSearchParams((prevSearchParams) => {
-        const allSearchParams = new URLSearchParams(prevSearchParams);
-
-        if (!allSearchParams.has(name)) {
-          allSearchParams.append(name, value);
-        } else {
-          allSearchParams.set(name, value);
-        }
-
-        return allSearchParams;
-      });
+      
+      addNewParam(setSearchParams,name,value)
 
       if (name === "sort") {
         setSort(value);
@@ -60,9 +51,10 @@ const Filter = () => {
           name="sort"
         >
           <option>Default</option>
+          <option value="newest">Newest</option>
           <option value="popular">Most Liked</option>
-          <option value="price_ascending">Price Ascending</option>
-          <option value="price_descending">Price Descending</option>
+          <option value="cheapest">Cheapest</option>
+          <option value="most_expensive">Most Expensive</option>
         </Form.Select>
       </ListGroup.Item>
 
