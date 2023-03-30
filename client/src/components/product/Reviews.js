@@ -5,14 +5,21 @@ import CommentForm from "./CommentForm";
 import { fetchProductComments } from "../../utility/comment";
 import { Link } from "react-router-dom";
 import LikeComment from "../common/LikeComment";
+import Pagination from "../common/Pagination";
+import { useSearchParams } from "react-router-dom";
 
 const Reviews = ({ productId }) => {
   const [comments, setComments] = useState([]);
+  const [commentCount, setcommentCount] = useState(0);
+  const [queryParams] = useSearchParams();
+
+  const page = queryParams.get("page") || 1;
 
   const getComments = useCallback(async () => {
-    const response = await fetchProductComments(productId);
-    setComments(response.data);
-  }, [productId]);
+    const { data } = await fetchProductComments(productId,page);
+    setComments(data.results);
+    setcommentCount(data.count);
+  }, [productId,page]);
 
   useEffect(() => {
     getComments();
@@ -40,6 +47,8 @@ const Reviews = ({ productId }) => {
           </div>
         ))}
       </div>
+
+      <Pagination count={commentCount} paginateBy={4} />
     </div>
   );
 };

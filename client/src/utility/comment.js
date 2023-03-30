@@ -1,9 +1,9 @@
 import authAxios from "./api";
 import { isAuthenticated } from "./auth";
 
-export const fetchProductComments = async (productId) => {
+export const fetchProductComments = async (productId,page) => {
   try {
-    const response = await authAxios.get(`/products/${productId}/comments`);
+    const response = await authAxios.get(`/products/${productId}/comments?page=${page}`);
     return response;
   } catch (error) {
     throw new Error("Fetch product comments failed, reload.");
