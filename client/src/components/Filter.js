@@ -1,17 +1,17 @@
 import React, { useState, useCallback } from "react";
-import { ListGroup, InputGroup } from "react-bootstrap";
+import { ListGroup, InputGroup, Button } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { useSearchParams } from "react-router-dom";
-import { addNewParam } from "../utility/queryParams";
+import { addArrayOfParamsToUrl } from "../utility/queryParams";
 
 const Filter = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [sort, setSort] = useState(searchParams.get("sort") || "Default");
+  const [sort, setSort] = useState(searchParams.get("sort") || "");
   const [minPrice, setMinPrice] = useState(searchParams.get("min") || 0);
-  const [maxPrice, setMaxPrice] = useState(searchParams.get("max") || "");
-  const [onlyAvailableProducts, setOnlyAvailableProducts] = useState(
-    searchParams.get("has_selling_stock") || false
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("max") || 0);
+  const [hasSellingStock, setHasSellingStock] = useState(
+    searchParams.get("has_selling_stock") || ""
   );
 
   const handleSearchParamsChange = useCallback(
@@ -19,8 +19,6 @@ const Filter = () => {
       const target = event.target;
       const name = target.name;
       const value = target.type === "checkbox" ? target.checked : target.value;
-      
-      addNewParam(setSearchParams,name,value)
 
       if (name === "sort") {
         setSort(value);
@@ -28,16 +26,32 @@ const Filter = () => {
         setMinPrice(value);
       } else if (name === "max") {
         setMaxPrice(value);
-      } else if (name === "has_selling_stock") setOnlyAvailableProducts(value);
+      } else if (name === "has_selling_stock") setHasSellingStock(value);
     },
-    [
-      setSearchParams,
-      setSort,
-      setMinPrice,
-      setMaxPrice,
-      setOnlyAvailableProducts,
-    ]
+    [setSort, setMinPrice, setMaxPrice, setHasSellingStock]
   );
+
+  const applyFilters = () => {
+    let params = [];
+
+    if (sort !== "") {
+      params.push({ name: "sort", value: sort });
+    }
+
+    if (minPrice !== 0) {
+      params.push({ name: "min", value: minPrice });
+    }
+
+    if (maxPrice !== 0) {
+      params.push({ name: "max", value: maxPrice });
+    }
+
+    if (hasSellingStock !== "") {
+      params.push({ name: "has_selling_stock", value: hasSellingStock });
+    }
+
+    addArrayOfParamsToUrl(setSearchParams, params);
+  };
 
   return (
     <ListGroup>
@@ -50,7 +64,7 @@ const Filter = () => {
           value={sort}
           name="sort"
         >
-          <option>Default</option>
+          <option value="default">Default</option>
           <option value="newest">Newest</option>
           <option value="popular">Most Liked</option>
           <option value="cheapest">Cheapest</option>
@@ -93,10 +107,15 @@ const Filter = () => {
           type="switch"
           id="custom-switch"
           label="Only available products"
-          checked={onlyAvailableProducts}
+          checked={hasSellingStock}
           onChange={handleSearchParamsChange}
           name="has_selling_stock"
         />
+      </ListGroup.Item>
+      <ListGroup.Item>
+        <Button onClick={() => applyFilters()} className="col-12">
+          Apply Filters
+        </Button>
       </ListGroup.Item>
     </ListGroup>
   );

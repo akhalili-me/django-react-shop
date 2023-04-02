@@ -6,6 +6,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import Container from "react-bootstrap/Container";
+import { useEffect } from "react";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -18,13 +19,19 @@ import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
 import Alarm from "./components/common/Alarm";
 
-import { isAuthenticated } from "./utility/auth";
+import { isAuthenticated, updateTokenIfExpired } from "./utility/auth";
 
 function App() {
+
+  useEffect(() => {
+      if (isAuthenticated()) {
+        updateTokenIfExpired();
+      }
+  }, []);
+
   function PrivateRoute({ component }) {
-    const auth = isAuthenticated();
     const location = useLocation();
-    return auth ? (
+    return isAuthenticated() ? (
       component
     ) : (
       <Navigate to={`/login?back=${location.pathname}`} />

@@ -1,7 +1,7 @@
 import React, {useMemo, useCallback } from "react";
 import Pagination from "react-bootstrap/Pagination";
 import {useSearchParams } from "react-router-dom";
-import { addNewParam } from "../../utility/queryParams";
+import { addSingleParamToUrl } from "../../utility/queryParams";
 
 const PAGE_RANGE_DISPLAYED = 3;
 
@@ -36,15 +36,15 @@ const _Pagination = ({ count, paginateBy }) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
 
   const handleNext = useCallback(() => {
-    addNewParam(setSearchParams, "page", currentPage + 1);
+    addSingleParamToUrl(setSearchParams, "page", currentPage + 1);
   }, [setSearchParams, currentPage]);
 
   const handlePrev = useCallback(() => {
-    addNewParam(setSearchParams, "page", currentPage - 1);
+    addSingleParamToUrl(setSearchParams, "page", currentPage - 1);
   }, [setSearchParams, currentPage]);
 
   const handlePaginateItemClick = (page) => {
-    addNewParam(setSearchParams, "page", page);
+    addSingleParamToUrl(setSearchParams, "page", page);
   }
 
   const paginateItems = generatePaginateItems(currentPage, lastActivePage, handlePaginateItemClick);

@@ -16,7 +16,7 @@ const authAxios = axios.create({
 authAxios.interceptors.request.use(
   async (config) => {
     if (isAuthenticated()) {
-      await updateTokenIfExpired();
+      updateTokenIfExpired();
       const token = getToken();
       config.headers.Authorization = `Bearer ${token}`;
     }
