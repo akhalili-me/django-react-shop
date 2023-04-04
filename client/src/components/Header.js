@@ -1,19 +1,24 @@
 import { useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import Badge from "react-bootstrap/Badge";
 import { LinkContainer } from "react-router-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../features/cart/cartSlice";
 import { isAuthenticated, logout } from "../utility/auth";
+import {
+  Offcanvas,
+  Nav,
+  Navbar,
+  Badge,
+  NavDropdown,
+  Form,
+  Button,
+  Container,
+} from "react-bootstrap";
+import CategorySidebar from "./category/CategorySidebar";
 
 const Header = () => {
   const [cartBadge, setCartBadge] = useState(0);
   const cartItemCount = useSelector((state) => state.cart.items.length);
+  const [showCategories, setShowCategories] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -25,71 +30,83 @@ const Header = () => {
     dispatch(clearCart());
   };
 
+  const handleCloseCategories = () => setShowCategories(false);
+  const handleShowCategories = () => setShowCategories(true);
+
   return (
-    <Navbar bg="light" expand="lg">
-      <Container>
-        <LinkContainer to={"/"}>
-          <Navbar.Brand>E-Shop</Navbar.Brand>
-        </LinkContainer>
+    <>
+      <Offcanvas show={showCategories} onHide={handleCloseCategories}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Product Categories</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <CategorySidebar closeSidebar={handleCloseCategories}/>
+        </Offcanvas.Body>
+      </Offcanvas>
 
-        <Navbar.Toggle aria-controls="navbarScroll" />
-        <Navbar.Collapse id="navbarScroll">
-          <Nav
-            className="me-auto my-2 my-lg-0"
-            style={{ maxHeight: "100px" }}
-            navbarScroll
-          >
-            <LinkContainer to={"cart"}>
-              <Nav.Link>
-                <i className="fa-solid fa-cart-shopping"></i>
-                <Badge className="cart_badge" bg="dark">
-                  {cartBadge}
-                </Badge>
-              </Nav.Link>
-            </LinkContainer>
+      <Navbar bg="light" expand="lg">
+        <Container>
+          <LinkContainer to={"/"}>
+            <Navbar.Brand>E-Shop</Navbar.Brand>
+          </LinkContainer>
 
-            {isAuthenticated() ? (
-              <>
-                <NavDropdown
-                  id="navbarScrollingDropdown"
-                  title=<i class="fa-solid fa-user"></i>
-                >
-                  <LinkContainer to={"/profile"}>
-                    <NavDropdown.Item>Amir Khalili</NavDropdown.Item>
-                  </LinkContainer>
-
-                  <NavDropdown.Divider />
-                  <LinkContainer to={"/profile/orders"}>
-                    <NavDropdown.Item>Orders</NavDropdown.Item>
-                  </LinkContainer>
-                  <LinkContainer to={"/profile/comments"}>
-                    <NavDropdown.Item>Comments</NavDropdown.Item>
-                  </LinkContainer>
-                </NavDropdown>
-                <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
-              </>
-            ) : (
-              <LinkContainer to={"login"}>
-                <Nav.Link>Login</Nav.Link>
+          <Navbar.Toggle aria-controls="navbarScroll" />
+          <Navbar.Collapse id="navbarScroll">
+            <Nav
+              className="me-auto my-2 my-lg-0"
+              style={{ maxHeight: "100px" }}
+              navbarScroll
+            >
+              <LinkContainer to={"cart"}>
+                <Nav.Link>
+                  <i className="fa-solid fa-cart-shopping"></i>
+                  <Badge className="cart_badge" bg="dark">
+                    {cartBadge}
+                  </Badge>
+                </Nav.Link>
               </LinkContainer>
-            )}
 
-            <LinkContainer to={"categories"}>
-              <Nav.Link>Categories</Nav.Link>
-            </LinkContainer>
-          </Nav>
-          <Form className="d-flex">
-            <Form.Control
-              type="search"
-              placeholder="Search"
-              className="me-2"
-              aria-label="Search"
-            />
-            <Button variant="outline-success">Search</Button>
-          </Form>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+              {isAuthenticated() ? (
+                <>
+                  <NavDropdown
+                    id="navbarScrollingDropdown"
+                    title=<i class="fa-solid fa-user"></i>
+                  >
+                    <LinkContainer to={"/profile"}>
+                      <NavDropdown.Item>Amir Khalili</NavDropdown.Item>
+                    </LinkContainer>
+
+                    <NavDropdown.Divider />
+                    <LinkContainer to={"/profile/orders"}>
+                      <NavDropdown.Item>Orders</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to={"/profile/comments"}>
+                      <NavDropdown.Item>Comments</NavDropdown.Item>
+                    </LinkContainer>
+                  </NavDropdown>
+                  <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+                </>
+              ) : (
+                <LinkContainer to={"login"}>
+                  <Nav.Link>Login</Nav.Link>
+                </LinkContainer>
+              )}
+
+              <Nav.Link onClick={handleShowCategories}>Categories</Nav.Link>
+            </Nav>
+            <Form className="d-flex">
+              <Form.Control
+                type="search"
+                placeholder="Search"
+                className="me-2"
+                aria-label="Search"
+              />
+              <Button variant="outline-success">Search</Button>
+            </Form>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    </>
   );
 };
 

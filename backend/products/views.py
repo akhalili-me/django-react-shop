@@ -7,7 +7,7 @@ from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .pagination import ProductListPagination,ProductCommentsPagination
+from .pagination import ProductListPagination, ProductCommentsPagination
 from .permissions import SuperuserEditOnly
 
 
@@ -51,14 +51,13 @@ class ProductFeatureListView(generics.ListAPIView):
         return Feature.objects.filter(product_id=self.kwargs["product_id"])
 
 
-class CategoryViewSet(ModelViewSet):
+class CategoryListView(generics.ListAPIView):
     """
-    ViewSet for viewing and editing the categories.
+    Listing the product categories.
     """
 
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
 
 
 class ProductCommentsListView(generics.ListAPIView):
@@ -140,6 +139,7 @@ class ProductsFilterListView(generics.ListAPIView):
             "cheapest": queryset.order_by("price"),
             "most_expensive": queryset.order_by("-price"),
             "newest": queryset.order_by("-created_at"),
+            "bestselling": queryset.order_by("-sold"),
         }
         queryset = sort_queries.get(sort)
 

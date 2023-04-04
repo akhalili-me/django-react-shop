@@ -2,8 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Carousel from "../components/HomeSwiper";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import Category from "../components/product/Category";
-import axios from "axios";
+import CategoryCard from "../components/category/CategoryCard";
 import ProductCard from "../components/product/ProductCard";
 import authAxios from "../utility/api";
 import Spinner from "react-bootstrap/Spinner";
@@ -14,17 +13,9 @@ import { updateTokenIfExpired } from "../utility/auth";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  // const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      const { data } = await authAxios.get(`/products/categories/`);
-      setCategories(data);
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -37,8 +28,7 @@ const Home = () => {
       updateTokenIfExpired();
     }
     getProducts();
-    fetchCategories();
-  }, [fetchCategories]);
+  }, []);
 
   const productCards = useMemo(() => {
     return products.map((product) => (
@@ -48,13 +38,13 @@ const Home = () => {
     ));
   }, [products]);
 
-  const categoryCards = useMemo(() => {
-    return categories.map((category) => (
-      <Col key={category.id} sm={4} md={4} lg={2} xl={2}>
-        <Category category={category} />
-      </Col>
-    ));
-  }, [categories]);
+  // const categoryCards = useMemo(() => {
+  //   return categories.map((category) => (
+  //     <Col key={category.id} sm={4} md={4} lg={2} xl={2}>
+  //       <CategoryCard category={category} />
+  //     </Col>
+  //   ));
+  // }, [categories]);
 
   return (
     <div>
@@ -72,10 +62,10 @@ const Home = () => {
         </>
       )}
 
-      <h1 className="py-4">Categories</h1>
+      {/* <h1 className="py-4">Categories</h1>
       <Row xs={1} md={2} className="">
         {categoryCards}
-      </Row>
+      </Row> */}
     </div>
   );
 };

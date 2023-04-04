@@ -66,6 +66,7 @@ const Filter = () => {
         >
           <option value="default">Default</option>
           <option value="newest">Newest</option>
+          <option value="bestselling">Bestselling</option>
           <option value="popular">Most Liked</option>
           <option value="cheapest">Cheapest</option>
           <option value="most_expensive">Most Expensive</option>

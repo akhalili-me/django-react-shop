@@ -5,6 +5,7 @@ from uuid import uuid4
 from django.utils.deconstruct import deconstructible
 from django.db.models import Avg
 
+
 @deconstructible
 class PathAndRename(object):
     def __init__(self, sub_path):
@@ -33,6 +34,8 @@ class Product(models.Model):
         validators=[MaxValueValidator(5)], max_digits=2, decimal_places=1, default=0
     )
     quantity = models.IntegerField(default=0)
+    sold = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     category = models.ForeignKey(
@@ -46,6 +49,7 @@ class Product(models.Model):
         comment_rates = self.comments.filter(rate__gt=0).aggregate(Avg("rate"))
         self.rate = comment_rates["rate__avg"] or 0
         self.save()
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(

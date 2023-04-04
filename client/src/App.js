@@ -20,14 +20,18 @@ import Cart from "./pages/Cart";
 import Alarm from "./components/common/Alarm";
 
 import { isAuthenticated, updateTokenIfExpired } from "./utility/auth";
+import { useDispatch } from "react-redux";
+import { getCategories } from "./features/category/categorySlice";
 
 function App() {
+  const dispatch = useDispatch();
 
   useEffect(() => {
-      if (isAuthenticated()) {
-        updateTokenIfExpired();
-      }
-  }, []);
+    if (isAuthenticated()) {
+      updateTokenIfExpired();
+    }
+    dispatch(getCategories());
+  }, [dispatch]);
 
   function PrivateRoute({ component }) {
     const location = useLocation();
