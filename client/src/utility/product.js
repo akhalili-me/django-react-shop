@@ -18,3 +18,12 @@ export const fetchProductFeatures = async (productId) => {
     throw new Error("Failed to fetch product features, try again.");
   }
 };
+
+export const fetchChildCategoriesWithTopSoldProducts = async (parentCategoryId) => {
+  try {
+    const response = await axios.get(`/products/category/${parentCategoryId}`);
+    return response;
+  } catch (error) {
+    throw new Error("Failed to fetch products, try again.");
+  }
+}

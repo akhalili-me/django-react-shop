@@ -5,23 +5,26 @@ import Row from "react-bootstrap/Row";
 import CategoryCard from "../components/category/CategoryCard";
 import ProductCard from "../components/product/ProductCard";
 import authAxios from "../utility/api";
-import Spinner from "react-bootstrap/Spinner";
 
+import Spinner from "react-bootstrap/Spinner";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { fetchLatestProducts } from "../utility/product";
 import { isAuthenticated } from "../utility/auth";
 import { updateTokenIfExpired } from "../utility/auth";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
-  // const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const parentCategories = useSelector((state) =>
+    state.category.categories.filter((c) => c.parent === null)
+  );
 
   useEffect(() => {
     const getProducts = async () => {
       const { data } = await fetchLatestProducts();
       setProducts(data.results);
-      setLoading(false)
+      setLoading(false);
     };
 
     if (isAuthenticated()) {
@@ -38,13 +41,15 @@ const Home = () => {
     ));
   }, [products]);
 
-  // const categoryCards = useMemo(() => {
-  //   return categories.map((category) => (
-  //     <Col key={category.id} sm={4} md={4} lg={2} xl={2}>
-  //       <CategoryCard category={category} />
-  //     </Col>
-  //   ));
-  // }, [categories]);
+  const categoryCards = useMemo(() => {
+    return parentCategories.map((category) => (
+      <Col key={category.id} sm={4} md={4} lg={2} xl={2}>
+        <Link to={`/category/${category.id}`}>
+          <CategoryCard category={category} />
+        </Link>
+      </Col>
+    ));
+  }, [parentCategories]);
 
   return (
     <div>
@@ -62,10 +67,10 @@ const Home = () => {
         </>
       )}
 
-      {/* <h1 className="py-4">Categories</h1>
+      <h1 className="py-4">Categories</h1>
       <Row xs={1} md={2} className="">
         {categoryCards}
-      </Row> */}
+      </Row>
     </div>
   );
 };

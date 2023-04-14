@@ -33,7 +33,7 @@ __pycache__/
 *.swp
 local_settings.py
 /staticfiles/
-/media/
+media/
 
 product_images/
 .vscode/ 

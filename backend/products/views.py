@@ -9,7 +9,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .pagination import ProductListPagination, ProductCommentsPagination
 from .permissions import SuperuserEditOnly
-
+from django.http import Http404
 
 class ProductViewSet(ModelViewSet):
     """
@@ -22,6 +22,16 @@ class ProductViewSet(ModelViewSet):
 
     def get_queryset(self):
         return Product.objects.all().order_by("-created_at")
+
+    def create(self, request, *args, **kwargs):
+        """
+        creating a product.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        headers = self.get_success_headers(serializer.data)
+        return Response(status=status.HTTP_201_CREATED, headers=headers)
 
 
 class ProductImageViewSet(ModelViewSet):
@@ -144,3 +154,19 @@ class ProductsFilterListView(generics.ListAPIView):
         queryset = sort_queries.get(sort)
 
         return queryset
+
+
+class TopSellingProductsEachChildCategoryView(generics.ListAPIView):
+    """
+    A view to fetch the top 3 selling product of a child category.
+    """
+
+    serializer_class = TopSellingProductsByChildCategorySerializer
+
+    def get_queryset(self):
+        category = get_object_or_404(Category, id=self.kwargs["pk"])
+
+        if category.parent != None:
+            raise Http404()
+
+        return category.children.all()

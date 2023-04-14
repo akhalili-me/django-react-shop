@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import *
-
+from django.shortcuts import get_object_or_404
 
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,6 +37,11 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_num_comments(obj):
         return obj.comments.count()
     
+    def validate_category(self, value):
+        category = get_object_or_404(Category, pk=value)
+        if category.parent is None:
+            raise serializers.ValidationError("Parent category cannot be set as product category")
+        return category
 
 class FeatureListSerilizer(serializers.ModelSerializer):
     class Meta: 
@@ -83,3 +88,16 @@ class ProductCommentCreateSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_likes(obj):
         return obj.likes.count()
+    
+class TopSellingProductsByChildCategorySerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Category
+        fields = ["name","products"]
+
+    @staticmethod
+    def get_products(obj):
+        products = obj.products.order_by("-sold")[:3]
+        product_serializer = ProductSerializer(products, many=True)
+        return product_serializer.data

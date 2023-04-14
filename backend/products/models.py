@@ -39,7 +39,7 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     category = models.ForeignKey(
-        "Category", on_delete=models.CASCADE, related_name="product"
+        "Category", on_delete=models.CASCADE, related_name="products"
     )
 
     def __str__(self):

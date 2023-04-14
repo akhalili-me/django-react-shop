@@ -18,10 +18,11 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
 import Alarm from "./components/common/Alarm";
-
+import ParentCategory from "./pages/ParentCategory";
 import { isAuthenticated, updateTokenIfExpired } from "./utility/auth";
 import { useDispatch } from "react-redux";
 import { getCategories } from "./features/category/categorySlice";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const dispatch = useDispatch();
@@ -53,6 +54,7 @@ function App() {
             <Route path="/product/:id/*" element={<Product />} />
             <Route path="/product/filter/:id" element={<ProductFilter />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/category/:id" element={<ParentCategory />} />
             <Route
               path="/login"
               element={isAuthenticated() ? <Navigate to={"/"} /> : <Login />}
@@ -67,6 +69,7 @@ function App() {
               path="/profile/*"
               element={<PrivateRoute component={<Profile />} />}
             />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Container>
       </main>
