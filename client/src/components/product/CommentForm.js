@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Form, Row, Col, Button } from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
-import { addComment } from "../../utility/comment";
+import { addComment } from "../../utility/api/comment";
 import { setAlarm } from "../../features/alert/alarmSlice";
 import { useDispatch } from "react-redux";
 

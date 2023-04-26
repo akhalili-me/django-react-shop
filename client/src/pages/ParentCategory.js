@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { Navigate, useParams, useNavigate } from "react-router-dom";
-import { fetchChildCategoriesWithTopSoldProducts } from "../utility/product";
+import {useParams, useNavigate } from "react-router-dom";
+import { fetchChildCategoriesWithTopSoldProducts } from "../utility/api/product";
 import ProductCard from "../components/product/ProductCard";
 import { Col } from "react-bootstrap";
 const ParentCategory = () => {

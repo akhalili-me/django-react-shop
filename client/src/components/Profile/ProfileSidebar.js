@@ -13,6 +13,9 @@ const ProfileSidebar = ({ user }) => {
       <Link to={"/profile/comments"}>
         <ListGroup.Item action>Comments</ListGroup.Item>
       </Link>
+      <Link to={"/profile/address"}>
+        <ListGroup.Item action>Addresses</ListGroup.Item>
+      </Link>
     </ListGroup>
   );
 };

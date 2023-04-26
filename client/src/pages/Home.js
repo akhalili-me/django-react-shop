@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Carousel from "../components/HomeSwiper";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -9,7 +9,7 @@ import authAxios from "../utility/api";
 import Spinner from "react-bootstrap/Spinner";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { fetchLatestProducts } from "../utility/product";
+import { fetchLatestProducts } from "../utility/api/product";
 import { isAuthenticated } from "../utility/auth";
 import { updateTokenIfExpired } from "../utility/auth";
 

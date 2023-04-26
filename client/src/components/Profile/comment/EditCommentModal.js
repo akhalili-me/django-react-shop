@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Modal, InputGroup, Form, Button } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { setAlarm } from "../../features/alert/alarmSlice";
-import { retrieveComment, updateComment } from "../../utility/comment";
+import { setAlarm } from "../../../features/alert/alarmSlice";
+import { retrieveComment, updateComment } from "../../../utility/api/comment";
 
 const EditModal = ({ show, commentId, onClose, updateCommentState }) => {
   const dispatch = useDispatch();

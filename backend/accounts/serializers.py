@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from django.core.validators import MinLengthValidator, RegexValidator
 from products.models import CommentLike, Comment
+from cart.models import Address
 
 User = get_user_model()
 
@@ -47,3 +48,16 @@ class CommentLikeSerializer(serializers.ModelSerializer):
         model = CommentLike
         fields = ["id", "comment", "user"]
         extra_kwargs = {"user": {"read_only": True}, "comment": {"read_only": True}}
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = [
+            "state",
+            "city",
+            "phone",
+            "postal_code",
+            "street_address",
+            "house_number",
+        ]

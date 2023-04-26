@@ -89,3 +89,5 @@ class DeleteAllCartItems(generics.DestroyAPIView):
         CartItem.objects.filter(session__user=self.request.user).delete()
         ShoppingSession.objects.get(user=request.user).update_total()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+

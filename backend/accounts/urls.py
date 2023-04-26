@@ -10,6 +10,7 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 
 router.register(r"users", UserViewSet, basename="users")
+router.register(r"address", AddressViewSet, basename="address")
 
 urlpatterns = [
     path("", include(router.urls)),

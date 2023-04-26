@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import Rating from "../common/Rating";
 import { isAuthenticated } from "../../utility/auth";
 import CommentForm from "./CommentForm";
-import { fetchProductComments } from "../../utility/comment";
+import { fetchProductComments } from "../../utility/api/comment";
 import { Link } from "react-router-dom";
 import LikeComment from "../common/LikeComment";
 import Pagination from "../common/Pagination";

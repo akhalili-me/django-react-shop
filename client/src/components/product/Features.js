@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Table from "react-bootstrap/Table";
-import { fetchProductFeatures } from "../../utility/product";
+import { fetchProductFeatures } from "../../utility/api/product";
 
 const Features = ({ productId }) => {
   const [features, setFeatures] = useState([]);

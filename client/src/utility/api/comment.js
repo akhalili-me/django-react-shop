@@ -1,5 +1,5 @@
-import authAxios from "./api";
-import { isAuthenticated } from "./auth";
+import authAxios from "../api";
+import { isAuthenticated } from "../auth";
 
 export const fetchProductComments = async (productId,page) => {
   try {

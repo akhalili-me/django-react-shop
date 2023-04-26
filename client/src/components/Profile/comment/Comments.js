@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Button, Row, Col, ListGroup, ButtonGroup } from "react-bootstrap";
-import { fetchUserComments, DeleteComment } from "../../utility/comment";
+import { fetchUserComments, DeleteComment } from "../../../utility/api/comment";
 import { useDispatch } from "react-redux";
-import DeleteModal from "../common/DeleteModal";
-import Rating from "../common/Rating";
-import { setAlarm } from "../../features/alert/alarmSlice";
+import DeleteModal from "../../common/DeleteModal";
+import Rating from "../../common/Rating";
+import { setAlarm } from "../../../features/alert/alarmSlice";
 import EditModal from "./EditCommentModal";
 
 const Comments = () => {

@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Sum, F
-
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 class ShoppingSession(models.Model):
     user = models.OneToOneField(
@@ -89,3 +90,4 @@ class Address(models.Model):
 
     def get_full_address(self):
         return f"{self.house_number}, {self.street_address}, {self.city}, {self.state}, {self.postal_code}"
+

@@ -5,7 +5,7 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from .permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticated
-from .serializers import CommentSerializer
+from .serializers import *
 from products.models import Comment, CommentLike
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
@@ -122,3 +122,16 @@ class RDCommentLikeView(generics.RetrieveDestroyAPIView):
         return CommentLike.objects.filter(
             user=self.request.user, comment_id=self.kwargs["comment_id"]
         )
+    
+class AddressViewSet(ModelViewSet):
+    """
+    View set for retrieve, update, delete and create address.
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = AddressSerializer
+
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

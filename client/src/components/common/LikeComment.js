@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { likeComment, removeLikeComment } from "../../utility/comment";
+import { likeComment, removeLikeComment } from "../../utility/api/comment";
 import { useDispatch } from "react-redux";
 import { setAlarm } from "../../features/alert/alarmSlice";
 

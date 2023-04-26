@@ -208,3 +208,7 @@ a{
 /* i {
     cursor: pointer;
 } */
+
+.wider-modal-dialog {
+    max-width: 800px;
+  }

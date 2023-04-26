@@ -3,7 +3,8 @@ import { Col, Row } from "react-bootstrap";
 import ProfileSidebar from "../components/profile/ProfileSidebar";
 import { Routes, Route } from "react-router-dom";
 import Orders from "../components/profile/Orders";
-import Comments from "../components/profile/Comments";
+import Comments from "../components/profile/comment/Comments";
+import Address from "../components/profile/address/Address";
 
 const Profile = () => {
   return (
@@ -15,6 +16,7 @@ const Profile = () => {
         <Routes>
           <Route path="/orders" element={<Orders />} />
           <Route path="/comments" element={<Comments />} />
+          <Route path="/address" element={<Address />} />
         </Routes>
       </Col>
     </Row>
