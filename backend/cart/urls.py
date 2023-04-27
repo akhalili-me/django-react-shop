@@ -8,4 +8,5 @@ urlpatterns = [
     path("create", CreateCartItems.as_view()),
     path("<int:pk>/", RDCartItems.as_view()),
     path("removeall", DeleteAllCartItems.as_view()),
+    path("location", StateCityList.as_view()),
 ]

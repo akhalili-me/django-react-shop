@@ -91,3 +91,12 @@ class DeleteAllCartItems(generics.DestroyAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class StateCityList(generics.ListAPIView):
+    """
+    Get state and cities associated with them.
+    """
+
+    serializer_class = StateCityListSerilizer
+
+    def get_queryset(self):
+        return State.objects.all()

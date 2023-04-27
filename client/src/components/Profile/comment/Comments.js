@@ -16,7 +16,7 @@ const Comments = () => {
 
   useEffect(() => {
     const getComments = async () => {
-      const { data } = await await fetchUserComments();
+      const { data } = await fetchUserComments();
       setComments(data);
     };
 

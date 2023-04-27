@@ -1,12 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
 import ProfileSidebar from "../components/profile/ProfileSidebar";
 import { Routes, Route } from "react-router-dom";
 import Orders from "../components/profile/Orders";
 import Comments from "../components/profile/comment/Comments";
 import Address from "../components/profile/address/Address";
+import { useDispatch } from "react-redux";
+import { getLocations } from "../features/stateCity/stateCitySlice";
 
 const Profile = () => {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(getLocations())
+  }, [dispatch])
+  
   return (
     <Row>
       <Col md={4}>

@@ -1,42 +1,62 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal, InputGroup, Form, Button, Col, Row } from "react-bootstrap";
-import { addAddress } from "../../../utility/api/address";
+import { fetchAddressById, updateAddress } from "../../../utility/api/address";
 import { setAlarm } from "../../../features/alert/alarmSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const AddAddressModal = ({ show, onClose }) => {
+const EditAddressModal = ({ show, onClose, updateAddressState, addressId }) => {
   const [address, setAddress] = useState({});
   const dispatch = useDispatch();
   const states = useSelector((state) => state.location.states);
   const [selectCityDisabled, setSelectCityDisabled] = useState(true);
   const [cities, setCities] = useState(null);
 
-  const handleFieldChange = useCallback((event) => {
-    const { name, value } = event.target;
-    setAddress({
-      ...address,
-      [name]: value,
-    });
-  
-    if (name === "state") {
-      if (value === "default") {
-        setSelectCityDisabled(true);
-        setCities(null)
-      } else {
-        setCities(states.find((c) => c.name === value).cities);
-        setSelectCityDisabled(false);
-      }
+  useEffect(() => {
+    const getAddressAndSetCities = async () => {
+      const { data } = await fetchAddressById(addressId);
+      setAddress(data);
+      setCities(states.find((c) => c.name === data?.state)?.cities);
+      setSelectCityDisabled(false);
+    };
+
+    if (addressId !== 0) {
+      getAddressAndSetCities();
+    } else {
+      setCities(null);
+      setSelectCityDisabled(true);
     }
-  }, [address, states]);
+  }, [addressId, states]);
+
+  const handleFieldChange = useCallback(
+    (event) => {
+      const { name, value } = event.target;
+      setAddress({
+        ...address,
+        [name]: value,
+      });
+
+      if (name === "state") {
+        if (value === "default") {
+          setSelectCityDisabled(true);
+          setCities(null);
+        } else {
+          setCities(states.find((c) => c.name === value)?.cities);
+          setSelectCityDisabled(false);
+        }
+      }
+    },
+    [address, states]
+  );
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      await addAddress(address);
+      await updateAddress(address);
+      updateAddressState(address)
       dispatch(
         setAlarm({
-          message: "Address added successfully.",
+          message: "Address updated successfully.",
           type: "success",
           show: true,
         })
@@ -44,7 +64,7 @@ const AddAddressModal = ({ show, onClose }) => {
     } catch (error) {
       dispatch(
         setAlarm({
-          message: "Failed to add address, try again.",
+          message: "Failed to update address, try again.",
           type: "danger",
           show: true,
         })
@@ -57,7 +77,7 @@ const AddAddressModal = ({ show, onClose }) => {
   return (
     <Modal show={show} onHide={onClose} dialogClassName="wider-modal-dialog">
       <Modal.Header closeButton>
-        <Modal.Title>Add Address</Modal.Title>
+        <Modal.Title>Edit Address</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
@@ -67,10 +87,13 @@ const AddAddressModal = ({ show, onClose }) => {
                 aria-label="Default select example"
                 onChange={handleFieldChange}
                 name="state"
+                value={address?.state || "default"}
               >
                 <option value="default">State</option>
                 {states?.map((state) => (
-                  <option key={state.id} value={state.name}>{state.name}</option>
+                  <option key={state.id} value={state.name}>
+                    {state.name}
+                  </option>
                 ))}
               </Form.Select>
               <Form.Control
@@ -78,6 +101,7 @@ const AddAddressModal = ({ show, onClose }) => {
                 name="phone"
                 type="tel"
                 onChange={handleFieldChange}
+                value={address.phone || ""}
                 placeholder="Phone number"
                 pattern="\d{11}"
                 required
@@ -86,18 +110,23 @@ const AddAddressModal = ({ show, onClose }) => {
             <Col md={6}>
               <Form.Select
                 onChange={handleFieldChange}
+                aria-label="Default select example"
                 name="city"
+                value={address?.city || "default"}
                 disabled={selectCityDisabled}
               >
                 <option>City</option>
-                {cities?.map((city,index) => (
-                  <option key={index} value={city}>{city}</option>
+                {cities?.map((city, index) => (
+                  <option key={index} value={city}>
+                    {city}
+                  </option>
                 ))}
               </Form.Select>
               <Form.Control
                 className="mt-3"
                 type="text"
-                name="postalCode"
+                name="postal_code"
+                value={address.postal_code || ""}
                 onChange={handleFieldChange}
                 placeholder="Postal code"
                 pattern="\d{10}"
@@ -110,7 +139,8 @@ const AddAddressModal = ({ show, onClose }) => {
               <Form.Control
                 className="mt-3"
                 type="text"
-                name="streetAddress"
+                name="street_address"
+                value={address.street_address || ""}
                 onChange={handleFieldChange}
                 placeholder="Street address"
                 required
@@ -121,7 +151,8 @@ const AddAddressModal = ({ show, onClose }) => {
                 className="mt-3"
                 type="number"
                 onChange={handleFieldChange}
-                name="houseNumber"
+                value={address.house_number || ""}
+                name="house_number"
                 placeholder="Pelak"
                 required
               />
@@ -134,7 +165,7 @@ const AddAddressModal = ({ show, onClose }) => {
             Close
           </Button>
           <Button type="submit" variant="primary">
-            Submit
+            Update
           </Button>
         </Modal.Footer>
       </Form>
@@ -142,4 +173,4 @@ const AddAddressModal = ({ show, onClose }) => {
   );
 };
 
-export default AddAddressModal;
+export default EditAddressModal;

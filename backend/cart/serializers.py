@@ -54,3 +54,11 @@ class CartItemsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShoppingSession
         fields = ["total", "cart_items"]
+
+
+class StateCityListSerilizer(serializers.ModelSerializer):
+    cities = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = State
+        fields = ["name", "cities"]

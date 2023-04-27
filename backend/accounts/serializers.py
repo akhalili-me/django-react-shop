@@ -54,6 +54,7 @@ class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = [
+            "id",
             "state",
             "city",
             "phone",

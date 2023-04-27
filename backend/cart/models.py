@@ -3,6 +3,7 @@ from django.db.models import Sum, F
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
+
 class ShoppingSession(models.Model):
     user = models.OneToOneField(
         "accounts.User", on_delete=models.CASCADE, related_name="shopping_session"
@@ -91,3 +92,17 @@ class Address(models.Model):
     def get_full_address(self):
         return f"{self.house_number}, {self.street_address}, {self.city}, {self.state}, {self.postal_code}"
 
+
+class State(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    name = models.CharField(max_length=50)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name="cities")
+
+    def __str__(self):
+        return self.name
