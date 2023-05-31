@@ -11,16 +11,16 @@ export const fetchAddressById = async (addressId) => {
 };
 
 export const addAddress = async (address) => {
-  const { state, city, phone, postalCode, streetAddress, houseNumber } =
+  const { state, city, phone, postal_code, street_address, house_number } =
     address;
 
   await authAxios.post(`/accounts/address/`, {
     state: state,
     city: city,
     phone: phone,
-    postal_code: postalCode,
-    street_address: streetAddress,
-    house_number: houseNumber,
+    postal_code: postal_code,
+    street_address: street_address,
+    house_number: house_number,
   });
 };
 
