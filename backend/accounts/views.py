@@ -60,10 +60,10 @@ class UserViewSet(ModelViewSet):
 
 class UserCommentsListView(generics.ListAPIView):
     """
-    Return the comments associated with the authenticated user.
+    Return the comments along with product associated with the authenticated user.
     """
 
-    serializer_class = CommentSerializer
+    serializer_class =  UserCommentsSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):

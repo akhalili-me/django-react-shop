@@ -6,6 +6,7 @@ import DeleteModal from "../../common/DeleteModal";
 import Rating from "../../common/Rating";
 import { setAlarm } from "../../../features/alert/alarmSlice";
 import EditModal from "./EditCommentModal";
+import { Link } from "react-router-dom";
 
 const Comments = () => {
   const dispatch = useDispatch();
@@ -131,6 +132,9 @@ const Comments = () => {
                 </ButtonGroup>
               </Col>
             </Row>
+            <Link to={`/product/${comment.product.id}`}>
+              <div className="mt-2"><strong>Product:</strong> {comment.product.name}</div>
+            </Link>
           </ListGroup.Item>
         ))}
       </ListGroup>

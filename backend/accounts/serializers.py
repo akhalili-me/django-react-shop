@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.core.validators import MinLengthValidator, RegexValidator
 from products.models import CommentLike, Comment
 from cart.models import Address
+from products.models import Product
 
 User = get_user_model()
 
@@ -41,6 +42,18 @@ class CommentSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_likes(obj):
         return obj.likes.count()
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Product
+        fields = ["id", "name"]
+
+class UserCommentsSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+
+    class Meta: 
+        model = Comment
+        fields = ["id", "text", "rate", "likes", "product"]
 
 
 class CommentLikeSerializer(serializers.ModelSerializer):

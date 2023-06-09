@@ -99,14 +99,9 @@ const Login = () => {
             onChange={handleFieldChange}
           />
         </Form.Group>
-        <Row className="mb-4 m-1">
-          <Col md={6}>
-            <Form.Check type="checkbox" label="Remeber Me" />
-          </Col>
-          <Col md={6}>
-            <Link to={``}>Forgot Password?</Link>
-          </Col>
-        </Row>
+        <div className="mb-4 m-1">
+          <Link to={``}>Forgot Password?</Link>
+        </div>
         <Button
           variant="primary"
           type="submit"
