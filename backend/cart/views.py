@@ -4,6 +4,7 @@ from rest_framework import status, generics
 from .serializers import *
 from .models import ShoppingSession
 from django.http import Http404
+from rest_framework.viewsets import ModelViewSet
 
 
 class CreateCartItems(generics.CreateAPIView):
@@ -100,3 +101,46 @@ class StateCityList(generics.ListAPIView):
 
     def get_queryset(self):
         return State.objects.all()
+
+
+class OrderViewSet(ModelViewSet):
+    """
+    Viewset for creating, editing, deleting and fetching a order.
+    """
+
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        validated_data = serializer.validated_data
+
+        payment = Payment.objects.create(
+            amount=validated_data["total"], status="created"
+        )
+        serializer.save(payment=payment, user=self.request.user)
+
+
+class RUDOrderItemView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Viewset for editing, deleting and fetching a order item by id.
+    """
+
+    serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return OrderItem.objects.filter(id=self.kwargs["pk"])
+
+class OrderItemList(generics.ListAPIView): 
+    """
+    view for listing order items based on order id.
+    """
+    serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        order_id = self.kwargs["pk"]
+        return OrderItem.objects.filter(order_id=order_id)

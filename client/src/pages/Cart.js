@@ -3,6 +3,7 @@ import { Button, Col, Row, ListGroup } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import CartItems from "../components/cart/CartItems";
 import { clearCart } from "../features/cart/cartSlice";
+import { Link } from "react-router-dom";
 
 const Cart = () => {
   const cart = useSelector((state) => state.cart);
@@ -33,7 +34,9 @@ const Cart = () => {
               <span className="bold">Total Price: </span> ${cart.total}
             </ListGroup.Item>
             <ListGroup.Item>
-              <Button variant="success">Checkout</Button>
+              <Link to={"/checkout"}>
+                <Button variant="success">Checkout</Button>
+              </Link>
             </ListGroup.Item>
           </ListGroup>
         </Col>

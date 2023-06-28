@@ -23,6 +23,7 @@ import { isAuthenticated, updateTokenIfExpired } from "./utility/auth";
 import { useDispatch } from "react-redux";
 import { getCategories } from "./features/category/categorySlice";
 import NotFound from "./pages/NotFound";
+import Checkout from "./pages/Checkout";
 
 function App() {
   const dispatch = useDispatch();
@@ -69,6 +70,13 @@ function App() {
               path="/profile/*"
               element={<PrivateRoute component={<Profile />} />}
             />
+            <Route
+              path="/checkout"
+              element={<PrivateRoute component={<Checkout />} />}
+            />
+        
+
+            {/* NotFound */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Container>

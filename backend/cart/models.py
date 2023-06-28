@@ -57,6 +57,9 @@ class Order(models.Model):
             total += item.product.price * item.quantity
         return total
 
+    def __str__(self):
+        return self.user.username + " | " + self.status + " | " + str(self.created_at)
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -89,9 +92,9 @@ class Address(models.Model):
     street_address = models.TextField(max_length=250)
     house_number = models.CharField(max_length=15)
 
-    def get_full_address(self):
-        return f"{self.house_number}, {self.street_address}, {self.city}, {self.state}, {self.postal_code}"
-
+        
+    def __str__(self):
+        return f"{self.state}, {self.city}, {self.street_address} ,{self.house_number}, {self.postal_code}"
 
 class State(models.Model):
     name = models.CharField(max_length=50)
