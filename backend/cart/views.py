@@ -144,3 +144,11 @@ class OrderItemList(generics.ListAPIView):
     def get_queryset(self):
         order_id = self.kwargs["pk"]
         return OrderItem.objects.filter(order_id=order_id)
+    
+class OrderItemCreate(generics.CreateAPIView): 
+    """
+    view for creating a order item.
+    """
+    serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
+

@@ -67,7 +67,7 @@ class StateCityListSerilizer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ["user", "address", "status", "total"]
+        fields = ["address", "status", "total"]
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

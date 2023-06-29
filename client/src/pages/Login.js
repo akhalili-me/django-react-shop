@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, Col, Row } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import { Link, useSearchParams } from "react-router-dom";
 import { login } from "../utility/auth";
 import Alert from "react-bootstrap/Alert";

@@ -10,7 +10,7 @@ import {
 export const register = async (email, username, password) => {
   try {
     const response = await axios.post(
-      "http://127.0.0.1:8000/api/accounts/users",
+      "http://127.0.0.1:8000/api/accounts/users/",
       {
         email,
         username,

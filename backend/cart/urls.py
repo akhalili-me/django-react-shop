@@ -14,6 +14,7 @@ urlpatterns = [
     path("<int:pk>/", RDCartItems.as_view()),
     path("removeall", DeleteAllCartItems.as_view()),
     path("location", StateCityList.as_view()),
+    path("orderitems",OrderItemCreate.as_view()),
     path("orderitems/<int:pk>/",RUDOrderItemView.as_view()),
     path("orderitemsbyorderid/<int:pk>/",OrderItemList.as_view()),
     path("", include(router.urls)),
