@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchUserAddresses } from "../utility/api/address";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import CartItems from "../components/cart/CartItems";
 import AddressItem from "../components/checkout/AddressItem";
+import addOrder from "../utility/api/order";
 
 const Checkout = () => {
     const [addresses, setAddresses] = useState([]);
@@ -13,10 +14,10 @@ const Checkout = () => {
     const cart = useSelector((state) => state.cart);
 
     const onChangeAddress = (event) => {
-        const selectedId = event.target.value
+        const selectedId = event.target.value;
         setSelectedAddressId(selectedId);
     };
-    
+
     useEffect(() => {
         const getUserAddresses = async () => {
             const { data } = await fetchUserAddresses();
@@ -33,10 +34,16 @@ const Checkout = () => {
             onChangeAddress={onChangeAddress}
         />
     ));
+
+    const onPayClick = async () => {
+        const order_items = cart.items.map(item => ({
+            product: item.product.id,
+            quantity: item.quantity
+        }));
+        await addOrder(selectedAddressId, cart.total, order_items);
+    };
     
-    const onPayClick = () => {
-        //TODO
-    }
+
     return (
         <>
             <h1 className="py-3">Choose your address</h1>
@@ -46,7 +53,13 @@ const Checkout = () => {
             <h3 className="py-3">
                 <strong>Total:</strong>${cart.total}
             </h3>
-            <Button onClick={onPayClick} className="pay_button" variant="success">Pay</Button>
+            <Button
+                onClick={onPayClick}
+                className="pay_button"
+                variant="success"
+            >
+                Pay
+            </Button>
         </>
     );
 };

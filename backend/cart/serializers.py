@@ -64,13 +64,20 @@ class StateCityListSerilizer(serializers.ModelSerializer):
         fields = ["name", "cities"]
 
 
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ["address", "status", "total"]
-
-
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ["order", "product", "quantity"]
+        fields = ["product", "quantity"]
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: Payment
+        fields = ["amount","status"]
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_items = OrderItemSerializer(many=True, read_only=True)
+    payment = PaymentSerializer(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ["address", "status", "total", "order_items", "payment"]

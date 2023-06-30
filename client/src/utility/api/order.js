@@ -10,12 +10,13 @@ export const fetchUserOrders = async () => {
     }
 };
 
-export const addOrder = async (addressId, totalPrice) => {
+export const addOrder = async (addressId,totalPrice,orderItems) => {
     try {
         await authAxios.post(`/cart/orders`, {
             address: addressId,
             status: "created",
             total: totalPrice,
+            order_items: orderItems,
         });
     } catch (error) {
         throw new Error("Failed to submit new order, try again.");
@@ -43,30 +44,7 @@ export const updateOrder = async (orderId, addressId, totalPrice, status) => {
 };
 
 // Order items CRUD
-export const fetchOrderItems = async (orderId) => {
-    try {
-        const response = await authAxios.get(
-            `/cart/orderitemsbyorderid/${orderId}`
-        );
-        return response;
-    } catch (error) {
-        throw new Error("Fetch order items failed, reload.");
-    }
-};
-
-export const addOrderItem = async (orderId, productId, quantity) => {
-    try {
-        await authAxios.post(`/cart/orderitems`, {
-            order: orderId,
-            product: productId,
-            quantity: quantity,
-        });
-    } catch (error) {
-        throw new Error("Failed to create order item, try again.");
-    }
-};
-
-export const deleteOrderItems = async (id) => {
+export const deleteOrderItem = async (id) => {
     try {
         await authAxios.delete(`/cart/orderitems/${id}`);
     } catch (error) {
@@ -74,7 +52,7 @@ export const deleteOrderItems = async (id) => {
     }
 };
 
-export const updateOrderItems = async (id,orderId, productId, quantity) => {
+export const updateOrderItem = async (id,orderId, productId, quantity) => {
     try {
         await authAxios.put(`/cart/orderitems/${id}`,{
             order: orderId,
@@ -83,5 +61,25 @@ export const updateOrderItems = async (id,orderId, productId, quantity) => {
         });
     } catch (error) {
         throw new Error("Failed to update order item, try again.");
+    }
+};
+
+//Payment CRUD
+export const deletePayment = async (id) => {
+    try {
+        await authAxios.delete(`/cart/payment/${id}`);
+    } catch (error) {
+        throw new Error("failed to delete a payment, try again");
+    }
+};
+
+export const updatePayment = async (id, amount, status) => {
+    try {
+        await authAxios.put(`/cart/payment/${id}`, {
+            amount: amount,
+            status: status,
+        });
+    } catch (error) {
+        throw new Error("Failed to update payment, try again.");
     }
 };

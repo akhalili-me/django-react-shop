@@ -5,6 +5,7 @@ from .serializers import *
 from .models import ShoppingSession
 from django.http import Http404
 from rest_framework.viewsets import ModelViewSet
+from django.db import transaction
 
 
 class CreateCartItems(generics.CreateAPIView):
@@ -26,7 +27,8 @@ class CreateCartItems(generics.CreateAPIView):
         )
 
         CartItem.objects.update_or_create(
-            product=product, session=shopping_session, defaults={"quantity": quantity}
+            product=product, session=shopping_session, defaults={
+                "quantity": quantity}
         )
         shopping_session.update_total()
         headers = self.get_success_headers(serializer.data)
@@ -105,9 +107,8 @@ class StateCityList(generics.ListAPIView):
 
 class OrderViewSet(ModelViewSet):
     """
-    Viewset for creating, editing, deleting and fetching a order.
+    View for creating, listing, editing, deleting and updating an order.
     """
-
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
@@ -115,40 +116,38 @@ class OrderViewSet(ModelViewSet):
         return Order.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        validated_data = serializer.validated_data
+        order_items = serializer.validated_data["order_items"]
 
-        payment = Payment.objects.create(
-            amount=validated_data["total"], status="created"
-        )
-        serializer.save(payment=payment, user=self.request.user)
+        with transaction.atomic():
+            payment = Payment.objects.create(
+                amount=serializer.validated_data["total"],
+                status="created"
+            )
+
+            order = serializer.save(payment=payment, user=self.request.user)
+
+            order_item_instances = [
+                OrderItem(
+                    order=order,
+                    product=item["product"],
+                    quantity=item["quantity"]
+                )
+                for item in order_items
+            ]
+            OrderItem.objects.bulk_create(order_item_instances)
 
 
 class RUDOrderItemView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Viewset for editing, deleting and fetching a order item by id.
-    """
-
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return OrderItem.objects.filter(id=self.kwargs["pk"])
+        return OrderItem.objects.filter(id=self.kwargs['pk'])
 
-class OrderItemList(generics.ListAPIView): 
-    """
-    view for listing order items based on order id.
-    """
-    serializer_class = OrderItemSerializer
+
+class RUDPaymentView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        order_id = self.kwargs["pk"]
-        return OrderItem.objects.filter(order_id=order_id)
-    
-class OrderItemCreate(generics.CreateAPIView): 
-    """
-    view for creating a order item.
-    """
-    serializer_class = OrderItemSerializer
-    permission_classes = [IsAuthenticated]
-
+        return Payment.objects.filter(id=self.kwargs['pk'])
