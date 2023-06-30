@@ -212,3 +212,8 @@ a{
 .wider-modal-dialog {
     max-width: 800px;
   }
+
+.pay_button {
+    width: 20%;
+    font-size: var(--font-size-sm);
+}

@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
-import ProfileSidebar from "../components/Profile/ProfileSidebar"
+import ProfileSidebar from "../components/profile/ProfileSidebar"
 import { Routes, Route } from "react-router-dom";
-import Orders from "../components/Profile/Orders";
-import Comments from "../components/Profile/comment/Comments";
-import Address from "../components/Profile/address/Address";
+import Orders from "../components/profile/Orders";
+import Comments from "../components/profile/comment/Comments";
+import Address from "../components/profile/address/Address";
 import { useDispatch } from "react-redux";
 import { getLocations } from "../features/stateCity/stateCitySlice";
 
