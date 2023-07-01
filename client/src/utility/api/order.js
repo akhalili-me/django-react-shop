@@ -12,7 +12,7 @@ export const fetchUserOrders = async () => {
 
 export const addOrder = async (addressId,totalPrice,orderItems) => {
     try {
-        await authAxios.post(`/cart/orders`, {
+        await authAxios.post(`/cart/orders/`, {
             address: addressId,
             status: "created",
             total: totalPrice,

@@ -62,9 +62,9 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
     product = models.ForeignKey(
-        "products.Product", on_delete=models.CASCADE, related_name="order_items"
+        "products.Product", on_delete=models.CASCADE,
     )
     quantity = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -94,7 +94,7 @@ class Address(models.Model):
 
         
     def __str__(self):
-        return f"{self.state}, {self.city}, {self.street_address} ,{self.house_number}, {self.postal_code}"
+        return f"{self.state}, {self.city}, {self.street_address}, Pelak: {self.house_number}, Postal Code: {self.postal_code}"
 
 class State(models.Model):
     name = models.CharField(max_length=50)

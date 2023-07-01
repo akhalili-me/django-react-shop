@@ -3,7 +3,6 @@ from .models import *
 from products.serializers import ProductImageSerializer
 from products.models import Product
 
-
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
 
@@ -71,13 +70,17 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
-        model: Payment
+        model = Payment
         fields = ["amount","status"]
 
 class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, read_only=True)
     payment = PaymentSerializer(read_only=True)
+    full_address = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ["address", "status", "total", "order_items", "payment"]
+        fields = ["id","status","full_address", "address","total", "payment", "order_items"]
+
+    def get_full_address(self, obj):
+        return str(obj.address)

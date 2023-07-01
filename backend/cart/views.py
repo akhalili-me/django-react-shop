@@ -105,18 +105,15 @@ class StateCityList(generics.ListAPIView):
         return State.objects.all()
 
 
-class OrderViewSet(ModelViewSet):
+class CreateOrderView(generics.CreateAPIView):
     """
-    View for creating, listing, editing, deleting and updating an order.
+    View for creating order with order items.
     """
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
-
     def perform_create(self, serializer):
-        order_items = serializer.validated_data["order_items"]
+        order_items_data = self.request.data.get("order_items")
 
         with transaction.atomic():
             payment = Payment.objects.create(
@@ -126,15 +123,19 @@ class OrderViewSet(ModelViewSet):
 
             order = serializer.save(payment=payment, user=self.request.user)
 
-            order_item_instances = [
+            order_item_serializer = OrderItemSerializer(data=order_items_data, many=True)
+            order_item_serializer.is_valid(raise_exception=True)
+
+            order_items = [
                 OrderItem(
                     order=order,
                     product=item["product"],
                     quantity=item["quantity"]
                 )
-                for item in order_items
+                for item in order_item_serializer.validated_data
             ]
-            OrderItem.objects.bulk_create(order_item_instances)
+            OrderItem.objects.bulk_create(order_items)
+
 
 
 class RUDOrderItemView(generics.RetrieveUpdateDestroyAPIView):

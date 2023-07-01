@@ -6,7 +6,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import CartItems from "../components/cart/CartItems";
 import AddressItem from "../components/checkout/AddressItem";
-import addOrder from "../utility/api/order";
+import {addOrder} from "../utility/api/order";
 
 const Checkout = () => {
     const [addresses, setAddresses] = useState([]);
@@ -40,6 +40,7 @@ const Checkout = () => {
             product: item.product.id,
             quantity: item.quantity
         }));
+        console.log(order_items);
         await addOrder(selectedAddressId, cart.total, order_items);
     };
     
