@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { LinkContainer } from "react-router-bootstrap";
 
 import Carousel from "./Carousel";
-import { addItem } from "../../features/cart/cartSlice";
+import { addItemCart } from "../../features/cart/cartSlice";
 import Rating from "../common/Rating";
 
 const ProductPage = ({ product }) => {
@@ -17,7 +17,7 @@ const ProductPage = ({ product }) => {
 
   const handleAddToCart = () => {
     try {
-      dispatch(addItem(product));
+      dispatch(addItemCart(product));
     } catch (error) {}
   };
 

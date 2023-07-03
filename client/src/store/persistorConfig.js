@@ -5,7 +5,7 @@ import rootReducer from "./rootReducer";
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: ["loading"], // don't persist the 'loading' slice of state
+  blacklist: ["product"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

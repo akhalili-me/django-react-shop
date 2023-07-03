@@ -1,13 +1,13 @@
 import React from "react";
 import { Table, Form } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { removeItem, updateItem } from "../../features/cart/cartSlice";
+import { removeItemCart, updateItemCart } from "../../features/cart/cartSlice";
 
 const CartItems = ({ items }) => {
   const dispatch = useDispatch();
 
   const handleRemoveItem = (productId, index) => {
-    dispatch(removeItem({ product: productId, index: index }));
+    dispatch(removeItemCart({ product: productId, index: index }));
   };
 
   const handleUpdateQuantity = (productId, quantity) => {
@@ -15,7 +15,7 @@ const CartItems = ({ items }) => {
       productId: productId,
       quantity: parseInt(quantity, 10),
     };
-    dispatch(updateItem(data));
+    dispatch(updateItemCart(data));
   };
 
   const products = items.map((i, index) => {

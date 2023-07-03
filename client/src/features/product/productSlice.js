@@ -13,8 +13,8 @@ export const productSlice = createSlice({
 			})
 			.addCase(getLatestProducts.fulfilled, (state, action) => {
 				state.loading = false;
-                state.products = action.payload.count ? action.payload.results : action.payload;
-                state.count = action.payload.count || state.count;
+                state.products = action.payload.results
+                state.count = action.payload.count;
 			})
 			.addCase(getLatestProducts.rejected, (state, action) => {
 				state.loading = false;
@@ -27,8 +27,8 @@ export const productSlice = createSlice({
 			})
 			.addCase(getProductsByFilter.fulfilled, (state, action) => {
 				state.loading = false;
-                state.products = action.payload.count ? action.payload.results : action.payload;
-                state.count = action.payload.count || state.count;
+                state.products = action.payload.results;
+                state.count = action.payload.count;
 			})
 			.addCase(getProductsByFilter.rejected, (state, action) => {
 				state.loading = false;

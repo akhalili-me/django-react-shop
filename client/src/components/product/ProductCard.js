@@ -1,18 +1,17 @@
-import { useState } from "react";
 import Button from "react-bootstrap/Button";
-import { Card, Alert } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import { truncateString } from "../../utility/string_utils";
-import { addItem } from "../../features/cart/cartSlice";
+import { addItemCart } from "../../features/cart/cartSlice";
 import { setAlarm } from "../../features/alert/alarmSlice";
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const handleAddToCart = () => {
     try {
-      dispatch(addItem(product));
+      dispatch(addItemCart(product));
       dispatch(
         setAlarm({
           message: "Successfully added to cart!",
