@@ -2,55 +2,55 @@ import { isAuthenticated } from "../../utility/auth";
 import authAxios from "../../utility/api";
 
 export const addItemReducer = (state, action) => {
-  const item = action.payload;
+    const item = action.payload;
 
-  if (item.quantity === 0) {
-    throw new Error("Not available in stock");
-  }
+    if (item.quantity === 0) {
+      throw new Error("Not available in stock");
+    }
 
-  if (isItemExist(state.items, item.id)) {
-    throw new Error("Already available in cart");
-  }
+    if (isItemExist(state.items, item.id)) {
+      throw new Error("Already available in cart");
+    }
 
-  const serializedItem = serializeItemData(item);
-  state.items.push(serializedItem);
+    if (isAuthenticated()) {
+      addOrUpdateItemInDatabase(item.id, 1);
+    }
 
-  if (isAuthenticated()) {
-    addOrUpdateItemInDatabase(item.id, 1);
-  }
+    const serializedItem = serializeItemData(item);
+    state.items.push(serializedItem);
 
-  calculateTotal(state);
+    calculateTotal(state);
 };
 
 export const removeItemReducer = (state, action) => {
-  const { product, index } = action.payload;
-  state.items.splice(index, 1);
-  calculateTotal(state);
+    const { product, index } = action.payload;
 
-  if (isAuthenticated()) {
-    removeItemInDatabase(product);
-  }
+    if (isAuthenticated()) {
+        removeItemInDatabase(product);
+    }
+
+    state.items.splice(index, 1);
+    calculateTotal(state);
 };
 
 export const UpdateItemQuantityReducer = (state, action) => {
   const { productId, quantity } = action.payload;
 
+  if (isAuthenticated()) {
+      addOrUpdateItemInDatabase(productId, quantity);
+  }
+
   const existingItem = state.items.find((i) => i.product.id === productId);
   existingItem.quantity = quantity;
-
-  if (isAuthenticated()) {
-    addOrUpdateItemInDatabase(productId, quantity);
-  }
   calculateTotal(state);
 };
 
 export const clearAllItmesReducer = (state, action) => {
-  state.total = 0;
-  state.items = [];
-
   if (isAuthenticated()) {
     removeAllItemsInDatabase();
   }
+  state.total = 0;
+  state.items = [];
 };
 
 // ##############################
@@ -83,16 +83,28 @@ const calculateTotal = (state) => {
 };
 
 const removeAllItemsInDatabase = async () => {
-  await authAxios.delete("cart/removeall");
-};
+    try {
+        await authAxios.delete("cart/removeall");
+    } catch (error) {
+      throw new Error("Failed to remove items, try again.");
+    }
+}
 
 const removeItemInDatabase = async (id) => {
-  await authAxios.delete(`cart/${id}`);
+  try {
+    await authAxios.delete(`cart/${id}`);
+  } catch (error) {
+    throw new Error("Failed to remove item, try again.");
+  }
 };
 
 const addOrUpdateItemInDatabase = async (id, quantity) => {
-  await authAxios.post("/cart/create", {
-    product: id,
-    quantity: quantity,
-  });
+  try {
+    await authAxios.post("/cart/create", {
+      product: id,
+      quantity: quantity,
+    });
+  } catch (error) {
+    throw new Error("Failed to add, try again.");
+  }
 };

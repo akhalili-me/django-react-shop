@@ -10,5 +10,7 @@ urlpatterns = [
     path("location", StateCityList.as_view(), name="state-city-list"),
     path("orderitems/<int:pk>", RUDOrderItemView.as_view(), name="rud-order-item"),
     path("payment/<int:pk>", RUDPaymentView.as_view(), name="rud-payment"),
-    path("orders/", CreateOrderView.as_view(), name="create-order"),
+    path("orders/create", CreateOrdersView.as_view(), name="create-order"),
+    path("orders/", ListUserOrdersView.as_view(), name="list-user-order"),
+    path("orders/<int:pk>", RUDOrderView.as_view(), name="rud-order"),
 ]

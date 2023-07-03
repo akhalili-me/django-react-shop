@@ -10,12 +10,19 @@ export const fetchUserOrders = async () => {
     }
 };
 
-export const addOrder = async (addressId,totalPrice,orderItems) => {
+export const addOrder = async (
+    addressId,
+    totalPrice,
+    shippingPrice,
+    paymentMethod,
+    orderItems
+) => {
     try {
         await authAxios.post(`/cart/orders/`, {
             address: addressId,
-            status: "created",
             total: totalPrice,
+            shipping_price: shippingPrice,
+            payment_method: paymentMethod,
             order_items: orderItems,
         });
     } catch (error) {

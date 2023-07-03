@@ -20,10 +20,10 @@ export const cartSlice = createSlice({
   name: "cart",
   initialState: { total: 0, items: [] },
   reducers: {
-    addItem: addItemReducer,
-    removeItem: removeItemReducer,
-    updateItem: UpdateItemQuantityReducer,
-    clearCart: clearAllItmesReducer,
+    CART_ADD_ITEM: addItemReducer,
+    CART_REMOVE_ITEM: removeItemReducer,
+    CART_UPDATE_ITEM: UpdateItemQuantityReducer,
+    CART_CLEAR_CART: clearAllItmesReducer,
   },
   extraReducers: (builder) => {
     builder.addCase(fetchCartItems.fulfilled, (state, action) => {
@@ -34,6 +34,6 @@ export const cartSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { addItem, removeItem, updateItem, clearCart } = cartSlice.actions;
+export const { CART_ADD_ITEM, CART_REMOVE_ITEM, CART_UPDATE_ITEM, CART_CLEAR_CART } = cartSlice.actions;
 
 export default cartSlice.reducer;

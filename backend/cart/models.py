@@ -36,12 +36,7 @@ class CartItem(models.Model):
 class Order(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     address = models.ForeignKey("Address", null=True, on_delete=models.CASCADE)
-    status = models.CharField(
-        max_length=20,
-        default="pending",
-        choices=(("created", "Created"), ("paid", "Paid"), ("failed", "Failed")),
-        db_index=True,
-    )
+    shipping_price = models.DecimalField(max_digits=10, decimal_places=2)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     payment = models.OneToOneField(
@@ -73,12 +68,14 @@ class OrderItem(models.Model):
 
 class Payment(models.Model):
     amount = models.BigIntegerField()
+    payment_method = models.CharField(max_length=200)
     status = models.CharField(
         max_length=20,
-        default="created",
-        choices=(("created", "Created"), ("paid", "Paid"), ("failed", "Failed")),
+        default="pending",
+        choices=(("pending", "Pending"), ("paid", "Paid"), ("failed", "Failed")),
         db_index=True,
     )
+    paid_at = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

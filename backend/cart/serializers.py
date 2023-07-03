@@ -3,6 +3,7 @@ from .models import *
 from products.serializers import ProductImageSerializer
 from products.models import Product
 
+
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
 
@@ -68,19 +69,41 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ["product", "quantity"]
 
+
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = ["amount","status"]
+        fields = ["amount", "status", "payment_method"]
 
-class OrderSerializer(serializers.ModelSerializer):
+
+class CreateOrderSerializer(serializers.ModelSerializer):
+    payment_method = serializers.CharField(max_length=200)
+
+    class Meta:
+        model = Order
+        fields = ["id", "address", "total", "shipping_price","payment_method"]
+
+
+class ListOrderSerializer(serializers.ModelSerializer):
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ["id", "status", "total", "created_at"]
+
+    def get_status(self, obj):
+        return obj.payment.status
+
+
+class RUDOrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, read_only=True)
     payment = PaymentSerializer(read_only=True)
     full_address = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ["id","status","full_address", "address","total", "payment", "order_items"]
+        fields = ["id", "full_address",
+                  "address", "total", "payment", "order_items"]
 
     def get_full_address(self, obj):
         return str(obj.address)

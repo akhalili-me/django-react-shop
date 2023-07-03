@@ -1,21 +1,25 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Col, Row } from "react-bootstrap";
 import Filter from "../components/Filter";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/product/ProductCard";
 import Pagination from "../components/common/Pagination";
+import { getProductsByFilter } from "../features/product/productReducers";
+import { useDispatch,useSelector } from "react-redux";
+import Loader from "../components/common/Loader";
+import Message from "../components/common/Message";
 
 const ProductFilter = () => {
-  const [products, setProducts] = useState([]);
-  const [count, setCount] = useState('');
+  const dispatch = useDispatch();
   const [queryParams] = useSearchParams();
   const { id } = useParams();
+  const { products, loading, error, count } = useSelector(state => state.product);
+
 
   useEffect(() => {
     let params = "";
-    const baseURL = `/products/search/${id}?`;
+    // const baseURL = `/products/search/${id}?`;
 
     const page = queryParams.get("page") || 1;
     // filters
@@ -44,16 +48,8 @@ const ProductFilter = () => {
       params += `has_selling_stock=${has_selling_stock}&`;
     }
 
-    const fetchProducts = async () => {
-      const finalURL = baseURL + params;
-
-      const { data } = await axios.get(finalURL);
-      setProducts(data.results);
-      setCount(data.count)
-    };
-
-    fetchProducts();
-  }, [id, queryParams]);
+    dispatch(getProductsByFilter(id,params))
+  }, [id, queryParams,dispatch]);
 
   const productCards = useMemo(
     () =>
@@ -66,20 +62,28 @@ const ProductFilter = () => {
   );
 
   return (
-    <>
-      <Row>
-        <Col md={9}>
-          <Row xs={1} md={2} className="g-4">
-            {productCards}
-          </Row>
-        </Col>
-        <Col md={3}>
-          <Filter />
-        </Col>
-      </Row>
+		<>
+			{loading ? (
+				<Loader />
+			) : error ? (
+				<Message variant={"danger"} message={error} />
+			) : (
+				<div>
+					<Row>
+						<Col md={9}>
+							<Row xs={1} md={2} className="g-4">
+								{productCards}
+							</Row>
+						</Col>
+						<Col md={3}>
+							<Filter />
+						</Col>
+					</Row>
 
-      <Pagination count={count} paginateBy={2}/>
-    </>
+					<Pagination count={count} paginateBy={2} />
+				</div>
+			)}
+		</>
   );
 };
 

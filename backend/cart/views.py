@@ -104,12 +104,15 @@ class StateCityList(generics.ListAPIView):
     def get_queryset(self):
         return State.objects.all()
 
+class ListUserOrdersView(generics.ListAPIView):
+    serializer_class = ListOrderSerializer
+    permission_classes = [IsAuthenticated]
 
-class CreateOrderView(generics.CreateAPIView):
-    """
-    View for creating order with order items.
-    """
-    serializer_class = OrderSerializer
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+class CreateOrdersView(generics.ListCreateAPIView):
+    serializer_class = CreateOrderSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
@@ -118,12 +121,13 @@ class CreateOrderView(generics.CreateAPIView):
         with transaction.atomic():
             payment = Payment.objects.create(
                 amount=serializer.validated_data["total"],
-                status="created"
+                payment_method = serializer.validated_data["payment_method"]
             )
 
             order = serializer.save(payment=payment, user=self.request.user)
 
-            order_item_serializer = OrderItemSerializer(data=order_items_data, many=True)
+            order_item_serializer = OrderItemSerializer(
+                data=order_items_data, many=True)
             order_item_serializer.is_valid(raise_exception=True)
 
             order_items = [
@@ -136,6 +140,13 @@ class CreateOrderView(generics.CreateAPIView):
             ]
             OrderItem.objects.bulk_create(order_items)
 
+
+class RUDOrderView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = RUDOrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(id=self.kwargs["pk"], user=self.request.user)
 
 
 class RUDOrderItemView(generics.RetrieveUpdateDestroyAPIView):

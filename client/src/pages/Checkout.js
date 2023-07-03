@@ -4,13 +4,14 @@ import { useEffect } from "react";
 import { fetchUserAddresses } from "../utility/api/address";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import CartItems from "../components/cart/CartItems";
 import AddressItem from "../components/checkout/AddressItem";
 import {addOrder} from "../utility/api/order";
+import OrderItems from "../components/checkout/OrderItems";
 
 const Checkout = () => {
     const [addresses, setAddresses] = useState([]);
     const [selectedAddressId, setSelectedAddressId] = useState();
+    const [shippingPrice] = useState(10);
     const cart = useSelector((state) => state.cart);
 
     const onChangeAddress = (event) => {
@@ -41,7 +42,12 @@ const Checkout = () => {
             quantity: item.quantity
         }));
         console.log(order_items);
-        await addOrder(selectedAddressId, cart.total, order_items);
+        await addOrder(
+            selectedAddressId,
+            cart.total + shippingPrice,
+            shippingPrice,
+            order_items
+        );
     };
     
 
@@ -50,7 +56,7 @@ const Checkout = () => {
             <h1 className="py-3">Choose your address</h1>
             <Form>{userAddresses}</Form>
             <h1 className="py-3">Order Products</h1>
-            <CartItems items={cart.items} />
+            <OrderItems items={cart.items} />
             <h3 className="py-3">
                 <strong>Total:</strong>${cart.total}
             </h3>
