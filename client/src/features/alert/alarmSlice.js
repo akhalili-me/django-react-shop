@@ -3,7 +3,7 @@ import { setAlertReducer, hideAlertReducer } from "./alarmReducers";
 
 export const alarmSlice = createSlice({
   name: "alarm",
-  initialState: { message: "", type: "", show: false },
+  initialState: { message: null, type: null, show: false },
   reducers: {
     setAlarm: setAlertReducer,
     hideAlarm: hideAlertReducer,

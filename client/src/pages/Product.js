@@ -1,26 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, {useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import Nav from "react-bootstrap/Nav";
 import { Routes, Route } from "react-router-dom";
 import { LinkContainer } from "react-router-bootstrap";
 import ProductPage from "../components/product/ProductPage";
 import Reviews from "../components/product/Reviews";
 import Features from "../components/product/Features";
+import { useSelector,useDispatch } from "react-redux";
+import { getProductDetails } from "../features/productDetails/productDetailsReducers";
 
 const Product = () => {
-  const [product, setProduct] = useState([]);
+  const dispatch = useDispatch()
+  const product = useSelector(state => state.productDetails.product)
   const { id } = useParams();
-
+  
   useEffect(() => {
-    async function getProducts() {
-      const response = await axios.get(`/products/${id}/`);
-      const { data: product } = response;
-      setProduct(product);
-    }
-
-    getProducts();
-  }, [id]);
+    dispatch(getProductDetails(id))
+  }, [id,dispatch]);
 
   return (
     <>

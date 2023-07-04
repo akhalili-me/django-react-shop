@@ -3,7 +3,7 @@ import { getLatestProducts,getProductsByFilter } from "./productReducers";
 
 export const productSlice = createSlice({
 	name: "product",
-	initialState: { products: [], loading: null, error: "", count: null },
+	initialState: { products: [], loading: null, error: null, count: null },
 	reducers: {},
 	extraReducers: (builder) => {
 		builder

@@ -1,6 +1,5 @@
 from django.urls import path, include
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
     TokenRefreshView,
 )
 from .views import *
@@ -14,7 +13,7 @@ router.register(r"address", AddressViewSet, basename="address")
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("token", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("token", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
     path("comments/", UserCommentsListView.as_view(), name="user_comments"),
     path("comments/<int:pk>", RUDCommentsView.as_view(), name="user_comments_RUD"),

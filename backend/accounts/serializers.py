@@ -4,7 +4,20 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from products.models import CommentLike, Comment
 from cart.models import Address
 from products.models import Product
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+from rest_framework import serializers
 
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['username'] = user.username
+        token['email'] = user.email
+        return token
+    
 User = get_user_model()
 
 

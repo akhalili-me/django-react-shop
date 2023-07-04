@@ -9,8 +9,14 @@ from .serializers import *
 from products.models import Comment, CommentLike
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
 
 User = get_user_model()
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 
 class UserViewSet(ModelViewSet):
@@ -52,7 +58,8 @@ class UserViewSet(ModelViewSet):
         """
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        serializer = self.serializer_class(instance, data=request.data, partial=partial)
+        serializer = self.serializer_class(
+            instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
@@ -63,7 +70,7 @@ class UserCommentsListView(generics.ListAPIView):
     Return the comments along with product associated with the authenticated user.
     """
 
-    serializer_class =  UserCommentsSerializer
+    serializer_class = UserCommentsSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -122,7 +129,8 @@ class RDCommentLikeView(generics.RetrieveDestroyAPIView):
         return CommentLike.objects.filter(
             user=self.request.user, comment_id=self.kwargs["comment_id"]
         )
-    
+
+
 class AddressViewSet(ModelViewSet):
     """
     View set for retrieve, update, delete and create address.
@@ -132,6 +140,6 @@ class AddressViewSet(ModelViewSet):
 
     def get_queryset(self):
         return Address.objects.filter(user=self.request.user)
-    
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
