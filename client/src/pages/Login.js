@@ -14,10 +14,9 @@ const Login = () => {
 	const [password, setPassword] = useState("");
 	const dispatch = useDispatch();
 	const history = useHistory();
-	const { authenticated, loading, error } = useSelector(
+	const { authenticated, loading, error, registered} = useSelector(
 		(state) => state.auth
 	);
-	const registerSuccess = queryParams.get("register") || false;
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -45,10 +44,10 @@ const Login = () => {
 		<div className="login_container center_screen">
 			{error ? (
 				<Message variant={"danger"} message={error} />
-			) : registerSuccess ? (
+			) : registered ? (
 				<Message
 					variant={"success"}
-					message={"Successfully registered."}
+					message={"Successfully registered, Now login."}
 				/>
 			) : (
 				""

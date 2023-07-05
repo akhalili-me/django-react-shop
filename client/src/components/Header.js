@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { LinkContainer } from "react-router-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../features/cart/cartSlice";
-import { isAuthenticated, logout } from "../utility/auth";
+import { isAuthenticated} from "../utility/auth";
+import { logout } from "../features/auth/authSlice";
 import {
   Offcanvas,
   Nav,
@@ -26,7 +27,7 @@ const Header = () => {
   }, [cartItemCount]);
 
   const handleLogout = async () => {
-    logout();
+    dispatch(logout());
     dispatch(clearCart());
   };
 

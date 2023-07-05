@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { setTokenLocalStorage } from "../../utility/token";
+import { removeTokensLocalStorage, setTokenLocalStorage } from "../../utility/token";
 import jwt_decode from "jwt-decode";
 
 export const login = createAsyncThunk(
@@ -27,3 +27,32 @@ export const login = createAsyncThunk(
 		}
 	}
 );
+
+export const register = createAsyncThunk(
+	"auth/register",
+	async ({ email, username, password }) => {
+		try {
+			const { data } = await axios.post("/accounts/users", {
+				email,
+				username,
+				password,
+			});
+			return data;
+		} catch (error) {
+			const errorMessage =
+				error.response && error.response.data.detail
+					? error.response.data.detail
+					: error.message;
+			throw new Error(errorMessage);
+		}
+	}
+);
+
+export const logoutReducer = (state, action) => {
+	removeTokensLocalStorage();
+	state.authenticated = false;
+	state.email = null;
+	state.username = null;
+	state.registered = null;
+	window.location.replace("/");
+};

@@ -20,7 +20,7 @@ export const getJwtTokens = () => {
   return { token, refreshToken };
 };
 
-export const removeTokens = () => {
+export const removeTokensLocalStorage = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 };

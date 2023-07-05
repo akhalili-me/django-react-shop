@@ -1,62 +1,39 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import Alert from "react-bootstrap/Alert";
-import { register } from "../utility/auth";
-import { jsonErrorstoString } from "../utility/string_utils";
+import { register } from "../features/auth/authReducers";
+import Loader from "../components/common/Loader";
+import Message from "../components/common/Message";
+import { useDispatch, useSelector } from "react-redux";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [failed, setFailed] = useState(false);
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-  const handleFieldChange = (event) => {
-    const target = event.target;
-    const value = target.value;
-    const name = target.name;
-
-    switch (name) {
-      case "email":
-        setEmail(value);
-        break;
-      case "username":
-        setUsername(value);
-        break;
-      case "password":
-        setPassword(value);
-        break;
-      case "password_confirm":
-        setPasswordConfirm(value);
-        break;
-      default:
-        break;
-    }
-  };
+  const dispatch = useDispatch()
+	const { loading, error} = useSelector(
+		(state) => state.auth
+	);
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
     if (password !== passwordConfirm && password !== null) {
-      setError("Password and Password Confirm must be same.");
-      setFailed(true);
+      setMessage("Passwords do not match!")
     } else {
-      register(email, username, password).then((response) => {
-        if (response.status !== 201) {
-          setError(jsonErrorstoString(response.data));
-          setFailed(true);
-        } else {
-          window.location.replace("login?register=true");
-        }
-      });
+      dispatch(register(email,username,password))
     }
   };
 
   return (
     <div className="login_container center_screen">
-      {failed ? <Alert variant={"danger"}>{error}</Alert> : ""}
+
+      {message && <Message variant="danger">{message}</Message>}
+      {error && <Message variant="danger">{error}</Message>}
+      {loading && <Loader />}
 
       <h2 className="text-center">Register</h2>
       <Form onSubmit={handleSubmit} className="login_form">
@@ -67,7 +44,7 @@ const Register = () => {
             placeholder="Enter email"
             name="email"
             value={email}
-            onChange={handleFieldChange}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </Form.Group>
 
@@ -78,7 +55,7 @@ const Register = () => {
             placeholder="Enter username"
             name="username"
             value={username}
-            onChange={handleFieldChange}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </Form.Group>
 
@@ -89,7 +66,7 @@ const Register = () => {
             placeholder="Password"
             name="password"
             value={password}
-            onChange={handleFieldChange}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </Form.Group>
 
@@ -100,7 +77,7 @@ const Register = () => {
             placeholder="Password confirm"
             name="password_confirm"
             value={passwordConfirm}
-            onChange={handleFieldChange}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
           />
         </Form.Group>
 

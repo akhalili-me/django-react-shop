@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getLatestProducts,getProductsByFilter } from "./productReducers";
+import { getLatestProducts,getProductsByFilter } from "./productListReducers";
 
-export const productSlice = createSlice({
-	name: "product",
+export const productListSlice = createSlice({
+	name: "productList",
 	initialState: { products: [], loading: null, error: null, count: null },
 	reducers: {},
 	extraReducers: (builder) => {
@@ -37,4 +37,4 @@ export const productSlice = createSlice({
 	},
 });
 
-export default productSlice.reducer;
+export default productListSlice.reducer;
