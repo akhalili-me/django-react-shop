@@ -6,7 +6,7 @@ import CategoryCard from "../components/category/CategoryCard";
 import ProductCard from "../components/product/ProductCard";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { getLatestProducts } from "../features/product/productReducers";
+import { getLatestProducts } from "../features/product/productList/productListReducers";
 import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
 
@@ -16,7 +16,7 @@ const Home = () => {
     state.category.categories.filter((c) => c.parent === null)
   );
   const { products, loading, error, count } = useSelector(
-    (state) => state.product
+    (state) => state.productList
   );
 
   useEffect(() => {

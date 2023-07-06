@@ -1,59 +1,45 @@
 import React, { useState } from "react";
 import { Form, Row, Col, Button } from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
-import { addComment } from "../../utility/api/comment";
 import { setAlarm } from "../../features/alert/alarmSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getProductComments } from "../../features/comment/commentsList/commentsListReducers";
+import { addComment } from "../../features/comment/commentOperations/commentOperationReducers";
 
-const CommentForm = ({ productId, getComments }) => {
+const CommentForm = ({ productId }) => {
   const [rate, setRate] = useState(0);
-  const [comment, setComment] = useState("");
+  const [text, setText] = useState("");
   const dispatch = useDispatch();
+  const {loading,error,success} = useSelector(state => state.commentOperations)
 
   const clearFields = () => {
     setRate(0);
-    setComment("");
-  };
-
-  const handleFieldChange = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-
-    switch (name) {
-      case "rate":
-        setRate(value);
-        break;
-      case "comment":
-        setComment(value);
-        break;
-      default:
-        break;
-    }
+    setText("");
   };
 
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
-    try {
-      await addComment({ text: comment, rate: rate }, productId);
-      getComments();
+    const comment = { text: text, rate: rate }
+    dispatch(addComment({comment,productId}))
+
+    if (success) {
+      dispatch(getProductComments())
       dispatch(
         setAlarm({
           message: "Comment Added Successfully",
           type: "success",
-          show: true,
         })
       );
-    } catch (error) {
+    } else if (success === false)
+    {
       dispatch(
         setAlarm({
-          message: error.message,
+          message: error,
           type: "danger",
-          show: true,
         })
       );
-    } finally {
-      clearFields();
     }
+    clearFields()
   };
 
   return (
@@ -65,9 +51,9 @@ const CommentForm = ({ productId, getComments }) => {
             <Form.Control
               as="textarea"
               rows={3}
-              onChange={handleFieldChange}
-              value={comment}
-              name="comment"
+              onChange={(e) => setText(e.target.value)}
+              value={text}
+              name="text"
             />
           </InputGroup>
         </Col>
@@ -78,7 +64,7 @@ const CommentForm = ({ productId, getComments }) => {
             </InputGroup.Text>
             <Form.Select
               aria-label="Default select example"
-              onChange={handleFieldChange}
+              onChange={(e) => setRate(e.target.value)}
               value={rate}
               name="rate"
             >

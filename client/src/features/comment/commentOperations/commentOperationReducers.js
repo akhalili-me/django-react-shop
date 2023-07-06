@@ -21,11 +21,11 @@ export const addComment = createAsyncThunk(
 
 export const updateComment = createAsyncThunk(
 	"commentOperations/addComment",
-	async (comment) => {
+	async ({commentId,text,rate}) => {
 		try {
-      await authAxios.put(`/accounts/comments/${comment.id}`, {
-        text: comment.text,
-        rate: comment.rate,
+      await authAxios.put(`/accounts/comments/${commentId}`, {
+        text: text,
+        rate: rate,
       });
 		} catch (error) {
 			const errorMessage =

@@ -4,10 +4,10 @@ import Nav from "react-bootstrap/Nav";
 import { Routes, Route } from "react-router-dom";
 import { LinkContainer } from "react-router-bootstrap";
 import ProductPage from "../components/product/ProductPage";
-import Reviews from "../components/product/Reviews";
+import Reviews from "../components/product/Comments";
 import Features from "../components/product/Features";
 import { useSelector,useDispatch } from "react-redux";
-import { getProductDetails } from "../features/productDetails/productDetailsReducers";
+import { getProductDetails } from "../features/product/productDetails/productDetailsReducers";
 
 const Product = () => {
   const dispatch = useDispatch()

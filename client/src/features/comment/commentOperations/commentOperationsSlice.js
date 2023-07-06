@@ -8,7 +8,7 @@ import {
 
 export const commentOperationSlice = createSlice({
 	name: "commentOperation",
-	initialState: { loading: null, error: null, success: false },
+	initialState: { loading: null, error: null, success: null },
 	reducers: {},
 	extraReducers: (builder) => {
 		builder
@@ -22,7 +22,7 @@ export const commentOperationSlice = createSlice({
 					].includes(action.type),
 				(state) => {
 					state.loading = true;
-					state.success = false;
+					state.success = null;
 				}
 			)
 			.addMatcher(

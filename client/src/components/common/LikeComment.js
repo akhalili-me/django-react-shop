@@ -1,54 +1,53 @@
 import React, { useState } from "react";
-import { likeComment, removeLikeComment } from "../../utility/api/comment";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAlarm } from "../../features/alert/alarmSlice";
+import { likeComment,deleteLikeComment } from "../../features/comment/commentOperations/commentOperationReducers";
+import { getProductComments } from "../../features/comment/commentsList/commentsListReducers";
 
-const LikeComment = ({ comment, getComments }) => {
+const LikeComment = ({comment,commentId}) => {
   const dispatch = useDispatch();
+  const { success, error } = useSelector(
+      (state) => state.commentOperations
+  );
 
   const handleLikeComment = async () => {
-    try {
-      await likeComment(comment.id);
-      await getComments();
+    dispatch(likeComment(comment.id))
 
+    if (success) {
+      dispatch(getProductComments(commentId))
       dispatch(
         setAlarm({
-          message: "Comment liked successfully",
-          type: "success",
-          show: true,
+            message: "Comment liked successfully",
+            type: "success",
         })
-      );
-    } catch (error) {
+    );
+    } else if (success === false) {
       dispatch(
         setAlarm({
-          message: error.message,
-          type: "danger",
-          show: true,
+            message: error,
+            type: "danger",
         })
-      );
+    );
     }
   };
 
-  const handleRemoveLikeComment = async () => {
-    try {
-      await removeLikeComment(comment.id);
-      await getComments();
-
+  const handleDeleteLikeComment = async () => {
+    dispatch(deleteLikeComment(comment.id))
+    if (success) {
+      dispatch(getProductComments(commentId))
       dispatch(
         setAlarm({
-          message: "Comment like removed successfully",
-          type: "success",
-          show: true,
+            message: "Comment like removed successfully.",
+            type: "success",
         })
-      );
-    } catch (error) {
+    );
+    } else if (success === false) {
       dispatch(
         setAlarm({
-          message: error.message,
-          type: "danger",
-          show: true,
+            message: error,
+            type: "danger",
         })
-      );
+    );
     }
   };
 
@@ -56,7 +55,7 @@ const LikeComment = ({ comment, getComments }) => {
     <>
       <span> {comment.likes} </span>
       {comment.liked_by_current_user ? (
-        <i onClick={handleRemoveLikeComment} class="fa-solid fa-thumbs-up"></i>
+        <i onClick={handleDeleteLikeComment} class="fa-solid fa-thumbs-up"></i>
       ) : (
         <i onClick={handleLikeComment} class="fa-regular fa-thumbs-up"></i>
       )}

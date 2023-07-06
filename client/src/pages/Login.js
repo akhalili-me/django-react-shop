@@ -7,13 +7,13 @@ import { login } from "../features/auth/authReducers";
 import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
 	const [queryParams] = useSearchParams();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const dispatch = useDispatch();
-	const history = useHistory();
 	const { authenticated, loading, error, registered} = useSelector(
 		(state) => state.auth
 	);
@@ -26,11 +26,11 @@ const Login = () => {
 	const redirectAfterLogin = () => {
 		const back = queryParams.get("back");
 		if (back) {
-			history.replace(back);
+		  window.location.replace(back);
 		} else {
-			history.replace("/");
+		  window.location.replace("/");
 		}
-	};
+	  };
 
 	useEffect(() => {
 		if (authenticated) {
