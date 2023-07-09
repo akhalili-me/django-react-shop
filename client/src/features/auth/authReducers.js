@@ -56,3 +56,7 @@ export const logoutReducer = (state, action) => {
 	state.registered = null;
 	window.location.replace("/");
 };
+
+export const clearAuthErrorsReducer = (state, action) => {
+	state.error = null;
+};

@@ -1,78 +1,74 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Modal, InputGroup, Form, Button, Col, Row } from "react-bootstrap";
-import { fetchAddressById, updateAddress } from "../../../utility/api/address";
+import React, { useEffect, useState } from "react";
+import { Modal, Form, Button, Col, Row } from "react-bootstrap";
 import { setAlarm } from "../../../features/alert/alarmSlice";
 import { useDispatch, useSelector } from "react-redux";
+import {getAddressById} from "../../../features/address/addressDetails/addressDetailsReducers"
+import { getUserAddresses } from "../../../features/address/addressList/addressListReducers";
+import { updateAddress } from "../../../features/address/addressOperations/addressOperationsReducers";
 
-const EditAddressModal = ({ show, onClose, updateAddressState, addressId }) => {
-  const [address, setAddress] = useState({});
+const EditAddressModal = ({ show, onClose, addressId }) => {
   const dispatch = useDispatch();
-  const states = useSelector((state) => state.location.states);
-  const [selectCityDisabled, setSelectCityDisabled] = useState(true);
-  const [cities, setCities] = useState(null);
+  const stateOptions = useSelector((state) => state.location.states);
+  const [cityOptions, setCityOptions] = useState(null);
+  const [isSelectCityDisabled, setIsSelectCityDisabled] = useState(true);
+
+  const [state, setState] = useState("");
+	const [city, setCity] = useState("");
+	const [phone, setPhone] = useState("");
+	const [postalCode, setPostalCode] = useState("");
+	const [streetAddress, setStreetAddress] = useState("");
+	const [houseNumber, setHouseNumber] = useState("");
+
+  const {address,loading,error} = useSelector(state => state.addressDetails)
+  const updateOperation = useSelector(state => state.adressOperations)
 
   useEffect(() => {
-    const getAddressAndSetCities = async () => {
-      const { data } = await fetchAddressById(addressId);
-      setAddress(data);
-      setCities(states.find((c) => c.name === data?.state)?.cities);
-      setSelectCityDisabled(false);
-    };
+    if (show) {
+      dispatch(getAddressById(addressId))
 
-    if (addressId !== 0) {
-      getAddressAndSetCities();
-    } else {
-      setCities(null);
-      setSelectCityDisabled(true);
-    }
-  }, [addressId, states]);
 
-  const handleFieldChange = useCallback(
-    (event) => {
-      const { name, value } = event.target;
-      setAddress({
-        ...address,
-        [name]: value,
-      });
-
-      if (name === "state") {
-        if (value === "default") {
-          setSelectCityDisabled(true);
-          setCities(null);
-        } else {
-          setCities(states.find((c) => c.name === value)?.cities);
-          setSelectCityDisabled(false);
-        }
+      if (error === null && loading === false) {
+        setState(address.state)
+        setCity(address.city)
+        setPhone(address.phone)
+        setPostalCode(address.postal_code)
+        setStreetAddress(address.street_address)
+        setHouseNumber(address.house_number)
+  
+        setCityOptions(stateOptions.find((s) => s.name === address.state)?.cities)
+        setIsSelectCityDisabled(false)
       }
-    },
-    [address, states]
-  );
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    try {
-      await updateAddress(address);
-      updateAddressState(address)
-      dispatch(
-        setAlarm({
-          message: "Address updated successfully.",
-          type: "success",
-          show: true,
-        })
-      );
-    } catch (error) {
-      dispatch(
-        setAlarm({
-          message: "Failed to update address, try again.",
-          type: "danger",
-          show: true,
-        })
-      );
     }
+  }, [dispatch, addressId]);
 
-    onClose();
-  };
+	const handleSubmit = async (event) => {
+		event.preventDefault();
+		dispatch(
+			updateAddress({
+        id: addressId,
+				state: state,
+				city: city,
+				phone: phone,
+				postal_code: postalCode,
+				street_address: streetAddress,
+				house_number: houseNumber,
+			})
+		);
+
+		if (updateOperation.success) {
+      dispatch(getUserAddresses())
+			dispatch(
+				setAlarm({
+					message: "Address updated successfuly.",
+					type: "success",
+				})
+			);
+		} else if (updateOperation.success === false) {
+			dispatch(setAlarm({ message: updateOperation.error, type: "danger" }));
+		}
+		onClose();
+	};
 
   return (
     <Modal show={show} onHide={onClose} dialogClassName="wider-modal-dialog">
@@ -85,12 +81,17 @@ const EditAddressModal = ({ show, onClose, updateAddressState, addressId }) => {
             <Col md={6}>
               <Form.Select
                 aria-label="Default select example"
-                onChange={handleFieldChange}
+                onChange={(e) => {
+                  const selectedState = e.target.value;
+                  setState(selectedState);
+                  setCityOptions(stateOptions.find((s) => s.name === selectedState)?.cities ?? null);
+                  setIsSelectCityDisabled(selectedState === "Default");
+								}}
                 name="state"
-                value={address?.state || "default"}
+                value={state || "Default"}
               >
-                <option value="default">State</option>
-                {states?.map((state) => (
+                <option value="Default">State</option>
+                {stateOptions?.map((state) => (
                   <option key={state.id} value={state.name}>
                     {state.name}
                   </option>
@@ -100,8 +101,8 @@ const EditAddressModal = ({ show, onClose, updateAddressState, addressId }) => {
                 className="mt-3"
                 name="phone"
                 type="tel"
-                onChange={handleFieldChange}
-                value={address.phone || ""}
+                onChange={(e) => setPhone(e.target.value)}
+                value={phone || ""}
                 placeholder="Phone number"
                 pattern="\d{11}"
                 required
@@ -109,14 +110,14 @@ const EditAddressModal = ({ show, onClose, updateAddressState, addressId }) => {
             </Col>
             <Col md={6}>
               <Form.Select
-                onChange={handleFieldChange}
+                onChange={(e) => setCity(e.target.value)}
                 aria-label="Default select example"
                 name="city"
-                value={address?.city || "default"}
-                disabled={selectCityDisabled}
+                value={city || "default"}
+                disabled={isSelectCityDisabled}
               >
                 <option>City</option>
-                {cities?.map((city, index) => (
+                {cityOptions?.map((city, index) => (
                   <option key={index} value={city}>
                     {city}
                   </option>
@@ -126,8 +127,8 @@ const EditAddressModal = ({ show, onClose, updateAddressState, addressId }) => {
                 className="mt-3"
                 type="text"
                 name="postal_code"
-                value={address.postal_code || ""}
-                onChange={handleFieldChange}
+                value={postalCode || ""}
+                onChange={(e) => setPostalCode(e.target.value)}
                 placeholder="Postal code"
                 pattern="\d{10}"
                 required
@@ -140,8 +141,8 @@ const EditAddressModal = ({ show, onClose, updateAddressState, addressId }) => {
                 className="mt-3"
                 type="text"
                 name="street_address"
-                value={address.street_address || ""}
-                onChange={handleFieldChange}
+                value={streetAddress || ""}
+                onChange={(e) => setStreetAddress(e.target.value)}
                 placeholder="Street address"
                 required
               />
@@ -150,8 +151,8 @@ const EditAddressModal = ({ show, onClose, updateAddressState, addressId }) => {
               <Form.Control
                 className="mt-3"
                 type="number"
-                onChange={handleFieldChange}
-                value={address.house_number || ""}
+                onChange={(e) => setHouseNumber(e.target.value)}
+                value={houseNumber || ""}
                 name="house_number"
                 placeholder="Pelak"
                 required

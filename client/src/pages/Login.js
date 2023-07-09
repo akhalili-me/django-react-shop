@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
-import { Link, useSearchParams, useHistory } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCartItems } from "../features/cart/cartSlice";
 import { login } from "../features/auth/authReducers";
 import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { clearAuthErrors } from "../features/auth/authSlice";
 
 const Login = () => {
 	const [queryParams] = useSearchParams();
@@ -33,6 +33,7 @@ const Login = () => {
 	  };
 
 	useEffect(() => {
+		dispatch(clearAuthErrors())
 		if (authenticated) {
 			dispatch(fetchCartItems());
 			redirectAfterLogin();

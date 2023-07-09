@@ -6,7 +6,6 @@ import Rating from "../../common/Rating";
 import EditModal from "./EditCommentModal";
 import { Link } from "react-router-dom";
 import { getUserComments } from "../../../features/comment/commentsList/commentsListReducers";
-import { deleteComment } from "../../../features/comment/commentOperations/commentOperationReducers";
 import Loader from "../../common/Loader";
 import Message from "../../common/Message";
 

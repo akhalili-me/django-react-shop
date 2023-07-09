@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { register } from "../features/auth/authReducers";
 import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
 import { useDispatch, useSelector } from "react-redux";
+import { clearAuthErrors } from "../features/auth/authSlice";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -28,6 +29,10 @@ const Register = () => {
     }
   };
 
+  useEffect(() => {
+    dispatch(clearAuthErrors())
+  }, [dispatch])
+  
   return (
     <div className="login_container center_screen">
 

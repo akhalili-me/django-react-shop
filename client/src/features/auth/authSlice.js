@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, register, logoutReducer } from "./authReducers";
+import { login, register, logoutReducer, clearAuthErrorsReducer } from "./authReducers";
 
 export const authSlice = createSlice({
 	name: "auth",
@@ -13,6 +13,7 @@ export const authSlice = createSlice({
 	},
 	reducers: {
 		logout: logoutReducer,
+		clearAuthErrors: clearAuthErrorsReducer
 	},
 	extraReducers: (builder) => {
 		builder
@@ -48,5 +49,5 @@ export const authSlice = createSlice({
 	},
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, clearAuthErrors } = authSlice.actions;
 export default authSlice.reducer;
