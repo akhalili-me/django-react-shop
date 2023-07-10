@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { register } from "../features/auth/authReducers";
 import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
 import { useDispatch, useSelector } from "react-redux";
-import { clearAuthErrors } from "../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+import { register } from "../features/auth/register/RegisterReducers";
+import { clearRegisterErrors } from "../features/auth/register/RegisterSlice";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -13,10 +14,11 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const dispatch = useDispatch()
-	const { loading, error} = useSelector(
-		(state) => state.auth
+	const { loading, error,success} = useSelector(
+		(state) => state.register
 	);
 
   const handleSubmit = (event) => {
@@ -25,19 +27,23 @@ const Register = () => {
     if (password !== passwordConfirm && password !== null) {
       setMessage("Passwords do not match!")
     } else {
-      dispatch(register(email,username,password))
+      dispatch(register({email,username,password}))
     }
   };
 
+  if (success === true) {
+    navigate('/login');
+  }
+  
   useEffect(() => {
-    dispatch(clearAuthErrors())
+    dispatch(clearRegisterErrors())
   }, [dispatch])
   
   return (
     <div className="login_container center_screen">
 
-      {message && <Message variant="danger">{message}</Message>}
-      {error && <Message variant="danger">{error}</Message>}
+      {message && <Message variant="danger" message={message}/>}
+      {error && <Message variant="danger" message={error}/>}
       {loading && <Loader />}
 
       <h2 className="text-center">Register</h2>

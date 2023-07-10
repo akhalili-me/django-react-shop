@@ -3,7 +3,7 @@ import { LinkContainer } from "react-router-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../features/cart/cartSlice";
 import { isAuthenticated} from "../utility/auth";
-import { logout } from "../features/auth/authSlice";
+import { logout } from "../features/auth/login/loginSlice";
 import {
   Offcanvas,
   Nav,

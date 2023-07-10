@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addAddress,udpateAddress,deleteAddress } from "./addressOperationsReducers";
+import { addAddress,updateAddress,deleteAddress } from "./addressOperationsReducers";
 
 export const addressOperationsSlice = createSlice({
 	name: "AddressOperations",
@@ -11,7 +11,7 @@ export const addressOperationsSlice = createSlice({
 				(action) =>
 					[
 						addAddress.pending,
-						udpateAddress.pending,
+						updateAddress.pending,
 						deleteAddress.pending,
 					].includes(action.type),
 				(state) => {
@@ -23,7 +23,7 @@ export const addressOperationsSlice = createSlice({
 				(action) =>
 					[
 						addAddress.fulfilled,
-						udpateAddress.fulfilled,
+						updateAddress.fulfilled,
 						deleteAddress.fulfilled,
 					].includes(action.type),
 				(state, action) => {
@@ -35,7 +35,7 @@ export const addressOperationsSlice = createSlice({
 				(action) =>
 					[
 						addAddress.rejected,
-						udpateAddress.rejected,
+						updateAddress.rejected,
 						deleteAddress.rejected,
 					].includes(action.type),
 				(state, action) => {
