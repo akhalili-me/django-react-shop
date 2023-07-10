@@ -1,38 +1,38 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
-import { fetchUserAddresses } from "../utility/api/address";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import AddressItem from "../components/checkout/AddressItem";
 import {addOrder} from "../utility/api/order";
 import OrderItems from "../components/checkout/OrderItems";
+import { useDispatch } from "react-redux";
+import { getUserAddresses } from "../features/address/addressList/addressListReducers";
+import Loader from "../components/common/Loader";
+import Message from "../components/common/Message";
+
 
 const Checkout = () => {
-    const [addresses, setAddresses] = useState([]);
     const [selectedAddressId, setSelectedAddressId] = useState();
     const [shippingPrice] = useState(10);
     const cart = useSelector((state) => state.cart);
 
-    const onChangeAddress = (event) => {
-        const selectedId = event.target.value;
-        setSelectedAddressId(selectedId);
-    };
+    const dispatch = useDispatch()
 
     useEffect(() => {
-        const getUserAddresses = async () => {
-            const { data } = await fetchUserAddresses();
-            setAddresses(data);
-        };
-        getUserAddresses();
-    }, []);
+        dispatch(getUserAddresses())
+    }, [dispatch]);
+
+    const {addresses,loading,error} = useSelector(state => state.addressList)
 
     const userAddresses = addresses.map((address) => (
         <AddressItem
             key={address.id}
             address={address}
             selectedAddressId={selectedAddressId}
-            onChangeAddress={onChangeAddress}
+            onChangeAddress={() => {
+                setSelectedAddressId(address.id)
+            }}
         />
     ));
 
@@ -41,7 +41,6 @@ const Checkout = () => {
             product: item.product.id,
             quantity: item.quantity
         }));
-        console.log(order_items);
         await addOrder(
             selectedAddressId,
             cart.total + shippingPrice,
@@ -54,7 +53,15 @@ const Checkout = () => {
     return (
         <>
             <h1 className="py-3">Choose your address</h1>
-            <Form>{userAddresses}</Form>
+            <Form>
+                {loading ? (
+                    <Loader />
+                ) : error ? (
+                    <Message variant={"danger"} message={error} />
+                ) : (
+                    userAddresses
+                )}
+            </Form>
             <h1 className="py-3">Order Products</h1>
             <OrderItems items={cart.items} />
             <h3 className="py-3">

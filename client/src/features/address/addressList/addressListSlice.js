@@ -3,7 +3,7 @@ import { getUserAddresses } from "./addressListReducers";
 
 export const addressListSlice = createSlice({
 	name: "addressList",
-	initialState: { addresses: [], loading: null, error: null, count: null },
+	initialState: { addresses: [], loading: null, error: null},
 	reducers: {},
 	extraReducers: (builder) => {
 		builder
@@ -23,8 +23,7 @@ export const addressListSlice = createSlice({
 					].includes(action.type),
 				(state, action) => {
 					state.loading = false;
-					state.addresses = action.payload.results;
-					state.count = action.payload.count;
+					state.addresses = action.payload;
 				}
 			)
 			.addMatcher(

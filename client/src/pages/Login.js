@@ -3,24 +3,26 @@ import { Form, Button } from "react-bootstrap";
 import { Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCartItems } from "../features/cart/cartSlice";
-import { login } from "../features/auth/authReducers";
 import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
 import { useEffect } from "react";
-import { clearAuthErrors } from "../features/auth/authSlice";
+import { login } from "../features/auth/login/loginReducers";
+import { clearLoginErrors } from "../features/auth/login/loginSlice";
 
 const Login = () => {
 	const [queryParams] = useSearchParams();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const dispatch = useDispatch();
-	const { authenticated, loading, error, registered} = useSelector(
-		(state) => state.auth
+	const { authenticated, loading, error} = useSelector(
+		(state) => state.login
 	);
+
+	const register = useSelector(state => state.register)
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		dispatch(login(email, password));
+		dispatch(login({email, password}));
 	};
 
 	const redirectAfterLogin = () => {
@@ -33,7 +35,7 @@ const Login = () => {
 	  };
 
 	useEffect(() => {
-		dispatch(clearAuthErrors())
+		dispatch(clearLoginErrors())
 		if (authenticated) {
 			dispatch(fetchCartItems());
 			redirectAfterLogin();
@@ -43,16 +45,9 @@ const Login = () => {
 
 	return (
 		<div className="login_container center_screen">
-			{error ? (
-				<Message variant={"danger"} message={error} />
-			) : registered ? (
-				<Message
-					variant={"success"}
-					message={"Successfully registered, Now login."}
-				/>
-			) : (
-				""
-			)}
+			{register.success && <Message variant={"success"} message={"Successfully registered, now login."} />}
+			{error && <Message variant={"danger"} message={error} />}
+
 
 			<h2 className="text-center">Login Page</h2>
 			<Form onSubmit={handleSubmit} className="login_form">

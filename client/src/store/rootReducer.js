@@ -5,17 +5,24 @@ import categoryReducer from '../features/category/categorySlice'
 import stateCityReducer from "../features/stateCity/stateCitySlice";
 import productListReducer from "../features/product/productList/productListSlice"
 import productDetailsReducer from "../features/product/productDetails/ProductDetailSlice"
-import authReducer from "../features/auth/authSlice"
+import registerReducers from "../features/auth/register/RegisterSlice"
+import loginReducers from "../features/auth/login/loginSlice"
 import commentListReducer from "../features/comment/commentsList/commentsListSlice"
 import commentDetailsReducer from "../features/comment/commentDetails/commentDetailsSlice"
 import commentOperationsReducer from "../features/comment/commentOperations/commentOperationsSlice"
+import addressListReducers from "../features/address/addressList/addressListSlice"
+import addressDetailsReducers from "../features/address/addressDetails/addressDetailsSlice"
+import addressOperationsReducers from "../features/address/addressOperations/addressOperationsSlice"
 
 const rootReducer = combineReducers({
   cart: cartReducer,
   alarm: alarmReducer,
   category: categoryReducer,
   location: stateCityReducer,
-  auth: authReducer,
+
+  // auth
+  login: loginReducers,
+  register: registerReducers,
 
   // Products
   productList: productListReducer,
@@ -24,7 +31,12 @@ const rootReducer = combineReducers({
   // Comments
   commentList: commentListReducer,
   commentDetails:commentDetailsReducer ,
-  commentOperations : commentOperationsReducer
+  commentOperations : commentOperationsReducer,
+
+  // Addreeses 
+  addressList: addressListReducers,
+  addressDetails: addressDetailsReducers,
+  addressOperations: addressOperationsReducers,
 });
 
 export default rootReducer;
