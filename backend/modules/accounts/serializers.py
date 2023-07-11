@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from django.core.validators import MinLengthValidator, RegexValidator
-from products.models import CommentLike, Comment
-from cart.models import Address
-from products.models import Product
+from modules.products.models import CommentLike, Comment
+from modules.cart.models import Address
+from modules.products.models import Product
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework import serializers
 

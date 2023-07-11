@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from .permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from .serializers import *
-from products.models import Comment, CommentLike
+from modules.products.models import Comment, CommentLike
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from rest_framework_simplejwt.views import TokenObtainPairView

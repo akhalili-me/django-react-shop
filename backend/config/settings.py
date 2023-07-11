@@ -14,8 +14,8 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-STATIC_DIR = Path.joinpath(BASE_DIR, "static")
-MEDIA_DIR = Path.joinpath(BASE_DIR, "media")
+STATIC_DIR = Path.joinpath(BASE_DIR, "modules/static")
+MEDIA_DIR = Path.joinpath(BASE_DIR, "modules/media")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -41,9 +41,9 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
-    "accounts",
-    "products",
-    "cart",
+    "modules.accounts",
+    "modules.products",
+    "modules.cart",
 ]
 
 MIDDLEWARE = [
