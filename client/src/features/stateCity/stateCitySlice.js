@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import authAxios from "../../utility/api"
 
 export const getLocations = createAsyncThunk(
   "location/getLocations",
   async () => {
-    const { data } = await axios.get('/cart/location');
+    const { data } = await authAxios.get('/cart/location');
     return data;
   }
 );

@@ -1,11 +1,11 @@
-import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import authAxios from "../../../utility/api";
 
 export const getLatestProducts = createAsyncThunk(
   "product/latestProducts",
   async () => {
     try {
-      const { data } = await axios.get("/products/");
+      const { data } = await authAxios.get("/products/");
       return data;
     } catch (error) {
       const errorMessage =
@@ -22,7 +22,7 @@ export const getProductsByFilter = createAsyncThunk(
   async ({ childCategoryId, params }) => {
     try {
       const URL = `/products/search/${childCategoryId}?${params}`;
-      const { data } = await axios.get(URL);
+      const { data } = await authAxios.get(URL);
       return data;
     } catch (error) {
       const errorMessage =
@@ -39,7 +39,7 @@ export const getChildCategoriesWithTopSoldProducts = createAsyncThunk(
   async (childCategoryId, urlParams) => {
     try {
       const URL = `/products/search/${childCategoryId}?${urlParams}`;
-      const { data } = axios.get(URL);
+      const { data } = authAxios.get(URL);
       return data;
     } catch (error) {
       const errorMessage =

@@ -1,11 +1,11 @@
-import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import authAxios from "../../../utility/api";
 
 export const getProductDetails = createAsyncThunk(
   "productDetails/getProductDetails",
   async (productId) => {
     try {
-      const { data } = await axios.get(`/products/${productId}/`);
+      const { data } = await authAxios.get(`/products/${productId}/`);
       return data;
     } catch (error) {
       const errorMessage =

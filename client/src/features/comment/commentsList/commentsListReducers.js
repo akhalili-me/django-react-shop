@@ -1,4 +1,3 @@
-import axios from "axios";
 import authAxios from "../../../utility/api";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
@@ -6,7 +5,7 @@ export const getProductComments = createAsyncThunk(
   "comments/productComments",
   async ({productId,page}) => {
     try {
-      const { data } = await axios.get(`/products/${productId}/comments?page=${page}`);
+      const { data } = await authAxios.get(`/products/${productId}/comments?page=${page}`);
       return data;
     } catch (error) {
       const errorMessage =

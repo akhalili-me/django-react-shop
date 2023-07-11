@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import authAxios from "../../utility/api";
 
 export const getCategories = createAsyncThunk(
 	"category/getCategories",
 	async () => {
 		try {
-			const { data } = await axios.get("/products/categories");
+			const { data } = await authAxios.get("/products/categories");
 			return data;
 		} catch (error) {
 			const errorMessage =
@@ -20,7 +20,7 @@ export const getCategories = createAsyncThunk(
 
 export const categorySlice = createSlice({
 	name: "category",
-	initialState: { categories: [], loading: null, error: "" },
+	initialState: { categories: [], loading: null, error: null },
 	reducers: {},
 	extraReducers: (builder) => {
 		builder
