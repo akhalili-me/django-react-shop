@@ -30,6 +30,7 @@ export const categorySlice = createSlice({
 			.addCase(getCategories.fulfilled, (state, action) => {
 				state.loading = false;
 				state.categories = action.payload;
+				state.error = null;
 			})
 			.addCase(getCategories.rejected, (state, action) => {
 				state.loading = false;

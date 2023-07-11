@@ -12,6 +12,7 @@ export const commentDetailsSlice = createSlice({
 				state.loading = true;
 			})
 			.addCase(getCommentById.fulfilled, (state, action) => {
+				state.error = null;
 				state.loading = false;
                 state.comment = action.payload
 			})

@@ -21,6 +21,7 @@ export const registerSlice = createSlice({
 			.addCase(register.fulfilled, (state, action) => {
 				state.loading = false;
 				state.success = true;
+				state.error = null;
 			})
 			.addCase(register.rejected, (state, action) => {
 				state.loading = false;

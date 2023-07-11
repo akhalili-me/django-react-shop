@@ -29,6 +29,7 @@ export const addressOperationsSlice = createSlice({
 				(state, action) => {
 					state.loading = false;
 					state.success = true;
+					state.error = null;
 				}
 			)
 			.addMatcher(

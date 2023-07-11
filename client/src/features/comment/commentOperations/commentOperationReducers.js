@@ -20,7 +20,7 @@ export const addComment = createAsyncThunk(
 );
 
 export const updateComment = createAsyncThunk(
-	"commentOperations/addComment",
+	"commentOperations/updateComment",
 	async ({commentId,text,rate}) => {
 		try {
       await authAxios.put(`/accounts/comments/${commentId}`, {
@@ -38,7 +38,7 @@ export const updateComment = createAsyncThunk(
 );
 
 export const deleteComment = createAsyncThunk(
-	"commentOperations/addComment",
+	"commentOperations/deleteComment",
 	async (commentId) => {
 		try {
       await authAxios.delete(`/accounts/comments/${commentId}`);

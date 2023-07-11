@@ -24,6 +24,7 @@ export const addressListSlice = createSlice({
 				(state, action) => {
 					state.loading = false;
 					state.addresses = action.payload;
+					state.error = null;
 				}
 			)
 			.addMatcher(

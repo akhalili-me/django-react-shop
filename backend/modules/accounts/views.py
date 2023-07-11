@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
+from .pagination import UserCommentListPagination
 
 User = get_user_model()
 
@@ -72,6 +73,7 @@ class UserCommentsListView(generics.ListAPIView):
 
     serializer_class = UserCommentsSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = UserCommentListPagination
 
     def get_queryset(self):
         return Comment.objects.filter(author=self.request.user).order_by("-created_at")

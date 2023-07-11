@@ -13,6 +13,7 @@ export const productDetailsSlice = createSlice({
 			})
 			.addCase(getProductDetails.fulfilled, (state, action) => {
 				state.loading = false;
+				state.error = null;
                 state.product = action.payload
 			})
 			.addCase(getProductDetails.rejected, (state, action) => {

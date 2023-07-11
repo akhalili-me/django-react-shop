@@ -13,6 +13,7 @@ export const AddressDetailsSlice = createSlice({
 			})
 			.addCase(getAddressById.fulfilled, (state, action) => {
 				state.loading = false;
+				state.error = null;
                 state.address = action.payload
 			})
 			.addCase(getAddressById.rejected, (state, action) => {

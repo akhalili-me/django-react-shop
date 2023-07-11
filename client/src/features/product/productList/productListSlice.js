@@ -13,6 +13,7 @@ export const productListSlice = createSlice({
 			})
 			.addCase(getLatestProducts.fulfilled, (state, action) => {
 				state.loading = false;
+				state.error = null;
                 state.products = action.payload.results
                 state.count = action.payload.count;
 			})
@@ -27,6 +28,7 @@ export const productListSlice = createSlice({
 			})
 			.addCase(getProductsByFilter.fulfilled, (state, action) => {
 				state.loading = false;
+				state.error = null;
                 state.products = action.payload.results;
                 state.count = action.payload.count;
 			})
