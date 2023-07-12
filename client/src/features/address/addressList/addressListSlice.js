@@ -7,36 +7,18 @@ export const addressListSlice = createSlice({
 	reducers: {},
 	extraReducers: (builder) => {
 		builder
-			.addMatcher(
-				(action) =>
-					[
-						getUserAddresses.pending,
-					].includes(action.type),
-				(state) => {
-					state.loading = true;
-				}
-			)
-			.addMatcher(
-				(action) =>
-					[
-						getUserAddresses.fulfilled,
-					].includes(action.type),
-				(state, action) => {
-					state.loading = false;
-					state.addresses = action.payload;
-					state.error = null;
-				}
-			)
-			.addMatcher(
-				(action) =>
-					[
-						getUserAddresses.rejected,
-					].includes(action.type),
-				(state, action) => {
-					state.loading = false;
-					state.error = action.error.message;
-				}
-			);
+		.addCase(getUserAddresses.pending, (state) => {
+			state.loading = true;
+		})
+		.addCase(getUserAddresses.fulfilled, (state, action) => {
+			state.loading = false;
+			state.error = null;
+			state.addresses = action.payload
+		})
+		.addCase(getUserAddresses.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.error.message;
+		})
 	},
 });
 

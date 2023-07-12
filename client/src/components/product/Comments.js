@@ -1,6 +1,5 @@
 import { useEffect} from "react";
 import Rating from "../common/Rating";
-import { isAuthenticated } from "../../utility/auth";
 import CommentForm from "./CommentForm";
 import { Link } from "react-router-dom";
 import LikeComment from "../common/LikeComment";
@@ -16,6 +15,7 @@ const Comments = ({ productId }) => {
   const [queryParams] = useSearchParams();
   const page = queryParams.get("page") || 1;
 
+  const {authenticated} = useSelector(state => state.login)
   const { comments, loading, error, count } = useSelector(
     (state) => state.commentList
   );
@@ -26,7 +26,7 @@ const Comments = ({ productId }) => {
 
   return (
     <div className="py-4">
-      {isAuthenticated() ? (
+      {authenticated ? (
         <CommentForm productId={productId} />
       ) : (
         <h2 className="bold mb-4">
@@ -46,7 +46,7 @@ const Comments = ({ productId }) => {
               <Rating
                 value={comment.rate}
                 text={
-                  <LikeComment comment={comment} productId ={productId} />
+                  <LikeComment comment={comment} productId ={productId}  page={page} />
                 }
               />
               <p>{comment.text}</p>

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { removeTokensLocalStorage, setTokenLocalStorage } from "../../../utility/token";
+import { setBothJwtTokenLocalStorage,removeJWTTokensLocalStorage } from "../../../utility/token";
 import jwt_decode from "jwt-decode";
 import authAxios from "../../../utility/api";
 
@@ -12,7 +12,7 @@ export const login = createAsyncThunk(
 				password,
 			});
 
-			setTokenLocalStorage(data);
+			setBothJwtTokenLocalStorage(data);
 			const decodedToken = jwt_decode(data.access);
 			return {
 				username: decodedToken.username,
@@ -29,7 +29,7 @@ export const login = createAsyncThunk(
 );
 
 export const logoutReducer = (state, action) => {
-	removeTokensLocalStorage();
+	removeJWTTokensLocalStorage();
 	state.authenticated = false;
 	state.email = null;
 	state.username = null;

@@ -1,5 +1,5 @@
-import { isAuthenticated } from "../../utility/auth";
 import authAxios from "../../utility/api";
+import { isAuthenticated } from "../../utility/token";
 
 export const addItemReducer = (state, action) => {
     const item = action.payload;

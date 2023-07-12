@@ -19,25 +19,39 @@ import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
 import Alarm from "./components/common/Alarm";
 import ParentCategory from "./pages/ParentCategory";
-import { isAuthenticated, updateTokenIfExpired } from "./utility/auth";
-import { useDispatch } from "react-redux";
-import { getCategories } from "./features/category/categorySlice";
+import { useDispatch, useSelector } from "react-redux";
 import NotFound from "./pages/NotFound";
 import Checkout from "./pages/Checkout";
+import { getCategories } from "./features/category/categorySlice";
+import { refreshAndSetAccessToken } from "./features/auth/token/tokenReducers";
 
 function App() {
   const dispatch = useDispatch();
+  const {authenticated} = useSelector(state => state.login)
 
   useEffect(() => {
-    if (isAuthenticated()) {
-      updateTokenIfExpired();
-    }
+    
     dispatch(getCategories());
-  }, [dispatch]);
+  }, [dispatch])
+  
+  useEffect(() => {
+    if (authenticated) {
+      dispatch(refreshAndSetAccessToken())
+      
+      const interval = setInterval( () => {
+        dispatch(refreshAndSetAccessToken())},
+        10 * 60 * 1000
+      );
+
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [dispatch,authenticated]);
 
   function PrivateRoute({ component }) {
     const location = useLocation();
-    return isAuthenticated() ? (
+    return authenticated ? (
       component
     ) : (
       <Navigate to={`/login?back=${location.pathname}`} />
@@ -58,11 +72,11 @@ function App() {
             <Route path="/category/:id" element={<ParentCategory />} />
             <Route
               path="/login"
-              element={isAuthenticated() ? <Navigate to={"/"} /> : <Login />}
+              element={authenticated ? <Navigate to={"/"} /> : <Login />}
             />
             <Route
               path="/register"
-              element={isAuthenticated() ? <Navigate to={"/"} /> : <Register />}
+              element={authenticated ? <Navigate to={"/"} /> : <Register />}
             />
 
             {/* Protected Routes */}

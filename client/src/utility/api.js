@@ -1,6 +1,6 @@
 import axios from "axios";
-import { getToken } from "./token";
-import { isAuthenticated, updateTokenIfExpired } from "./auth";
+import { getToken, isTokenExpired } from "./token";
+import { getAccessToken } from "./token";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api/";
 
@@ -15,11 +15,10 @@ const authAxios = axios.create({
 
 authAxios.interceptors.request.use(
   async (config) => {
-    if (isAuthenticated()) {
-      updateTokenIfExpired();
-      const token = getToken();
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+      const accessToken = getAccessToken();
+      if (accessToken && isTokenExpired(accessToken) === false) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
     return config;
   },
   (error) => Promise.reject(error)

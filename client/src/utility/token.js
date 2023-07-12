@@ -1,31 +1,45 @@
-export const TOKEN_KEY = "access_token";
+export const ACCESS_TOKEN_KEY = "access_token";
 export const REFRESH_TOKEN_KEY = "refresh_token";
 
-export const setTokenLocalStorage = (tokenData) => {
-  localStorage.setItem(TOKEN_KEY, tokenData.access);
+export const setAccessTokenLocalStorage = (accessToken) => {
+  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+}
+
+export const setBothJwtTokenLocalStorage = (tokenData) => {
+  localStorage.setItem(ACCESS_TOKEN_KEY, tokenData.access);
   localStorage.setItem(REFRESH_TOKEN_KEY, tokenData.refresh);
 };
 
-export const getToken = () => {
-  return localStorage.getItem(TOKEN_KEY);
+export const getAccessToken = () => {
+  return localStorage.getItem(ACCESS_TOKEN_KEY);
 };
 
 export const getRefreshToken = () => {
   return localStorage.getItem(REFRESH_TOKEN_KEY);
 };
 
-export const getJwtTokens = () => {
-  const token = getToken();
+export const getBothJwtTokenLocalStorage = () => {
+  const accessToken = getAccessToken();
   const refreshToken = getRefreshToken();
-  return { token, refreshToken };
+  return { accessToken, refreshToken };
 };
 
-export const removeTokensLocalStorage = () => {
-  localStorage.removeItem(TOKEN_KEY);
+export const removeJWTTokensLocalStorage = () => {
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 };
 
 export const isTokenExpired = (token) => {
   const decodedToken = JSON.parse(atob(token.split(".")[1]));
   return decodedToken.exp <= Date.now() / 1000;
+};
+
+export const isAuthenticated = () => {
+  const { token, refreshToken } = getBothJwtTokenLocalStorage();
+
+  if (!refreshToken || !token || isTokenExpired(refreshToken)) {
+    return false;
+  }
+
+  return true;
 };

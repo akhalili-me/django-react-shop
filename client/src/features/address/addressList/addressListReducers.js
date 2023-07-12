@@ -6,6 +6,7 @@ export const getUserAddresses = createAsyncThunk(
   async () => {
     try {
       const { data } = await authAxios.get(`/accounts/address`);
+      console.log(data);
       return data;
     } catch (error) {
       const errorMessage =

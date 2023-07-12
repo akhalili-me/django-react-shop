@@ -10,7 +10,6 @@ const CommentForm = ({ productId }) => {
   const [rate, setRate] = useState(0);
   const [text, setText] = useState("");
   const dispatch = useDispatch();
-  const {loading,error,success} = useSelector(state => state.commentOperations)
 
   const clearFields = () => {
     setRate(0);
@@ -21,24 +20,6 @@ const CommentForm = ({ productId }) => {
     event.preventDefault();
     const comment = { text: text, rate: rate }
     dispatch(addComment({comment,productId}))
-
-    if (success) {
-      dispatch(getProductComments())
-      dispatch(
-        setAlarm({
-          message: "Comment Added Successfully",
-          type: "success",
-        })
-      );
-    } else if (success === false)
-    {
-      dispatch(
-        setAlarm({
-          message: error,
-          type: "danger",
-        })
-      );
-    }
     clearFields()
   };
 

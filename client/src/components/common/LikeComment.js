@@ -1,54 +1,16 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setAlarm } from "../../features/alert/alarmSlice";
+import React from "react";
+import { useDispatch } from "react-redux";
 import { likeComment,deleteLikeComment } from "../../features/comment/commentOperations/commentOperationReducers";
-import { getProductComments } from "../../features/comment/commentsList/commentsListReducers";
 
-const LikeComment = ({comment,commentId}) => {
+const LikeComment = ({comment,productId,page}) => {
   const dispatch = useDispatch();
-  const { success, error } = useSelector(
-      (state) => state.commentOperations
-  );
 
   const handleLikeComment = async () => {
-    dispatch(likeComment(comment.id))
-
-    if (success) {
-      dispatch(getProductComments(commentId))
-      dispatch(
-        setAlarm({
-            message: "Comment liked successfully",
-            type: "success",
-        })
-    );
-    } else if (success === false) {
-      dispatch(
-        setAlarm({
-            message: error,
-            type: "danger",
-        })
-    );
-    }
+    dispatch(likeComment({commentId: comment.id,productId,page}))
   };
 
   const handleDeleteLikeComment = async () => {
-    dispatch(deleteLikeComment(comment.id))
-    if (success) {
-      dispatch(getProductComments(commentId))
-      dispatch(
-        setAlarm({
-            message: "Comment like removed successfully.",
-            type: "success",
-        })
-    );
-    } else if (success === false) {
-      dispatch(
-        setAlarm({
-            message: error,
-            type: "danger",
-        })
-    );
-    }
+    dispatch(deleteLikeComment({commentId: comment.id,productId,page}))
   };
 
   return (

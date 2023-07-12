@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { LinkContainer } from "react-router-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../features/cart/cartSlice";
-import { isAuthenticated} from "../utility/auth";
 import { logout } from "../features/auth/login/loginSlice";
 import {
   Offcanvas,
@@ -19,6 +18,7 @@ import CategorySidebar from "./category/CategorySidebar";
 const Header = () => {
   const [cartBadge, setCartBadge] = useState(0);
   const cartItemCount = useSelector((state) => state.cart.items.length);
+  const {authenticated} = useSelector(state => state.login)
   const [showCategories, setShowCategories] = useState(false);
   const dispatch = useDispatch();
 
@@ -67,7 +67,7 @@ const Header = () => {
                 </Nav.Link>
               </LinkContainer>
 
-              {isAuthenticated() ? (
+              {authenticated ? (
                 <>
                   <NavDropdown
                     id="navbarScrollingDropdown"
