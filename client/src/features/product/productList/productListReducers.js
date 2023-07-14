@@ -8,10 +8,7 @@ export const getLatestProducts = createAsyncThunk(
       const { data } = await authAxios.get("/products/");
       return data;
     } catch (error) {
-      const errorMessage =
-        error.response && error.response.data.detail
-          ? error.response.data.detail
-          : error.message;
+			const errorMessage = error.response?.data?.detail || error.message;
       throw new Error(errorMessage);
     }
   }
@@ -25,10 +22,7 @@ export const getProductsByFilter = createAsyncThunk(
       const { data } = await authAxios.get(URL);
       return data;
     } catch (error) {
-      const errorMessage =
-        error.response && error.response.data.detail
-          ? error.response.data.detail
-          : error.message;
+			const errorMessage = error.response?.data?.detail || error.message;
       throw new Error(errorMessage);
     }
   }
@@ -42,10 +36,7 @@ export const getChildCategoriesWithTopSoldProducts = createAsyncThunk(
       const { data } = authAxios.get(URL);
       return data;
     } catch (error) {
-      const errorMessage =
-        error.response && error.response.data.detail
-          ? error.response.data.detail
-          : error.message;
+			const errorMessage = error.response?.data?.detail || error.message;
       throw new Error(errorMessage);
     }
   }

@@ -91,13 +91,18 @@ class ProductCommentCreateSerializer(serializers.ModelSerializer):
     
 class TopSellingProductsByChildCategorySerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
-    
+    parent = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
-        fields = ["name","products"]
+        fields = ["name","products","parent"]
 
     @staticmethod
     def get_products(obj):
         products = obj.products.order_by("-sold")[:3]
         product_serializer = ProductSerializer(products, many=True)
         return product_serializer.data
+    
+    @staticmethod
+    def get_parent(obj): 
+        return obj.parent.name

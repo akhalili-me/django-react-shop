@@ -1,30 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Table from "react-bootstrap/Table";
-import { fetchProductFeatures } from "../../utility/api/product";
+import { useDispatch, useSelector } from "react-bootstrap";
+import { getProductFeatures } from "../../features/product/productFeatures/productFeaturesReducers";
+import Loader from "../common/Loader";
+import Message from "../common/Message";
 
 const Features = ({ productId }) => {
-  const [features, setFeatures] = useState([]);
+  const dispatch = useDispatch();
+  const { features, loading, error } = useSelector(
+    (state) => state.productFeatures
+  );
 
   useEffect(() => {
-    const getFeatures = async () => {
-      const { data } = await fetchProductFeatures(productId);
-      setFeatures(data);
-    };
-
-    getFeatures();
-  }, [productId]);
+    dispatch(getProductFeatures(productId));
+  }, [dispatch, productId]);
 
   return (
-    <Table striped className="mt-4">
-      <tbody>
-        {features.map((feature) => (
-          <tr>
-            <td>{feature.name}</td>
-            <td>{feature.description}</td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+    <>
+      {loading ? (
+        <Loader />
+      ) : error ? (
+        <Message variant={"danger"} message={error} />
+      ) : (
+        <Table striped className="mt-4">
+          <tbody>
+            {features.map((feature) => (
+              <tr>
+                <td>{feature.name}</td>
+                <td>{feature.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
+    </>
   );
 };
 

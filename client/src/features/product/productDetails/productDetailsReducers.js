@@ -8,10 +8,7 @@ export const getProductDetails = createAsyncThunk(
       const { data } = await authAxios.get(`/products/${productId}/`);
       return data;
     } catch (error) {
-      const errorMessage =
-        error.response && error.response.data.detail
-          ? error.response.data.detail
-          : error.message;
+			const errorMessage = error.response?.data?.detail || error.message;
       throw new Error(errorMessage);
     }
   }
