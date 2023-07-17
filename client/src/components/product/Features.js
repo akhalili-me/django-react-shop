@@ -1,18 +1,17 @@
 import React, { useEffect } from "react";
 import Table from "react-bootstrap/Table";
-import { useDispatch, useSelector } from "react-bootstrap";
 import { getProductFeatures } from "../../features/product/productFeatures/productFeaturesReducers";
 import Loader from "../common/Loader";
 import Message from "../common/Message";
+import { useSelector,useDispatch } from "react-redux";
 
 const Features = ({ productId }) => {
   const dispatch = useDispatch();
   const { features, loading, error } = useSelector(
     (state) => state.productFeatures
   );
-
   useEffect(() => {
-    dispatch(getProductFeatures(productId));
+    dispatch(getProductFeatures({productId}));
   }, [dispatch, productId]);
 
   return (
@@ -24,7 +23,7 @@ const Features = ({ productId }) => {
       ) : (
         <Table striped className="mt-4">
           <tbody>
-            {features.map((feature) => (
+            {features?.map((feature) => (
               <tr>
                 <td>{feature.name}</td>
                 <td>{feature.description}</td>

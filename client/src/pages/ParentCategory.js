@@ -14,12 +14,20 @@ const ParentCategory = () => {
   const navigate = useNavigate();
 
   const { childCategory, parentCategory, loading, error } = useSelector(
-    (state) => state.childCategory
+    (state) => state.childCategoryProducts
   );
 
   useEffect(() => {
-    dispatch(getChildCategoriesWithTopSoldProducts(id));
-  }, [id, dispatch]);
+
+    if (categories.length > 0) {
+      const category = categories.find((category) => category.id === Number(id))
+      if (!category || category.parent !== null) {
+        navigate("/notfound");
+      }
+    }
+
+    dispatch(getChildCategoriesWithTopSoldProducts({ parentCategoryId: id }));
+  }, [id, dispatch,categories,navigate]);
 
   return (
     <>

@@ -5,6 +5,8 @@ import categoryReducer from '../features/category/categorySlice'
 import stateCityReducer from "../features/stateCity/stateCitySlice";
 import productListReducer from "../features/product/productList/productListSlice"
 import productDetailsReducer from "../features/product/productDetails/ProductDetailSlice"
+import productFeaturesReducers from "../features/product/productFeatures/productFeaturesSlice"
+import childCategoryProductsReducers from "../features/product/childCategoryProducts/childCategoryProductsSlice"
 import registerReducers from "../features/auth/register/RegisterSlice"
 import loginReducers from "../features/auth/login/loginSlice"
 import commentListReducer from "../features/comment/commentsList/commentsListSlice"
@@ -27,6 +29,8 @@ const rootReducer = combineReducers({
   // Products
   productList: productListReducer,
   productDetails: productDetailsReducer,
+  childCategoryProducts: childCategoryProductsReducers,
+  productFeatures: productFeaturesReducers,
   
   // Comments
   commentList: commentListReducer,
