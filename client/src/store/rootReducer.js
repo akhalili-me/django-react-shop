@@ -16,6 +16,9 @@ import addressListReducers from "../features/address/addressList/addressListSlic
 import addressDetailsReducers from "../features/address/addressDetails/addressDetailsSlice"
 import addressOperationsReducers from "../features/address/addressOperations/addressOperationsSlice"
 
+import orderListReducers from "../features/order/orderOperations/orderOperationsSlice"
+import orderOperationsReducers from "../features/order/orderOperations/orderOperationsSlice"
+
 const rootReducer = combineReducers({
   cart: cartReducer,
   alarm: alarmReducer,
@@ -41,6 +44,10 @@ const rootReducer = combineReducers({
   addressList: addressListReducers,
   addressDetails: addressDetailsReducers,
   addressOperations: addressOperationsReducers,
+
+  // Order
+  orderList: orderListReducers,
+  orderOperations: orderOperationsReducers
 });
 
 export default rootReducer;

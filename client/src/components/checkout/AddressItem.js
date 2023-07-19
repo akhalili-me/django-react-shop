@@ -9,7 +9,7 @@ const AddressItem = ({ address, selectedAddressId, onChangeAddress }) => {
   return (
     <Form.Check
       name="address"
-      checked={selectedAddressId === address.id.toString()}
+      checked={selectedAddressId === address.id}
       type="radio"
       value={address.id}
       label={<span dangerouslySetInnerHTML={{ __html: fullAddress }} />}
