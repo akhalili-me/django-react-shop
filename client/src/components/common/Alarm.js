@@ -9,7 +9,7 @@ const Alarm = () => {
 
   useEffect(() => {
     if (show) {
-      setTimeout(() => dispatch(hideAlarm()), 3000);
+      setTimeout(() => dispatch(hideAlarm()), 1500);
     }
   }, [show, dispatch]);
 

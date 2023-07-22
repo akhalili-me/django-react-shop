@@ -72,7 +72,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = ["amount", "status", "payment_method"]
+        fields = ["amount", "status", "payment_method","paid_at"]
 
 
 class PaymentMethodSerializer(serializers.ModelSerializer):

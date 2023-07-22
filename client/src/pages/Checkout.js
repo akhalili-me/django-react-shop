@@ -9,11 +9,13 @@ import { useDispatch } from "react-redux";
 import { getUserAddresses } from "../features/address/addressList/addressListReducers";
 import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
-import {addOrder} from "../features/order/orderOperations/orderOperationsReducers";
+import { addOrder } from "../features/order/orderOperations/orderOperationsReducers";
+import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
   const [selectedAddressId, setSelectedAddressId] = useState();
   const [shippingPrice] = useState(10);
+  const navigate = useNavigate();
   const cart = useSelector((state) => state.cart);
 
   const dispatch = useDispatch();
@@ -25,6 +27,8 @@ const Checkout = () => {
   const { addresses, loading, error } = useSelector(
     (state) => state.addressList
   );
+
+  const { success } = useSelector((state) => state.orderOperations);
 
   const userAddresses = addresses.map((address) => (
     <AddressItem
@@ -50,9 +54,11 @@ const Checkout = () => {
         paymentMethod: "saderat",
         shippingPrice,
         orderItems,
+        navigator: navigate
       })
     );
   };
+
 
   return (
     <>
@@ -69,7 +75,10 @@ const Checkout = () => {
       <h1 className="py-3">Order Products</h1>
       <OrderItems items={cart.items} />
       <h3 className="py-3">
-        <strong>Total:</strong>${cart.total}
+        <strong>Shipping Price:</strong>${shippingPrice}
+      </h3>
+      <h3 className="py-3">
+        <strong>Total:</strong>${cart.total + shippingPrice}
       </h3>
       <Button onClick={onPayClick} className="pay_button" variant="success">
         Pay

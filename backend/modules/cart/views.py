@@ -116,8 +116,17 @@ class CreateOrdersView(generics.CreateAPIView):
     serializer_class = CreateOrderSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        order_items_data = self.request.data.get("order_items")
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        order_items_data = request.data.get("order_items")
+
+        if not order_items_data or len(order_items_data) == 0:
+            return Response(
+                {"detail": "Order items cannot be empty."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         with transaction.atomic():
             payment_data = serializer.validated_data["payment"]
@@ -126,10 +135,9 @@ class CreateOrdersView(generics.CreateAPIView):
                 payment_method=payment_data["payment_method"]
             )
 
-            order = serializer.save(payment=payment, user=self.request.user)
+            order = serializer.save(payment=payment, user=request.user)
 
-            order_item_serializer = OrderItemSerializer(
-                data=order_items_data, many=True)
+            order_item_serializer = OrderItemSerializer(data=order_items_data, many=True)
             order_item_serializer.is_valid(raise_exception=True)
 
             order_items = [
@@ -141,6 +149,15 @@ class CreateOrdersView(generics.CreateAPIView):
                 for item in order_item_serializer.validated_data
             ]
             OrderItem.objects.bulk_create(order_items)
+
+        response_data = {
+            "order_id": order.id,
+            "payment_id": payment.id,
+            "message": "Order created successfully!",
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
 
 
 
