@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import authAxios from "../../../utility/api";
 import { setAlarm } from "../../alert/alarmSlice";
+import { clearCart } from "../../cart/cartSlice";
 
 export const addOrder = createAsyncThunk(
   "orderOperations/addOrder",
@@ -9,15 +10,14 @@ export const addOrder = createAsyncThunk(
     { dispatch }
   ) => {
     try {
-      console.log(addressId, totalPrice, shippingPrice, paymentMethod, orderItems);
       await authAxios.post(`/cart/orders/create`, {
         address: addressId,
         total: totalPrice,
         shipping_price: shippingPrice,
-        payment_method: paymentMethod,
+        payment: { payment_method: paymentMethod },
         order_items: orderItems,
       });
-
+      dispatch(clearCart())
       dispatch(
         setAlarm({
           message: "Order successfully added.",

@@ -15,7 +15,7 @@ const ProductFilter = () => {
   const [queryParams] = useSearchParams();
   const { id } = useParams();
   const { products, loading, error, count } = useSelector(
-    (state) => state.product
+    (state) => state.productList
   );
 
   useEffect(() => {

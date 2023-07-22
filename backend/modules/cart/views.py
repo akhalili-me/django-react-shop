@@ -109,10 +109,10 @@ class ListUserOrdersView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        return Order.objects.filter(user=self.request.user).order_by("-created_at")
 
 class CreateOrdersView(generics.CreateAPIView):
-
+    
     serializer_class = CreateOrderSerializer
     permission_classes = [IsAuthenticated]
 
@@ -120,9 +120,10 @@ class CreateOrdersView(generics.CreateAPIView):
         order_items_data = self.request.data.get("order_items")
 
         with transaction.atomic():
+            payment_data = serializer.validated_data["payment"]
             payment = Payment.objects.create(
                 amount=serializer.validated_data["total"],
-                payment_method = serializer.validated_data["payment_method"]
+                payment_method=payment_data["payment_method"]
             )
 
             order = serializer.save(payment=payment, user=self.request.user)
@@ -140,6 +141,7 @@ class CreateOrdersView(generics.CreateAPIView):
                 for item in order_item_serializer.validated_data
             ]
             OrderItem.objects.bulk_create(order_items)
+
 
 
 class RUDOrderView(generics.RetrieveUpdateDestroyAPIView):

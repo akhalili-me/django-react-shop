@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAlarm } from "../../../features/alert/alarmSlice";
 import { getCommentById } from "../../../features/comment/commentDetails/commentDetailsReducers";
 import { updateComment } from "../../../features/comment/commentOperations/commentOperationReducers";
-import { getUserComments } from "../../../features/comment/commentsList/commentsListReducers";
 import Loader from "../../common/Loader";
 import Message from "../../common/Message";
 

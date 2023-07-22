@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound";
 import Checkout from "./pages/Checkout";
 import { getCategories } from "./features/category/categorySlice";
 import { refreshAndSetAccessToken } from "./features/auth/token/tokenReducers";
+import OrderDetails from "./components/profile/order/OrderDetails";
 
 function App() {
   const dispatch = useDispatch();
@@ -80,6 +81,11 @@ function App() {
             />
 
             {/* Protected Routes */}
+            <Route
+              path="/orders/:id"
+              element={<PrivateRoute component={<OrderDetails />} />}
+            />
+
             <Route
               path="/profile/*"
               element={<PrivateRoute component={<Profile />} />}

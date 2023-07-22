@@ -75,12 +75,17 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = ["amount", "status", "payment_method"]
 
 
+class PaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ["payment_method"]
+
 class CreateOrderSerializer(serializers.ModelSerializer):
-    payment_method = serializers.CharField(max_length=200)
+    payment = PaymentMethodSerializer()
 
     class Meta:
         model = Order
-        fields = ["id", "address", "total", "shipping_price","payment_method"]
+        fields = ["id", "address", "total", "shipping_price","payment"]
 
 
 class ListOrderSerializer(serializers.ModelSerializer):
@@ -93,9 +98,15 @@ class ListOrderSerializer(serializers.ModelSerializer):
     def get_status(self, obj):
         return obj.payment.status
 
+class OrderItemsDetailsSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+
+    class Meta: 
+        model = OrderItem
+        fields =["quantity","product"]
 
 class RUDOrderSerializer(serializers.ModelSerializer):
-    order_items = OrderItemSerializer(many=True, read_only=True)
+    order_items = OrderItemsDetailsSerializer(many=True, read_only=True)
     payment = PaymentSerializer(read_only=True)
     full_address = serializers.SerializerMethodField()
 
