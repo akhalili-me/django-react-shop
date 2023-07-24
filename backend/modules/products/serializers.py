@@ -106,3 +106,9 @@ class TopSellingProductsByChildCategorySerializer(serializers.ModelSerializer):
     @staticmethod
     def get_parent(obj): 
         return obj.parent.name
+
+class CommentLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentLike
+        fields = ["id", "comment", "user"]
+        extra_kwargs = {"user": {"read_only": True}, "comment": {"read_only": True}}

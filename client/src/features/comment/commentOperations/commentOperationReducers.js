@@ -77,7 +77,7 @@ export const likeComment = createAsyncThunk(
     "commentOperations/likeComment",
     async ({commentId,productId,page},{dispatch}) => {
         try {
-            await authAxios.post(`/accounts/comments/${commentId}/like/`);
+            await authAxios.post(`/products/commentlike/create/${commentId}`);
 
 			dispatch(
                 setAlarm({
@@ -99,7 +99,7 @@ export const deleteLikeComment = createAsyncThunk(
     async ({commentId,productId,page},{dispatch}) => {
         try {
             await authAxios.delete(
-                `/accounts/comments/${commentId}/like/remove`
+                `/products/commentlike/remove/${commentId}`
             );
 
 			dispatch(

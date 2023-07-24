@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken, isTokenExpired } from "./token";
+import { isTokenExpired } from "./token";
 import { getAccessToken } from "./token";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api/";

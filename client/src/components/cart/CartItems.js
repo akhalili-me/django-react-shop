@@ -2,7 +2,7 @@ import React from "react";
 import { Table, Form } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { removeItemCart, updateItemCart } from "../../features/cart/cartSlice";
-
+import { setAlarm } from "../../features/alert/alarmSlice";
 const CartItems = ({ items }) => {
   const dispatch = useDispatch();
 
@@ -10,10 +10,17 @@ const CartItems = ({ items }) => {
     dispatch(removeItemCart({ product: productId, index: index }));
   };
 
-  const handleUpdateQuantity = (productId, quantity) => {
+  const handleUpdateQuantity = (productId, productQuantity, event) => {
+    const quantity = parseInt(event.target.value, 10);
+
+    if (quantity >= Number(productQuantity)) {
+      dispatch(setAlarm({ message: "No more in stock", type: "danger" }));
+      return;
+    }
+
     const data = {
       productId: productId,
-      quantity: parseInt(quantity, 10),
+      quantity: quantity,
     };
     dispatch(updateItemCart(data));
   };
@@ -35,15 +42,13 @@ const CartItems = ({ items }) => {
         <td>{i.product.name}</td>
         <td>${i.product.price}</td>
         <td>
-          {" "}
           <Form.Control
             onChange={(event) =>
-              handleUpdateQuantity(i.product.id, event.target.value)
+              handleUpdateQuantity(i.product.id, i.product.quantity, event)
             }
             type="number"
-            min="1"
-            max={i.product.quantity}
-            defaultValue={i.quantity}
+            min={1}
+            value={i.quantity}
             className="text-center"
           />
         </td>

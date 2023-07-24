@@ -17,14 +17,4 @@ urlpatterns = [
     path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
     path("comments/", UserCommentsListView.as_view(), name="user_comments"),
     path("comments/<int:pk>", RUDCommentsView.as_view(), name="user_comments_RUD"),
-    path(
-        "comments/<int:pk>/like/",
-        CommentLikeCreateView.as_view(),
-        name="create_comment_likes",
-    ),
-    path(
-        "comments/<int:comment_id>/like/remove",
-        RDCommentLikeView.as_view(),
-        name="retrieve_delete_comment_likes",
-    ),
 ]

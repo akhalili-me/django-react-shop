@@ -4,7 +4,7 @@ import os
 from uuid import uuid4
 from django.utils.deconstruct import deconstructible
 from django.db.models import Avg
-
+from .managers import CommentLikeManager
 
 @deconstructible
 class PathAndRename(object):
@@ -96,6 +96,8 @@ class CommentLike(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    objects = CommentLikeManager()
+    
     class Meta:
         constraints = [
             models.UniqueConstraint(

@@ -3,9 +3,9 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from .serializers import *
 from .models import ShoppingSession
-from django.http import Http404
-from rest_framework.viewsets import ModelViewSet
-from django.db import transaction
+from .helpers import (
+    invalid_order_response,
+)
 
 
 class CreateCartItems(generics.CreateAPIView):
@@ -20,17 +20,13 @@ class CreateCartItems(generics.CreateAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        product = serializer.validated_data["product"]
-        quantity = serializer.validated_data["quantity"]
-        shopping_session, _ = ShoppingSession.objects.get_or_create(
-            user=self.request.user
+        shopping_session = ShoppingSession.objects.get_or_create_shopping_session(
+            request.user
+        )
+        CartItem.objects.create_or_update_cart_item(
+            shopping_session, **serializer.validated_data
         )
 
-        CartItem.objects.update_or_create(
-            product=product, session=shopping_session, defaults={
-                "quantity": quantity}
-        )
-        shopping_session.update_total()
         headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
@@ -46,26 +42,15 @@ class RDCartItems(generics.RetrieveDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_cart_item_by_product_id(kwargs.get("pk"))
-        serilizer = self.serializer_class(instance=instance)
+        cart_item_object = CartItem.objects.get_cart_item_by_product_id(
+            kwargs.get("pk"), request.user
+        )
+        serilizer = self.serializer_class(instance=cart_item_object)
         return Response(serilizer.data)
 
     def destroy(self, request, *args, **kwargs):
-        cart_item = self.get_cart_item_by_product_id(kwargs.get("pk"))
-        shopping_session = cart_item.session
-        self.perform_destroy(cart_item)
-        shopping_session.update_total()
+        CartItem.objects.delete_one_cart_item(kwargs.get("pk"),request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def get_cart_item_by_product_id(self, id):
-        try:
-            cart_item = CartItem.objects.get(
-                product__id=id, session__user=self.request.user
-            )
-        except CartItem.DoesNotExist:
-            raise Http404()
-
-        return cart_item
 
 
 class CartItemsList(generics.ListAPIView):
@@ -77,8 +62,8 @@ class CartItemsList(generics.ListAPIView):
     serializer_class = CartItemsListSerializer
 
     def get_queryset(self):
-        session = ShoppingSession.objects.filter(user=self.request.user)
-        return session
+        return ShoppingSession.objects.filter(user=self.request.user)
+ 
 
 
 class DeleteAllCartItems(generics.DestroyAPIView):
@@ -89,8 +74,7 @@ class DeleteAllCartItems(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def destroy(self, request, *args, **kwargs):
-        CartItem.objects.filter(session__user=self.request.user).delete()
-        ShoppingSession.objects.get(user=request.user).update_total()
+        CartItem.objects.delete_all_user_cart_items(request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -104,6 +88,7 @@ class StateCityList(generics.ListAPIView):
     def get_queryset(self):
         return State.objects.all()
 
+
 class ListUserOrdersView(generics.ListAPIView):
     serializer_class = ListOrderSerializer
     permission_classes = [IsAuthenticated]
@@ -111,8 +96,8 @@ class ListUserOrdersView(generics.ListAPIView):
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user).order_by("-created_at")
 
+
 class CreateOrdersView(generics.CreateAPIView):
-    
     serializer_class = CreateOrderSerializer
     permission_classes = [IsAuthenticated]
 
@@ -123,42 +108,33 @@ class CreateOrdersView(generics.CreateAPIView):
         order_items_data = request.data.get("order_items")
 
         if not order_items_data or len(order_items_data) == 0:
-            return Response(
-                {"detail": "Order items cannot be empty."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            invalid_order_response()
 
-        with transaction.atomic():
-            payment_data = serializer.validated_data["payment"]
-            payment = Payment.objects.create(
-                amount=serializer.validated_data["total"],
-                payment_method=payment_data["payment_method"]
-            )
+        order_item_serializer = OrderItemSerializer(data=order_items_data, many=True)
+        order_item_serializer.is_valid(raise_exception=True)
 
-            order = serializer.save(payment=payment, user=request.user)
+        order_data = {
+            "address": serializer.validated_data["address"],
+            "shipping_price": serializer.validated_data["shipping_price"],
+            "total": serializer.validated_data["total"],
+        }
 
-            order_item_serializer = OrderItemSerializer(data=order_items_data, many=True)
-            order_item_serializer.is_valid(raise_exception=True)
+        payment_data = {
+            "amount": serializer.validated_data["total"],
+            "payment_method": serializer.validated_data["payment"]["payment_method"],
+        }
 
-            order_items = [
-                OrderItem(
-                    order=order,
-                    product=item["product"],
-                    quantity=item["quantity"]
-                )
-                for item in order_item_serializer.validated_data
-            ]
-            OrderItem.objects.bulk_create(order_items)
+        order = Order.objects.create_order_with_payment_and_items(
+            request.user, order_data, payment_data, order_item_serializer.validated_data
+        )
 
         response_data = {
             "order_id": order.id,
-            "payment_id": payment.id,
+            "payment_id": order.payment.id,
             "message": "Order created successfully!",
         }
 
         return Response(response_data, status=status.HTTP_201_CREATED)
-
-
 
 
 class RUDOrderView(generics.RetrieveUpdateDestroyAPIView):
@@ -174,7 +150,7 @@ class RUDOrderItemView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return OrderItem.objects.filter(id=self.kwargs['pk'])
+        return OrderItem.objects.filter(id=self.kwargs["pk"])
 
 
 class RUDPaymentView(generics.RetrieveUpdateDestroyAPIView):
@@ -182,4 +158,5 @@ class RUDPaymentView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Payment.objects.filter(id=self.kwargs['pk'])
+        return Payment.objects.filter(id=self.kwargs["pk"])
+ 

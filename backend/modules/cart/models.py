@@ -1,8 +1,6 @@
 from django.db import models
 from django.db.models import Sum, F
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-
+from .managers import *
 
 class ShoppingSession(models.Model):
     user = models.OneToOneField(
@@ -11,6 +9,8 @@ class ShoppingSession(models.Model):
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ShoppingSessionManager()
 
     def update_total(self):
         total = (
@@ -32,6 +32,8 @@ class CartItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    objects = CartItemManager()
+
 
 class Order(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
@@ -44,13 +46,7 @@ class Order(models.Model):
     )
     updated_at = models.DateTimeField(auto_now=True)
 
-    def calculate_total(self):
-        # calculate the total amount of the order
-        total = 0
-        order_items = OrderItem.objects.filter(order=self)
-        for item in order_items:
-            total += item.product.price * item.quantity
-        return total
+    objects = OrderManager()
 
     def __str__(self):
         return self.user.username + " | " + self.status + " | " + str(self.created_at)

@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from .models import *
 from .serializers import *
@@ -10,6 +10,9 @@ from django.shortcuts import get_object_or_404
 from .pagination import ProductListPagination, ProductCommentsPagination
 from .permissions import SuperuserEditOnly
 from django.http import Http404
+from .helpers import *
+from django.db import IntegrityError
+
 
 class ProductViewSet(ModelViewSet):
     """
@@ -40,7 +43,7 @@ class ProductImageViewSet(ModelViewSet):
     """
 
     serializer_class = ProductImageSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """
@@ -76,7 +79,6 @@ class ProductCommentsListView(generics.ListAPIView):
     """
 
     serializer_class = ProductCommentListSerializer
-    permission_classes = []
     pagination_class = ProductCommentsPagination
 
     def get_queryset(self):
@@ -98,7 +100,7 @@ class ProductCommentsCreateView(generics.CreateAPIView):
     """
 
     serializer_class = ProductCommentCreateSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     pagination_class = ProductCommentsPagination
 
     def create(self, request, *args, **kwargs):
@@ -109,6 +111,42 @@ class ProductCommentsCreateView(generics.CreateAPIView):
         product.update_rate()
         headers = self.get_success_headers(serializer.data)
         return Response(status=status.HTTP_201_CREATED, headers=headers)
+
+
+class CommentLikeCreateView(generics.CreateAPIView):
+    """
+    View for creating comment likes.
+    """
+
+    serializer_class = CommentLikeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            CommentLike.objects.like_comment(kwargs["pk"], request.user)
+        except IntegrityError:
+            comment_already_liked_response()
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(status=status.HTTP_201_CREATED, headers=headers)
+
+
+class RDCommentLikeView(generics.RetrieveDestroyAPIView):
+    """
+    View for retrieve and destroy comment likes.
+    """
+
+    serializer_class = CommentLikeSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = "comment_id"
+
+    def get_queryset(self):
+        return CommentLike.objects.filter(
+            user=self.request.user, comment_id=self.kwargs["comment_id"]
+        )
 
 
 class ProductsFilterListView(generics.ListAPIView):
@@ -129,29 +167,10 @@ class ProductsFilterListView(generics.ListAPIView):
         max_price = int(self.request.query_params.get("max", 0))
         has_selling_stock = self.request.query_params.get("has_selling_stock", "false")
 
-        filter_queries = Q()
-        # Price range filter
-        if min_price > 0:
-            filter_queries &= Q(price__gte=min_price)
-        if max_price > 0:
-            filter_queries &= Q(price__lte=max_price)
-
-        # Check for product avaiability
-        if has_selling_stock == "true":
-            filter_queries &= Q(quantity__gte=1)
-
-        queryset = queryset.filter(filter_queries)
-
-        # Order based filter
-        sort_queries = {
-            "default": queryset,
-            "popular": queryset.order_by("-rate"),
-            "cheapest": queryset.order_by("price"),
-            "most_expensive": queryset.order_by("-price"),
-            "newest": queryset.order_by("-created_at"),
-            "bestselling": queryset.order_by("-sold"),
-        }
-        queryset = sort_queries.get(sort)
+        # Filter products
+        queryset = filter_products_by_price(queryset, min_price, max_price)
+        queryset = filter_products_by_availability(queryset, has_selling_stock)
+        queryset = sort_products(queryset, sort)
 
         return queryset
 

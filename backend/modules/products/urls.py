@@ -16,4 +16,6 @@ urlpatterns = [
     path("<int:product_id>/comments/create", ProductCommentsCreateView.as_view()),
     path("search/<int:pk>", ProductsFilterListView.as_view()),
     path("category/<int:pk>", TopSellingProductsEachChildCategoryView.as_view()),
+    path("commentlike/create/<int:pk>",CommentLikeCreateView.as_view()),
+    path("commentlike/remove/<int:comment_id>",RDCommentLikeView.as_view())
 ]
