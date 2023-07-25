@@ -4,7 +4,7 @@ import os
 from uuid import uuid4
 from django.utils.deconstruct import deconstructible
 from django.db.models import Avg
-from .managers import CommentLikeManager
+from .managers import *
 
 @deconstructible
 class PathAndRename(object):
@@ -86,6 +86,8 @@ class Comment(models.Model):
     rate = models.IntegerField(validators=[MaxValueValidator(5)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = CommentManager()
 
     def __str__(self):
         return f"{self.text}"

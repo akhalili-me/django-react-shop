@@ -27,6 +27,7 @@ const Register = () => {
     if (password !== passwordConfirm && password !== null) {
       setMessage("Passwords do not match!")
     } else {
+      setMessage("")
       dispatch(register({email,username,password}))
     }
   };

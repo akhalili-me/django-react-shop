@@ -32,7 +32,7 @@ export const updateComment = createAsyncThunk(
     "commentOperations/updateComment",
     async ({ commentId, text, rate }, { dispatch }) => {
         try {
-            await authAxios.put(`/accounts/comments/${commentId}`, {
+            await authAxios.patch(`/accounts/comments/${commentId}`, {
                 text: text,
                 rate: rate,
             });

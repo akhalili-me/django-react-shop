@@ -10,57 +10,26 @@ from modules.products.models import Comment
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
 from .pagination import UserCommentListPagination
-
-User = get_user_model()
+from .models import User
+from .helpers import create_user_from_serializer
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
-class UserViewSet(ModelViewSet):
+class UserRegisterView(generics.CreateAPIView):
     """
-    Viewset for creating, editing, deleting and fetching a user.
+    Viewset for creating user.
     """
 
     serializer_class = UserSerializer
-    queryset = User.objects.all()
-    permission_classes = [IsOwnerOrReadOnly]
-
-    def perform_create(self, serializer):
-        user = serializer.save()
-        user.set_password(self.request.data.get("password"))
-        user.save()
-
-    def perform_update(self, serializer):
-        user = serializer.save()
-        password = self.request.data.get("password")
-        if password:
-            user.set_password(password)
-            user.save()
 
     def create(self, request, *args, **kwargs):
-        """
-        Add user and hash the password.
-        """
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
-
-    def update(self, request, *args, **kwargs):
-        """
-        Update user and hash the password.
-        """
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-        serializer = self.serializer_class(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+        create_user_from_serializer(serializer)
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class UserCommentsListView(generics.ListAPIView):
@@ -76,7 +45,7 @@ class UserCommentsListView(generics.ListAPIView):
         return Comment.objects.filter(author=self.request.user).order_by("-created_at")
 
 
-class RUDCommentsView(generics.RetrieveDestroyAPIView):
+class RUDCommentsView(generics.RetrieveUpdateDestroyAPIView):
     """
     View for retrieve, update and destroy comments.
     """

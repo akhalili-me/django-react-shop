@@ -13,7 +13,7 @@ urlpatterns = [
     path("categories", CategoryListView.as_view()),
     path("<int:product_id>/features", ProductFeatureListView.as_view()),
     path("<int:product_id>/comments", ProductCommentsListView.as_view()),
-    path("<int:product_id>/comments/create", ProductCommentsCreateView.as_view()),
+    path("<int:product_id>/comments/create", CommentsCreateView.as_view()),
     path("search/<int:pk>", ProductsFilterListView.as_view()),
     path("category/<int:pk>", TopSellingProductsEachChildCategoryView.as_view()),
     path("commentlike/create/<int:pk>",CommentLikeCreateView.as_view()),

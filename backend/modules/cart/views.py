@@ -3,9 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from .serializers import *
 from .models import ShoppingSession
-from .helpers import (
-    invalid_order_response,
-)
+from .helpers import *
 
 
 class CreateCartItems(generics.CreateAPIView):
@@ -49,7 +47,7 @@ class RDCartItems(generics.RetrieveDestroyAPIView):
         return Response(serilizer.data)
 
     def destroy(self, request, *args, **kwargs):
-        CartItem.objects.delete_one_cart_item(kwargs.get("pk"),request.user)
+        CartItem.objects.delete_one_cart_item(kwargs.get("pk"), request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -63,7 +61,6 @@ class CartItemsList(generics.ListAPIView):
 
     def get_queryset(self):
         return ShoppingSession.objects.filter(user=self.request.user)
- 
 
 
 class DeleteAllCartItems(generics.DestroyAPIView):
@@ -108,33 +105,20 @@ class CreateOrdersView(generics.CreateAPIView):
         order_items_data = request.data.get("order_items")
 
         if not order_items_data or len(order_items_data) == 0:
-            invalid_order_response()
+            return invalid_order_response()
 
         order_item_serializer = OrderItemSerializer(data=order_items_data, many=True)
         order_item_serializer.is_valid(raise_exception=True)
 
-        order_data = {
-            "address": serializer.validated_data["address"],
-            "shipping_price": serializer.validated_data["shipping_price"],
-            "total": serializer.validated_data["total"],
-        }
-
-        payment_data = {
-            "amount": serializer.validated_data["total"],
-            "payment_method": serializer.validated_data["payment"]["payment_method"],
-        }
+        order_data, payment_data = serialize_order_and_payment_data(
+            serializer.validated_data
+        )
 
         order = Order.objects.create_order_with_payment_and_items(
             request.user, order_data, payment_data, order_item_serializer.validated_data
         )
 
-        response_data = {
-            "order_id": order.id,
-            "payment_id": order.payment.id,
-            "message": "Order created successfully!",
-        }
-
-        return Response(response_data, status=status.HTTP_201_CREATED)
+        return success_order_created_response(order)
 
 
 class RUDOrderView(generics.RetrieveUpdateDestroyAPIView):
@@ -159,4 +143,3 @@ class RUDPaymentView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Payment.objects.filter(id=self.kwargs["pk"])
- 

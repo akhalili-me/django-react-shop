@@ -34,7 +34,7 @@ __pycache__/
 local_settings.py
 /staticfiles/
 media/
-
+.env
 product_images/
 .vscode/ 
 data/

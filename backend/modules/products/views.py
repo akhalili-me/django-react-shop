@@ -26,17 +26,6 @@ class ProductViewSet(ModelViewSet):
     def get_queryset(self):
         return Product.objects.all().order_by("-created_at")
 
-    def create(self, request, *args, **kwargs):
-        """
-        creating a product.
-        """
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        headers = self.get_success_headers(serializer.data)
-        return Response(status=status.HTTP_201_CREATED, headers=headers)
-
-
 class ProductImageViewSet(ModelViewSet):
     """
     ViewSet for viewing and editing the product images.
@@ -88,15 +77,10 @@ class ProductCommentsListView(generics.ListAPIView):
         product_id = self.kwargs["product_id"]
         return Comment.objects.filter(product_id=product_id).order_by("-created_at")
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["request"] = self.request
-        return context
 
-
-class ProductCommentsCreateView(generics.CreateAPIView):
+class CommentsCreateView(generics.CreateAPIView):
     """
-    ViewSet for creating product comments.
+    ViewSet for creating comments.
     """
 
     serializer_class = ProductCommentCreateSerializer
@@ -106,11 +90,10 @@ class ProductCommentsCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        product = get_object_or_404(Product, id=kwargs["product_id"])
-        serializer.save(product=product, author=self.request.user)
-        product.update_rate()
-        headers = self.get_success_headers(serializer.data)
-        return Response(status=status.HTTP_201_CREATED, headers=headers)
+        Comment.objects.create_comment(
+            kwargs["product_id"], request.user, **serializer.validated_data
+        )
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class CommentLikeCreateView(generics.CreateAPIView):
