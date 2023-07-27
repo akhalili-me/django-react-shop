@@ -1,14 +1,12 @@
-from django.db import models
+from modules.utility.models import TimeStampedModel
 from django.db.models import Sum, F
 from .managers import *
 
-class ShoppingSession(models.Model):
+class ShoppingSession(TimeStampedModel):
     user = models.OneToOneField(
         "accounts.User", on_delete=models.CASCADE, related_name="shopping_session"
     )
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     objects = ShoppingSessionManager()
 
@@ -23,28 +21,24 @@ class ShoppingSession(models.Model):
         self.save()
 
 
-class CartItem(models.Model):
+class CartItem(TimeStampedModel):
     session = models.ForeignKey(
         ShoppingSession, null=True, on_delete=models.CASCADE, related_name="cart_items"
     )
     product = models.ForeignKey("products.Product", on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     objects = CartItemManager()
 
 
-class Order(models.Model):
+class Order(TimeStampedModel):
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     address = models.ForeignKey("Address", null=True, on_delete=models.CASCADE)
     shipping_price = models.DecimalField(max_digits=10, decimal_places=2)
     total = models.DecimalField(max_digits=10, decimal_places=2)
-    created_at = models.DateTimeField(auto_now_add=True)
     payment = models.OneToOneField(
         "Payment", on_delete=models.CASCADE, related_name="order"
     )
-    updated_at = models.DateTimeField(auto_now=True)
 
     objects = OrderManager()
 
@@ -52,17 +46,15 @@ class Order(models.Model):
         return self.user.username + " | " + self.status + " | " + str(self.created_at)
 
 
-class OrderItem(models.Model):
+class OrderItem(TimeStampedModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
     product = models.ForeignKey(
         "products.Product", on_delete=models.CASCADE,
     )
     quantity = models.IntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 
-class Payment(models.Model):
+class Payment(TimeStampedModel):
     amount = models.BigIntegerField()
     payment_method = models.CharField(max_length=200)
     status = models.CharField(
@@ -72,11 +64,9 @@ class Payment(models.Model):
         db_index=True,
     )
     paid_at = models.DateTimeField(auto_now_add=False, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 
-class Address(models.Model):
+class Address(TimeStampedModel):
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     state = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
@@ -89,14 +79,14 @@ class Address(models.Model):
     def __str__(self):
         return f"{self.state}, {self.city}, {self.street_address}, Pelak: {self.house_number}, Postal Code: {self.postal_code}"
 
-class State(models.Model):
+class State(TimeStampedModel):
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
 
 
-class City(models.Model):
+class City(TimeStampedModel):
     name = models.CharField(max_length=50)
     state = models.ForeignKey(State, on_delete=models.CASCADE, related_name="cities")
 

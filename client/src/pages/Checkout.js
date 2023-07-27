@@ -11,6 +11,7 @@ import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
 import { addOrder } from "../features/order/orderOperations/orderOperationsReducers";
 import { useNavigate } from "react-router-dom";
+import { setAlarm } from "../features/alert/alarmSlice";
 
 const Checkout = () => {
   const [selectedAddressId, setSelectedAddressId] = useState();
@@ -21,14 +22,16 @@ const Checkout = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (cart.items.length === 0) {
+      dispatch(setAlarm({ message: "Your cart is empty", type: "info" }));
+      navigate("/");
+    }
     dispatch(getUserAddresses());
-  }, [dispatch]);
+  }, [dispatch, cart, navigate]);
 
   const { addresses, loading, error } = useSelector(
     (state) => state.addressList
   );
-
-  const { success } = useSelector((state) => state.orderOperations);
 
   const userAddresses = addresses.map((address) => (
     <AddressItem
@@ -54,35 +57,43 @@ const Checkout = () => {
         paymentMethod: "saderat",
         shippingPrice,
         orderItems,
-        navigator: navigate
+        navigator: navigate,
       })
     );
   };
 
-
   return (
     <>
-      <h1 className="py-3">Choose your address</h1>
-      <Form>
-        {loading ? (
-          <Loader />
-        ) : error ? (
-          <Message variant={"danger"} message={error} />
-        ) : (
-          userAddresses
-        )}
-      </Form>
-      <h1 className="py-3">Order Products</h1>
-      <OrderItems items={cart.items} />
-      <h3 className="py-3">
-        <strong>Shipping Price:</strong>${shippingPrice}
-      </h3>
-      <h3 className="py-3">
-        <strong>Total:</strong>${cart.total + shippingPrice}
-      </h3>
-      <Button onClick={onPayClick} className="pay_button" variant="success">
-        Pay
-      </Button>
+      {addresses.length === 0 ? (
+        <Message
+          message={"Add an address in user profile."}
+          variant={"info"}
+        />
+      ) : (
+        <div>
+          <h1 className="py-3">Choose your address</h1>
+          <Form>
+            {loading ? (
+              <Loader />
+            ) : error ? (
+              <Message variant={"danger"} message={error} />
+            ) : (
+              userAddresses
+            )}
+          </Form>
+          <h1 className="py-3">Order Products</h1>
+          <OrderItems items={cart.items} />
+          <h3 className="py-3">
+            <strong>Shipping Price:</strong>${shippingPrice}
+          </h3>
+          <h3 className="py-3">
+            <strong>Total:</strong>${cart.total + shippingPrice}
+          </h3>
+          <Button onClick={onPayClick} className="pay_button" variant="success">
+            Pay
+          </Button>
+        </div>
+      )}
     </>
   );
 };

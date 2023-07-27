@@ -1,16 +1,18 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import Carousel from "../components/HomeSwiper";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import CategoryCard from "../components/category/CategoryCard";
 import ProductCard from "../components/product/ProductCard";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { getLatestProducts } from "../features/product/productList/productListReducers";
 import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
+import Pagination from "../components/common/Pagination";
 
 const Home = () => {
+  const [queryParams] = useSearchParams();
   const dispatch = useDispatch();
   const parentCategories = useSelector((state) =>
     state.category.categories.filter((c) => c.parent === null)
@@ -19,9 +21,11 @@ const Home = () => {
     (state) => state.productList
   );
 
+  const productPage = queryParams.get("page") || 1;
+
   useEffect(() => {
-    dispatch(getLatestProducts());
-  }, [dispatch]);
+    dispatch(getLatestProducts(productPage));
+  }, [dispatch, productPage]);
 
   const categoryCards = useMemo(() => {
     return parentCategories.map((category) => (
@@ -51,7 +55,7 @@ const Home = () => {
               </Col>
             ))}
           </Row>
-          <a className="">See More...</a>
+          <Pagination count={count} paginateBy={6} />
         </>
       )}
 

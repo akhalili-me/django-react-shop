@@ -1,14 +1,31 @@
-from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 import os
 from dotenv import load_dotenv
+
+load_dotenv()
+
+
+def get_env_variable(var_name):
+    """get env variable or return exception"""
+
+    try:
+        return os.environ.get(var_name)
+    except KeyError:
+        err_msg = "Set the {var_name} env variable."
+        raise ImproperlyConfigured(err_msg)
+
+
+############
+############
+
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 STATIC_DIR = Path.joinpath(BASE_DIR, "modules/static")
 MEDIA_DIR = Path.joinpath(BASE_DIR, "modules/media")
 
-load_dotenv()
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = get_env_variable("SECRET_KEY")
 
 ALLOWED_HOSTS = []
 
@@ -25,6 +42,7 @@ INSTALLED_APPS = [
     "modules.accounts",
     "modules.products",
     "modules.cart",
+    "modules.utility"
 ]
 
 MIDDLEWARE = [

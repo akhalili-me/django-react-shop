@@ -3,9 +3,9 @@ import authAxios from "../../../utility/api";
 
 export const getLatestProducts = createAsyncThunk(
   "product/latestProducts",
-  async () => {
+  async (productPage) => {
     try {
-      const { data } = await authAxios.get("/products/");
+      const { data } = await authAxios.get(`/products?${productPage}`);
       return data;
     } catch (error) {
 			const errorMessage = error.response?.data?.detail || error.message;

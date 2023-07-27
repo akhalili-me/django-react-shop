@@ -1,4 +1,4 @@
-from django.db import models
+from modules.utility.models import TimeStampedModel
 from django.core.validators import MaxValueValidator
 import os
 from uuid import uuid4
@@ -26,7 +26,7 @@ category_image = PathAndRename("images/categories")
 #########################
 
 
-class Product(models.Model):
+class Product(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -36,8 +36,6 @@ class Product(models.Model):
     quantity = models.IntegerField(default=0)
     sold = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     category = models.ForeignKey(
         "Category", on_delete=models.CASCADE, related_name="products"
     )
@@ -51,41 +49,35 @@ class Product(models.Model):
         self.save()
 
 
-class ProductImage(models.Model):
+class ProductImage(TimeStampedModel):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="images"
     )
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to=product_image)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.image.url}"
 
 
-class Category(models.Model):
+class Category(TimeStampedModel):
     name = models.CharField(max_length=255)
     parent = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.CASCADE, related_name="children"
     )
     image = models.ImageField(upload_to=category_image)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name}"
 
 
-class Comment(models.Model):
+class Comment(TimeStampedModel):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="comments"
     )
     author = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     text = models.TextField(max_length=500)
     rate = models.IntegerField(validators=[MaxValueValidator(5)])
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     objects = CommentManager()
 
@@ -93,10 +85,9 @@ class Comment(models.Model):
         return f"{self.text}"
 
 
-class CommentLike(models.Model):
+class CommentLike(TimeStampedModel):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="likes")
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     objects = CommentLikeManager()
     
@@ -108,14 +99,12 @@ class CommentLike(models.Model):
         ]
 
 
-class Feature(models.Model):
+class Feature(TimeStampedModel):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="features"
     )
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=500)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name}"
