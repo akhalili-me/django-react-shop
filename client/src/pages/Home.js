@@ -4,28 +4,30 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import CategoryCard from "../components/category/CategoryCard";
 import ProductCard from "../components/product/ProductCard";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { getLatestProducts } from "../features/product/productList/productListReducers";
 import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
-import Pagination from "../components/common/Pagination";
+import {
+  getBestSellingProducts,
+  getMostViewedProducts,
+  getNewestProducts,
+} from "../features/product/homeProductsList/homeProductsReducers";
 
 const Home = () => {
-  const [queryParams] = useSearchParams();
   const dispatch = useDispatch();
   const parentCategories = useSelector((state) =>
     state.category.categories.filter((c) => c.parent === null)
   );
-  const { products, loading, error, count } = useSelector(
-    (state) => state.productList
-  );
-
-  const productPage = queryParams.get("page") || 1;
+  const newestProducts = useSelector((state) => state.homeproducts.newest);
+  const bestsellingProducts = useSelector((state) => state.homeproducts.newest);
+  const mostViewedProducts = useSelector((state) => state.homeproducts.newest);
 
   useEffect(() => {
-    dispatch(getLatestProducts(productPage));
-  }, [dispatch, productPage]);
+    dispatch(getNewestProducts());
+    dispatch(getBestSellingProducts());
+    dispatch(getMostViewedProducts());
+  }, [dispatch]);
 
   const categoryCards = useMemo(() => {
     return parentCategories.map((category) => (
@@ -42,20 +44,54 @@ const Home = () => {
       <Carousel />
       <h1 className="py-4">Latest Products</h1>
 
-      {loading ? (
+      {newestProducts.loading ? (
         <Loader />
-      ) : error ? (
-        <Message variant={"danger"} message={error} />
+      ) : newestProducts.error ? (
+        <Message variant={"danger"} message={newestProducts.error} />
       ) : (
         <>
           <Row xs={1} md={2} className="g-4">
-            {products.map((product) => (
+            {newestProducts.products.map((product) => (
               <Col key={product.id} sm={12} md={6} lg={4} xl={4}>
                 <ProductCard product={product} />
               </Col>
             ))}
           </Row>
-          <Pagination count={count} paginateBy={6} />
+        </>
+      )}
+
+      <h1 className="py-4">Bestselling Products</h1>
+
+      {bestsellingProducts.loading ? (
+        <Loader />
+      ) : bestsellingProducts.error ? (
+        <Message variant={"danger"} message={bestsellingProducts.error} />
+      ) : (
+        <>
+          <Row xs={1} md={2} className="g-4">
+            {bestsellingProducts.products.map((product) => (
+              <Col key={product.id} sm={12} md={6} lg={4} xl={4}>
+                <ProductCard product={product} />
+              </Col>
+            ))}
+          </Row>
+        </>
+      )}
+      <h1 className="py-4">Most Viewed Products</h1>
+
+      {mostViewedProducts.loading ? (
+        <Loader />
+      ) : mostViewedProducts.error ? (
+        <Message variant={"danger"} message={mostViewedProducts.error} />
+      ) : (
+        <>
+          <Row xs={1} md={2} className="g-4">
+            {mostViewedProducts.products.map((product) => (
+              <Col key={product.id} sm={12} md={6} lg={4} xl={4}>
+                <ProductCard product={product} />
+              </Col>
+            ))}
+          </Row>
         </>
       )}
 

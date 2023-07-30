@@ -2,6 +2,7 @@ from modules.utility.models import TimeStampedModel
 from django.db.models import Sum, F
 from .managers import *
 
+
 class ShoppingSession(TimeStampedModel):
     user = models.OneToOneField(
         "accounts.User", on_delete=models.CASCADE, related_name="shopping_session"
@@ -47,20 +48,25 @@ class Order(TimeStampedModel):
 
 
 class OrderItem(TimeStampedModel):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="order_items"
+    )
     product = models.ForeignKey(
-        "products.Product", on_delete=models.CASCADE,
+        "products.Product",
+        on_delete=models.CASCADE,
     )
     quantity = models.IntegerField(default=1)
 
 
 class Payment(TimeStampedModel):
+    STATUS_CHOICES = (("pending", "Pending"), ("paid", "Paid"), ("failed", "Failed"))
+
     amount = models.BigIntegerField()
     payment_method = models.CharField(max_length=200)
     status = models.CharField(
         max_length=20,
         default="pending",
-        choices=(("pending", "Pending"), ("paid", "Paid"), ("failed", "Failed")),
+        choices=STATUS_CHOICES,
         db_index=True,
     )
     paid_at = models.DateTimeField(auto_now_add=False, null=True, blank=True)
@@ -75,9 +81,9 @@ class Address(TimeStampedModel):
     street_address = models.TextField(max_length=250)
     house_number = models.CharField(max_length=15)
 
-        
     def __str__(self):
         return f"{self.state}, {self.city}, {self.street_address}, Pelak: {self.house_number}, Postal Code: {self.postal_code}"
+
 
 class State(TimeStampedModel):
     name = models.CharField(max_length=50)

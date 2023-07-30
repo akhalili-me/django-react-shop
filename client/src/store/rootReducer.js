@@ -20,6 +20,8 @@ import orderListReducers from "../features/order/orderList/orderListSlice"
 import orderOperationsReducers from "../features/order/orderOperations/orderOperationsSlice"
 import orderDetailsReducer from "../features/order/orderDetails/orderDetailsSlice";
 
+import homeProductsSlice from "../features/product/homeProductsList/homeProductsSlice";
+
 const rootReducer = combineReducers({
   cart: cartReducer,
   alarm: alarmReducer,
@@ -35,6 +37,7 @@ const rootReducer = combineReducers({
   productDetails: productDetailsReducer,
   childCategoryProducts: childCategoryProductsReducers,
   productFeatures: productFeaturesReducers,
+  homeProducts: homeProductsSlice,
   
   // Comments
   commentList: commentListReducer,

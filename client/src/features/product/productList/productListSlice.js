@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getLatestProducts,getProductsByFilter } from "./productListReducers";
+import {getProductsByFilter } from "./productListReducers";
 
 export const productListSlice = createSlice({
 	name: "productList",
@@ -7,21 +7,6 @@ export const productListSlice = createSlice({
 	reducers: {},
 	extraReducers: (builder) => {
 		builder
-			// Fetch latest products
-			.addCase(getLatestProducts.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(getLatestProducts.fulfilled, (state, action) => {
-				state.loading = false;
-				state.error = null;
-                state.products = action.payload.results
-                state.count = action.payload.count;
-			})
-			.addCase(getLatestProducts.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.error.message;
-			})
-
 			// Fetch products by filter
 			.addCase(getProductsByFilter.pending, (state) => {
 				state.loading = true;

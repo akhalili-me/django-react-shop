@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "modules.accounts",
     "modules.products",
     "modules.cart",
-    "modules.utility"
+    "modules.utility",
 ]
 
 MIDDLEWARE = [
@@ -143,3 +143,12 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": "memcached:11211",
+    }
+}
+
+CACHE_TIMEOUT = 3600

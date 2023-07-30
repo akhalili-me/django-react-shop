@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getChildCategoriesWithTopSoldProducts } from "./childCategoryProductsReducers";
 
-export const productDetailsSlice = createSlice({
-	name: "productDetails",
+export const ChildCategoryProducts = createSlice({
+	name: "childCategoryProducts",
 	initialState: { childCategory: [], parentCategory: null, loading: null, error: null},
 	reducers: {},
 	extraReducers: (builder) => {
@@ -24,4 +24,4 @@ export const productDetailsSlice = createSlice({
 	},
 });
 
-export default productDetailsSlice.reducer;
+export default ChildCategoryProducts.reducer;

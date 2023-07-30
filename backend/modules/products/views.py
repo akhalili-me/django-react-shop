@@ -8,38 +8,31 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .pagination import ProductListPagination, ProductCommentsPagination
-from .permissions import SuperuserEditOnly
 from django.http import Http404
 from .helpers import *
 from django.db import IntegrityError
 
+from django.core.cache import cache
 
-class ProductViewSet(ModelViewSet):
-    """
-    ViewSet for viewing and editing the products.
-    """
 
+class ProductListSortView(generics.ListAPIView):
     serializer_class = ProductSerializer
-    pagination_class = ProductListPagination
-    permission_classes = [SuperuserEditOnly]
+    queryset = Product.objects.all()
 
-    def get_queryset(self):
-        return Product.objects.all().order_by("-created_at")
+    def list(self, request):
+        sort_method = self.request.query_params.get("sort")
+        if is_sort_invalid(sort_method):
+            return sort_invalid_response()
 
-class ProductImageViewSet(ModelViewSet):
-    """
-    ViewSet for viewing and editing the product images.
-    """
+        cache_key = f"product_list_{sort_method}"
+        data = get_data_from_cache(cache_key)
 
-    serializer_class = ProductImageSerializer
-    permission_classes = [IsAuthenticated]
+        if not data:
+            self.queryset = sort_products(self.queryset, sort_method)[:6]
+            data = super().list(request=request).data
+            cache.set(cache_key, data)
 
-    def get_queryset(self):
-        """
-        Return the images associated with a particular product ID.
-        """
-        product_id = self.kwargs["product_id"]
-        return ProductImage.objects.filter(product_id=product_id)
+        return Response(data)
 
 
 class ProductFeatureListView(generics.ListAPIView):

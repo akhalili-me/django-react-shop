@@ -10,6 +10,7 @@ services:
         - POSTGRES_PASSWORD=postgres
         - POSTGRES_USER=postgres
         - POSTGRES_DB=postgres
+        - MEMCACHE_HOST=memcached
 
       ports:
         - '8000:8000'
@@ -19,6 +20,7 @@ services:
 
       depends_on:
         - db
+        - memcached
 
   frontend:
     build:
@@ -47,3 +49,7 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data/
 
+  memcached: 
+    image: memcached:1.6.21-alpine
+    ports:
+      - '11211:11211'
