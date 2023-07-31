@@ -5,17 +5,18 @@ import {
 } from "../../../utility/token";
 import jwt_decode from "jwt-decode";
 import authAxios from "../../../utility/api";
+import { getCartItems } from "../../cart/cartOperations";
 
 export const login = createAsyncThunk(
   "auth/login",
-  async ({ email, password }) => {
+  async ({ email, password }, { dispatch }) => {
     try {
       const { data } = await authAxios.post("/accounts/token", {
         email,
         password,
       });
-
       setBothJwtTokenLocalStorage(data);
+      dispatch(getCartItems());
       const decodedToken = jwt_decode(data.access);
       return {
         username: decodedToken.username,

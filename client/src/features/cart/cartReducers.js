@@ -1,5 +1,5 @@
-import authAxios from "../../utility/api";
 import { isAuthenticated } from "../../utility/token";
+import { addOrUpdateItemInDatabase,removeAllItemsInDatabase } from "./cartOperations";
 
 export const addItemReducer = (state, action) => {
     const item = action.payload;
@@ -25,9 +25,9 @@ export const addItemReducer = (state, action) => {
 export const removeItemReducer = (state, action) => {
     const { product, index } = action.payload;
 
-    if (isAuthenticated()) {
-        removeItemInDatabase(product);
-    }
+    // if (isAuthenticated()) {
+    //     removeItemInDatabase(product);
+    // }
 
     state.items.splice(index, 1);
     calculateTotal(state);
@@ -36,9 +36,9 @@ export const removeItemReducer = (state, action) => {
 export const UpdateItemQuantityReducer = (state, action) => {
   const { productId, quantity } = action.payload;
 
-  if (isAuthenticated()) {
-      addOrUpdateItemInDatabase(productId, quantity);
-  }
+  // if (isAuthenticated()) {
+  //     addOrUpdateItemInDatabase(productId, quantity);
+  // }
 
   const existingItem = state.items.find((i) => i.product.id === productId);
   existingItem.quantity = quantity;
@@ -82,29 +82,3 @@ const calculateTotal = (state) => {
   );
 };
 
-const removeAllItemsInDatabase = async () => {
-    try {
-        await authAxios.delete("cart/removeall");
-    } catch (error) {
-      throw new Error("Failed to remove items, try again.");
-    }
-}
-
-const removeItemInDatabase = async (id) => {
-  try {
-    await authAxios.delete(`cart/${id}`);
-  } catch (error) {
-    throw new Error("Failed to remove item, try again.");
-  }
-};
-
-const addOrUpdateItemInDatabase = async (id, quantity) => {
-  try {
-    await authAxios.post("/cart/create", {
-      product: id,
-      quantity: quantity,
-    });
-  } catch (error) {
-    throw new Error("Failed to add, try again.");
-  }
-};

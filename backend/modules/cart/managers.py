@@ -46,9 +46,8 @@ class CartItemManager(models.Manager):
 
         shopping_session.update_total()
 
-    def delete_one_cart_item(self, user, product_id):
+    def delete_one_cart_item(self, cart_item):
         with transaction.atomic():
-            cart_item = self.get_cart_item_by_product_id(product_id, user)
             shopping_session = cart_item.session
             cart_item.delete()
             shopping_session.update_total()
@@ -57,13 +56,8 @@ class CartItemManager(models.Manager):
         from .models import CartItem, ShoppingSession
 
         shopping_session = get_object_or_404(ShoppingSession, user=user)
-        CartItem.objects.filter(session__user=user).delete()
+        CartItem.objects.filter(session=shopping_session).delete()
         shopping_session.update_total()
-
-    def get_cart_item_by_product_id(self, product_id, user):
-        from .models import CartItem
-
-        return get_object_or_404(CartItem, product__id=product_id, session__user=user)
 
 
 class ShoppingSessionManager(models.Manager):

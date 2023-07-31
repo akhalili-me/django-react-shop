@@ -35,9 +35,9 @@ export const isTokenExpired = (token) => {
 };
 
 export const isAuthenticated = () => {
-  const { token, refreshToken } = getBothJwtTokenLocalStorage();
+  const { accessToken, refreshToken } = getBothJwtTokenLocalStorage();
 
-  if (!refreshToken || !token || isTokenExpired(refreshToken)) {
+  if (!refreshToken || !accessToken || isTokenExpired(refreshToken)) {
     return false;
   }
 

@@ -35,20 +35,8 @@ class RDCartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ["product", "quantity"]
 
-    def validate(self, data):
-        product_quantity = data["product"].quantity
-        cart_item_quantity = data["quantity"]
-
-        if product_quantity < cart_item_quantity:
-            raise serializers.ValidationError(
-                "Product quantity is less than cart item quantity"
-            )
-
-        return data
-
-
 class CartItemsListSerializer(serializers.ModelSerializer):
-    cart_items = RDCartItemSerializer(many=True, read_only=True)
+    cart_items = RDCartItemSerializer(many=True)
 
     class Meta:
         model = ShoppingSession

@@ -1,12 +1,22 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, generics
+from rest_framework.generics import (
+    RetrieveUpdateDestroyAPIView,
+    RetrieveDestroyAPIView,
+    ListAPIView,
+    CreateAPIView,
+    RetrieveAPIView,
+    DestroyAPIView,
+)
 from .serializers import *
 from .models import ShoppingSession
 from .helpers import *
+from modules.utility.permissions import IsSuperuserOrObjectOwner
+from modules.utility.mixins import SingleFieldUrlGetObjectMixin
 
 
-class CreateCartItems(generics.CreateAPIView):
+class CreateCartItems(CreateAPIView):
     """
     View for creating cart items.
     """
@@ -31,7 +41,7 @@ class CreateCartItems(generics.CreateAPIView):
         )
 
 
-class RDCartItems(generics.RetrieveDestroyAPIView):
+class RUDCartItem(RetrieveDestroyAPIView):
     """
     View for retrieve and delete cart item.
     """
@@ -39,19 +49,18 @@ class RDCartItems(generics.RetrieveDestroyAPIView):
     serializer_class = RDCartItemSerializer
     permission_classes = [IsAuthenticated]
 
-    def retrieve(self, request, *args, **kwargs):
-        cart_item_object = CartItem.objects.get_cart_item_by_product_id(
-            kwargs.get("pk"), request.user
-        )
-        serilizer = self.serializer_class(instance=cart_item_object)
-        return Response(serilizer.data)
+    def get_object(self):
+        user = self.request.user
+        productId = self.kwargs.get("pk")
+        return get_object_or_404(CartItem, product__id=productId, session__user=user)
 
     def destroy(self, request, *args, **kwargs):
-        CartItem.objects.delete_one_cart_item(kwargs.get("pk"), request.user)
+        cart_item = self.get_object()
+        CartItem.objects.delete_one_cart_item(cart_item)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CartItemsList(generics.ListAPIView):
+class CartItemsList(RetrieveAPIView):
     """
     Get session and cart items associated with it.
     """
@@ -59,11 +68,11 @@ class CartItemsList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CartItemsListSerializer
 
-    def get_queryset(self):
-        return ShoppingSession.objects.filter(user=self.request.user)
+    def get_object(self):
+        return get_object_or_404(ShoppingSession, user=self.request.user)
 
 
-class DeleteAllCartItems(generics.DestroyAPIView):
+class DeleteAllCartItems(DestroyAPIView):
     """
     Delete all cart items associated with the authenticated user.
     """
@@ -75,7 +84,7 @@ class DeleteAllCartItems(generics.DestroyAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class StateCityList(generics.ListAPIView):
+class StateCityList(ListAPIView):
     """
     Get state and cities associated with them.
     """
@@ -86,7 +95,7 @@ class StateCityList(generics.ListAPIView):
         return State.objects.all()
 
 
-class ListUserOrdersView(generics.ListAPIView):
+class ListUserOrdersView(ListAPIView):
     serializer_class = ListOrderSerializer
     permission_classes = [IsAuthenticated]
 
@@ -94,7 +103,7 @@ class ListUserOrdersView(generics.ListAPIView):
         return Order.objects.filter(user=self.request.user).order_by("-created_at")
 
 
-class CreateOrdersView(generics.CreateAPIView):
+class CreateOrdersView(CreateAPIView):
     serializer_class = CreateOrderSerializer
     permission_classes = [IsAuthenticated]
 
@@ -121,25 +130,20 @@ class CreateOrdersView(generics.CreateAPIView):
         return success_order_created_response(order)
 
 
-class RUDOrderView(generics.RetrieveUpdateDestroyAPIView):
+class RUDOrderView(SingleFieldUrlGetObjectMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = RUDOrderSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Order.objects.filter(id=self.kwargs["pk"], user=self.request.user)
+    permission_classes = [IsSuperuserOrObjectOwner]
+    model = Order
 
 
-class RUDOrderItemView(generics.RetrieveUpdateDestroyAPIView):
+class RUDOrderItemView(SingleFieldUrlGetObjectMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = OrderItemSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return OrderItem.objects.filter(id=self.kwargs["pk"])
+    permission_classes = [IsSuperuserOrObjectOwner]
+    model = OrderItem
 
 
-class RUDPaymentView(generics.RetrieveUpdateDestroyAPIView):
+class RUDPaymentView(SingleFieldUrlGetObjectMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = PaymentSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Payment.objects.filter(id=self.kwargs["pk"])
+    permission_classes = [IsSuperuserOrObjectOwner]
+    model = Payment
+    filter_field = "order__id"

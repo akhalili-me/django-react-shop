@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCartItems } from "../features/cart/cartSlice";
 import Loader from "../components/common/Loader";
 import Message from "../components/common/Message";
 import { useEffect } from "react";
@@ -32,12 +31,11 @@ const Login = () => {
 		} else {
 		  window.location.replace("/");
 		}
-	  };
+	};
 
 	useEffect(() => {
 		dispatch(clearLoginErrors())
 		if (authenticated) {
-			dispatch(fetchCartItems());
 			redirectAfterLogin();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps

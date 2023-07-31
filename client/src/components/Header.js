@@ -17,7 +17,7 @@ import CategorySidebar from "./category/CategorySidebar";
 
 const Header = () => {
   const [cartBadge, setCartBadge] = useState(0);
-  const cartItemCount = useSelector((state) => state.cart.items.length);
+  const cartItemCount = useSelector((state) => state.cart.items?.length);
   const {authenticated} = useSelector(state => state.login)
   const [showCategories, setShowCategories] = useState(false);
   const dispatch = useDispatch();

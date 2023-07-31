@@ -3,7 +3,8 @@ from rest_framework import routers
 from .views import *
 
 urlpatterns = [
-    path("", ProductListSortView.as_view()),
+    path("<int:pk>", RUDProductView.as_view()),
+    path("list", ProductListSortView.as_view()),
     path("categories", CategoryListView.as_view()),
     path("<int:product_id>/features", ProductFeatureListView.as_view()),
     path("<int:product_id>/comments", ProductCommentsListView.as_view()),

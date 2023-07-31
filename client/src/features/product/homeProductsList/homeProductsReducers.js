@@ -5,7 +5,7 @@ export const getNewestProducts = createAsyncThunk(
   "homeProductList/newestProducts",
   async () => {
     try {
-      const { data } = await authAxios.get(`/products?sort=newest`);
+      const { data } = await authAxios.get(`/products/list?sort=newest`);
       return data;
     } catch (error) {
         const errorMessage = error.response?.data?.detail || error.message;
@@ -17,7 +17,7 @@ export const getBestSellingProducts = createAsyncThunk(
   "homeProductList/bestSellingProducts",
   async () => {
     try {
-      const { data } = await authAxios.get(`/products?sort=bestselling`);
+      const { data } = await authAxios.get(`/products/list?sort=bestselling`);
       return data;
     } catch (error) {
         const errorMessage = error.response?.data?.detail || error.message;
@@ -29,7 +29,7 @@ export const getMostViewedProducts = createAsyncThunk(
   "homeProductList/mostViewedProducts",
   async () => {
     try {
-      const { data } = await authAxios.get(`/products?sort=most_viewed`);
+      const { data } = await authAxios.get(`/products/list?sort=most_viewed`);
       return data;
     } catch (error) {
         const errorMessage = error.response?.data?.detail || error.message;

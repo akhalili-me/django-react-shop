@@ -5,16 +5,7 @@ import {
   UpdateItemQuantityReducer,
   clearAllItmesReducer,
 } from "./cartReducers";
-import authAxios from "../../utility/api";
-import { createAsyncThunk } from "@reduxjs/toolkit";
-
-export const fetchCartItems = createAsyncThunk(
-  "cart/fetchCartItems",
-  async () => {
-    const response = await authAxios.get("/cart");
-    return response.data;
-  }
-);
+import { getCartItems } from "./cartOperations";
 
 export const cartSlice = createSlice({
   name: "cart",
@@ -26,9 +17,9 @@ export const cartSlice = createSlice({
     clearCart: clearAllItmesReducer,
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchCartItems.fulfilled, (state, action) => {
-      state.total = action.payload[0].total;
-      state.items = action.payload[0].cart_items;
+    builder.addCase(getCartItems.fulfilled, (state, action) => {
+      state.total = action.payload.total;
+      state.items = action.payload.cart_items;
     });
   },
 });

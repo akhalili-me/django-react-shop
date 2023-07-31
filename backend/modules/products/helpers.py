@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
-from django.core.cache import cache
+
 
 def filter_products_by_price(queryset, min_price, max_price):
     filter_queries = Q()
@@ -25,7 +25,7 @@ def sort_products(queryset, sort):
         "most_expensive": "-price",
         "newest": "-created_at",
         "bestselling": "-sold",
-        "most_viewed": "-views"
+        "most_viewed": "-views",
     }
     sort_order = SORT_QUERIES.get(sort, "-created_at")
     return queryset.order_by(sort_order)
@@ -38,14 +38,10 @@ def comment_already_liked_response():
     )
 
 
-def get_data_from_cache(cache_key):
-    data = cache.get(cache_key)
-    return data
-
-
 def is_sort_invalid(sort_method):
     SORT_CHOICES = ("newest", "bestselling", "most_viewed")
     return sort_method not in SORT_CHOICES
+
 
 def sort_invalid_response():
     return Response(

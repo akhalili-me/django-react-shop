@@ -2,6 +2,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from .models import *
 from .serializers import *
+from .permissions import SuperuserEditOnly
 from rest_framework import generics
 from django.db.models import Q
 from rest_framework.response import Response
@@ -11,7 +12,7 @@ from .pagination import ProductListPagination, ProductCommentsPagination
 from django.http import Http404
 from .helpers import *
 from django.db import IntegrityError
-
+from modules.utility.utils import get_data_from_cache
 from django.core.cache import cache
 
 
@@ -33,6 +34,12 @@ class ProductListSortView(generics.ListAPIView):
             cache.set(cache_key, data)
 
         return Response(data)
+
+
+class RUDProductView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [SuperuserEditOnly]
+    queryset = Product.objects.all()
 
 
 class ProductFeatureListView(generics.ListAPIView):

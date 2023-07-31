@@ -8,10 +8,7 @@ export const getCommentById = createAsyncThunk(
       const { data } = await authAxios.get(`/accounts/comments/${commentId}`);
       return data;
     } catch (error) {
-      const errorMessage =
-        error.response && error.response.data.detail
-          ? error.response.data.detail
-          : error.message;
+      const errorMessage = error.response?.data?.detail || error.message;
       throw new Error(errorMessage);
     }
   }

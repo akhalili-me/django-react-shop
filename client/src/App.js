@@ -25,19 +25,20 @@ import Checkout from "./pages/Checkout";
 import { getCategories } from "./features/category/categorySlice";
 import { refreshAndSetAccessToken } from "./features/auth/token/tokenReducers";
 import OrderDetails from "./components/profile/order/OrderDetails";
+import { getCartItems } from "./features/cart/cartOperations";
 
 function App() {
   const dispatch = useDispatch();
   const {authenticated} = useSelector(state => state.login)
 
   useEffect(() => {
-    
     dispatch(getCategories());
   }, [dispatch])
   
   useEffect(() => {
     if (authenticated) {
       dispatch(refreshAndSetAccessToken())
+      dispatch(getCartItems())
       
       const interval = setInterval( () => {
         dispatch(refreshAndSetAccessToken())},

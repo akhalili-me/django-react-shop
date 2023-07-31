@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import Carousel from "../components/HomeSwiper";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
+import { Col, Row, Tab, Tabs } from "react-bootstrap";
 import CategoryCard from "../components/category/CategoryCard";
 import ProductCard from "../components/product/ProductCard";
 import { Link } from "react-router-dom";
@@ -19,9 +18,9 @@ const Home = () => {
   const parentCategories = useSelector((state) =>
     state.category.categories.filter((c) => c.parent === null)
   );
-  const newestProducts = useSelector((state) => state.homeproducts.newest);
-  const bestsellingProducts = useSelector((state) => state.homeproducts.newest);
-  const mostViewedProducts = useSelector((state) => state.homeproducts.newest);
+  const { newest, bestselling, mostViewed } = useSelector(
+    (state) => state.homeProducts
+  );
 
   useEffect(() => {
     dispatch(getNewestProducts());
@@ -42,58 +41,65 @@ const Home = () => {
   return (
     <div>
       <Carousel />
-      <h1 className="py-4">Latest Products</h1>
+      <h1 className="py-4">Products</h1>
 
-      {newestProducts.loading ? (
-        <Loader />
-      ) : newestProducts.error ? (
-        <Message variant={"danger"} message={newestProducts.error} />
-      ) : (
-        <>
-          <Row xs={1} md={2} className="g-4">
-            {newestProducts.products.map((product) => (
-              <Col key={product.id} sm={12} md={6} lg={4} xl={4}>
-                <ProductCard product={product} />
-              </Col>
-            ))}
-          </Row>
-        </>
-      )}
-
-      <h1 className="py-4">Bestselling Products</h1>
-
-      {bestsellingProducts.loading ? (
-        <Loader />
-      ) : bestsellingProducts.error ? (
-        <Message variant={"danger"} message={bestsellingProducts.error} />
-      ) : (
-        <>
-          <Row xs={1} md={2} className="g-4">
-            {bestsellingProducts.products.map((product) => (
-              <Col key={product.id} sm={12} md={6} lg={4} xl={4}>
-                <ProductCard product={product} />
-              </Col>
-            ))}
-          </Row>
-        </>
-      )}
-      <h1 className="py-4">Most Viewed Products</h1>
-
-      {mostViewedProducts.loading ? (
-        <Loader />
-      ) : mostViewedProducts.error ? (
-        <Message variant={"danger"} message={mostViewedProducts.error} />
-      ) : (
-        <>
-          <Row xs={1} md={2} className="g-4">
-            {mostViewedProducts.products.map((product) => (
-              <Col key={product.id} sm={12} md={6} lg={4} xl={4}>
-                <ProductCard product={product} />
-              </Col>
-            ))}
-          </Row>
-        </>
-      )}
+      <Tabs
+        defaultActiveKey="Newest"
+        className="mb-3"
+        fill
+      >
+        <Tab eventKey="Newest" title="Newest">
+          {newest.loading ? (
+            <Loader />
+          ) : newest.error ? (
+            <Message variant={"danger"} message={newest.error} />
+          ) : (
+            <>
+              <Row xs={1} md={2} className="g-4">
+                {newest.products?.map((product) => (
+                  <Col key={product.id} sm={12} md={6} lg={4} xl={4}>
+                    <ProductCard product={product} />
+                  </Col>
+                ))}
+              </Row>
+            </>
+          )}
+        </Tab>
+        <Tab eventKey="Bestselling" title="Bestselling">
+          {bestselling.loading ? (
+            <Loader />
+          ) : bestselling.error ? (
+            <Message variant={"danger"} message={bestselling.error} />
+          ) : (
+            <>
+              <Row xs={1} md={2} className="g-4">
+                {bestselling.products?.map((product) => (
+                  <Col key={product.id} sm={12} md={6} lg={4} xl={4}>
+                    <ProductCard product={product} />
+                  </Col>
+                ))}
+              </Row>
+            </>
+          )}
+        </Tab>
+        <Tab eventKey="Most Viewed" title="Most Viewed">
+          {mostViewed.loading ? (
+            <Loader />
+          ) : mostViewed.error ? (
+            <Message variant={"danger"} message={mostViewed.error} />
+          ) : (
+            <>
+              <Row xs={1} md={2} className="g-4">
+                {mostViewed.products?.map((product) => (
+                  <Col key={product.id} sm={12} md={6} lg={4} xl={4}>
+                    <ProductCard product={product} />
+                  </Col>
+                ))}
+              </Row>
+            </>
+          )}
+        </Tab>
+      </Tabs>
 
       <h1 className="py-4">Categories</h1>
       <Row xs={1} md={2} className="">

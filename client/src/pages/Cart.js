@@ -5,18 +5,35 @@ import CartItems from "../components/cart/CartItems";
 import { clearCart } from "../features/cart/cartSlice";
 import { Link } from "react-router-dom";
 import Message from "../components/common/Message";
-
+import { setAlarm } from "../features/alert/alarmSlice";
 const Cart = () => {
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const handleClearCart = () => {
-    dispatch(clearCart());
+    try {
+      dispatch(clearCart());
+      dispatch(
+        setAlarm({
+          message: "Successfully emptied cart.",
+          type: "success",
+          show: true,
+        })
+      );
+    } catch (error) {
+      dispatch(
+        setAlarm({
+          message: error.message,
+          type: "danger",
+          show: true,
+        })
+      );
+    }
   };
 
   return (
     <>
-      {cart.items.length === 0 ? (
+      {cart.items?.length === 0 ? (
         <Message
           message={"Please Add a product to continiue."}
           variant={"info"}
