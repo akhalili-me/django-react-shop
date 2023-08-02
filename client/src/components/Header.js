@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { LinkContainer } from "react-router-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { clearCart } from "../features/cart/cartSlice";
+import { clearAllItmesInCart } from "../features/cart/cartReducers";
 import { logout } from "../features/auth/login/loginSlice";
 import {
   Offcanvas,
@@ -28,7 +28,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     dispatch(logout());
-    dispatch(clearCart());
+    dispatch(clearAllItmesInCart());
   };
 
   const handleCloseCategories = () => setShowCategories(false);

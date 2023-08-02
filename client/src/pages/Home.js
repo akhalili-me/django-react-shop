@@ -41,7 +41,7 @@ const Home = () => {
   return (
     <div>
       <Carousel />
-      <h1 className="py-4">Products</h1>
+      <h1 className="py-4">Productsasdsad</h1>
 
       <Tabs
         defaultActiveKey="Newest"

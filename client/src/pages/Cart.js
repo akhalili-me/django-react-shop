@@ -2,33 +2,16 @@ import React from "react";
 import { Button, Col, Row, ListGroup } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import CartItems from "../components/cart/CartItems";
-import { clearCart } from "../features/cart/cartSlice";
 import { Link } from "react-router-dom";
 import Message from "../components/common/Message";
-import { setAlarm } from "../features/alert/alarmSlice";
+import { clearAllItmesInCart } from "../features/cart/cartReducers";
+
 const Cart = () => {
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const handleClearCart = () => {
-    try {
-      dispatch(clearCart());
-      dispatch(
-        setAlarm({
-          message: "Successfully emptied cart.",
-          type: "success",
-          show: true,
-        })
-      );
-    } catch (error) {
-      dispatch(
-        setAlarm({
-          message: error.message,
-          type: "danger",
-          show: true,
-        })
-      );
-    }
+      dispatch(clearAllItmesInCart());
   };
 
   return (

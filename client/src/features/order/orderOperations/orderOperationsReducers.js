@@ -1,13 +1,19 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import authAxios from "../../../utility/api";
 import { setAlarm } from "../../alert/alarmSlice";
-import { clearCart } from "../../cart/cartSlice";
-import {paymentSuccessfull} from "../../payment/paymentOperationsReducer"
-
+import { paymentSuccessfull } from "../../payment/paymentOperationsReducer";
+import { clearAllItmesInCart } from "../../cart/cartReducers";
 export const addOrder = createAsyncThunk(
   "orderOperations/addOrder",
   async (
-    { addressId, totalPrice, shippingPrice, paymentMethod, orderItems, navigator },
+    {
+      addressId,
+      totalPrice,
+      shippingPrice,
+      paymentMethod,
+      orderItems,
+      navigator,
+    },
     { dispatch }
   ) => {
     try {
@@ -18,18 +24,17 @@ export const addOrder = createAsyncThunk(
         payment: { payment_method: paymentMethod },
         order_items: orderItems,
       });
-      dispatch(clearCart());
+      dispatch(clearAllItmesInCart());
       dispatch(
         setAlarm({
           message: "Order successfully added.",
           type: "success",
         })
       );
-      
-      // Just for testing
-      dispatch(paymentSuccessfull({paymentId: data.payment_id}))
-      navigator(`/orders/${data.order_id}?paymentSuccess=true`)
 
+      // Just for testing
+      dispatch(paymentSuccessfull({ paymentId: data.payment_id }));
+      navigator(`/orders/${data.order_id}?paymentSuccess=true`);
     } catch (error) {
       const errorMessage = error.response?.data?.detail || error.message;
       dispatch(setAlarm({ message: errorMessage, type: "danger" }));

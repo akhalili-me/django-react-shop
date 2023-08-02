@@ -5,9 +5,8 @@ import { useDispatch } from "react-redux";
 import { LinkContainer } from "react-router-bootstrap";
 
 import Carousel from "./Carousel";
-import { addItemCart } from "../../features/cart/cartSlice";
 import Rating from "../common/Rating";
-
+import { addItemToCart } from "../../features/cart/cartReducers";
 const ProductPage = ({ product }) => {
   const { name, quantity, price, rate, description, images, num_comments } =
     product;
@@ -16,9 +15,7 @@ const ProductPage = ({ product }) => {
   const dispatch = useDispatch();
 
   const handleAddToCart = () => {
-    try {
-      dispatch(addItemCart(product));
-    } catch (error) {}
+    dispatch(addItemToCart({ item: product }));
   };
 
   return (

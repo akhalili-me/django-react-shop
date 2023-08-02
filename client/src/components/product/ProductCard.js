@@ -4,30 +4,14 @@ import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import { truncateString } from "../../utility/string_utils";
-import { addItemCart } from "../../features/cart/cartSlice";
-import { setAlarm } from "../../features/alert/alarmSlice";
+import { addItemToCart } from "../../features/cart/cartReducers";
+
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
+  
   const handleAddToCart = () => {
-    try {
-      dispatch(addItemCart(product));
-      dispatch(
-        setAlarm({
-          message: "Successfully added to cart!",
-          type: "success",
-          show: true,
-        })
-      );
-    } catch (error) {
-      dispatch(
-        setAlarm({
-          message: error.message,
-          type: "danger",
-          show: true,
-        })
-      );
-    }
+    dispatch(addItemToCart({ item: product }));
   };
 
   return (

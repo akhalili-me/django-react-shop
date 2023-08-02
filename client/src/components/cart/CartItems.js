@@ -1,13 +1,17 @@
 import React from "react";
 import { Table, Form } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { removeItemCart, updateItemCart } from "../../features/cart/cartSlice";
 import { setAlarm } from "../../features/alert/alarmSlice";
+import {
+  removeItemFromCart,
+  UpdateItemQuantityInCart,
+} from "../../features/cart/cartReducers";
+
 const CartItems = ({ items }) => {
   const dispatch = useDispatch();
 
   const handleRemoveItem = (productId, index) => {
-    dispatch(removeItemCart({ product: productId, index: index }));
+    dispatch(removeItemFromCart({ product: productId, index: index }));
   };
 
   const handleUpdateQuantity = (productId, productQuantity, event) => {
@@ -22,7 +26,7 @@ const CartItems = ({ items }) => {
       productId: productId,
       quantity: quantity,
     };
-    dispatch(updateItemCart(data));
+    dispatch(UpdateItemQuantityInCart(data));
   };
 
   const products = items.map((i, index) => {
