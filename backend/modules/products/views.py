@@ -1,5 +1,4 @@
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
 from .models import *
 from .serializers import *
 from .permissions import SuperuserEditOnly
@@ -12,8 +11,9 @@ from .pagination import ProductListPagination, ProductCommentsPagination
 from django.http import Http404
 from .helpers import *
 from django.db import IntegrityError
-from modules.utility.utils import get_data_from_cache
+from modules.utility.utils.cache import get_data_from_cache
 from django.core.cache import cache
+from .api_exceptions import CommentAlreadyLikedException, SortMethodInvalidException
 
 
 class ProductListSortView(generics.ListAPIView):
@@ -22,8 +22,9 @@ class ProductListSortView(generics.ListAPIView):
 
     def list(self, request):
         sort_method = self.request.query_params.get("sort")
+
         if is_sort_invalid(sort_method):
-            return sort_invalid_response()
+            raise SortMethodInvalidException()
 
         cache_key = f"product_list_{sort_method}"
         data = get_data_from_cache(cache_key)
@@ -111,7 +112,7 @@ class CommentLikeCreateView(generics.CreateAPIView):
         try:
             CommentLike.objects.like_comment(kwargs["pk"], request.user)
         except IntegrityError:
-            comment_already_liked_response()
+            raise CommentAlreadyLikedException()
 
         headers = self.get_success_headers(serializer.data)
         return Response(status=status.HTTP_201_CREATED, headers=headers)

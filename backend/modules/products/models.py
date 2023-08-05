@@ -6,6 +6,7 @@ from django.utils.deconstruct import deconstructible
 from django.db.models import Avg
 from .managers import *
 
+
 @deconstructible
 class PathAndRename(object):
     def __init__(self, sub_path):
@@ -90,7 +91,7 @@ class CommentLike(TimeStampedModel):
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
 
     objects = CommentLikeManager()
-    
+
     class Meta:
         constraints = [
             models.UniqueConstraint(

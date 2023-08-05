@@ -14,6 +14,7 @@ from .models import ShoppingSession
 from .helpers import *
 from modules.utility.permissions import IsSuperuserOrObjectOwner
 from modules.utility.mixins import SingleFieldUrlGetObjectMixin
+from .api_exceptions import OrderItemsEmptyException
 
 
 class CreateCartItems(CreateAPIView):
@@ -114,7 +115,7 @@ class CreateOrdersView(CreateAPIView):
         order_items_data = request.data.get("order_items")
 
         if not order_items_data or len(order_items_data) == 0:
-            return invalid_order_response()
+            raise OrderItemsEmptyException()
 
         order_item_serializer = OrderItemSerializer(data=order_items_data, many=True)
         order_item_serializer.is_valid(raise_exception=True)

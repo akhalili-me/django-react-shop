@@ -57,6 +57,8 @@ class OrderItem(TimeStampedModel):
     )
     quantity = models.IntegerField(default=1)
 
+    objects = OrderItemManager()
+
 
 class Payment(TimeStampedModel):
     STATUS_CHOICES = (("pending", "Pending"), ("paid", "Paid"), ("failed", "Failed"))

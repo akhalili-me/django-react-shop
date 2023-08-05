@@ -31,20 +31,7 @@ def sort_products(queryset, sort):
     return queryset.order_by(sort_order)
 
 
-def comment_already_liked_response():
-    return Response(
-        {"detail": "This comment is already liked by this user."},
-        status=status.HTTP_400_BAD_REQUEST,
-    )
-
 
 def is_sort_invalid(sort_method):
     SORT_CHOICES = ("newest", "bestselling", "most_viewed")
     return sort_method not in SORT_CHOICES
-
-
-def sort_invalid_response():
-    return Response(
-        {"detail": "Sort method is not valid."},
-        status=status.HTTP_400_BAD_REQUEST,
-    )
