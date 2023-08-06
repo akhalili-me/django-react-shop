@@ -2,7 +2,13 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
-from .views import *
+from .views import (
+    UserRegisterView,
+    CustomTokenObtainPairView,
+    UserCommentsListView,
+    RUDCommentsView,
+    AddressViewSet,
+)
 
 from rest_framework import routers
 

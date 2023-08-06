@@ -1,6 +1,17 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import *
+from .views import (
+    RUDProductView,
+    ProductListSortView,
+    CategoryListView,
+    ProductFeatureListView,
+    ProductCommentsListView,
+    CommentsCreateView,
+    ProductsFilterListView,
+    TopSellingProductsEachChildCategoryView,
+    CommentLikeCreateView,
+    RDCommentLikeView,
+)
 
 urlpatterns = [
     path("<int:pk>", RUDProductView.as_view()),

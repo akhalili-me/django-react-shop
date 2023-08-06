@@ -4,7 +4,7 @@ import os
 from uuid import uuid4
 from django.utils.deconstruct import deconstructible
 from django.db.models import Avg
-from .managers import *
+from django.db import models
 
 
 @deconstructible
@@ -80,8 +80,6 @@ class Comment(TimeStampedModel):
     text = models.TextField(max_length=500)
     rate = models.IntegerField(validators=[MaxValueValidator(5)])
 
-    objects = CommentManager()
-
     def __str__(self):
         return f"{self.text}"
 
@@ -89,8 +87,6 @@ class Comment(TimeStampedModel):
 class CommentLike(TimeStampedModel):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="likes")
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
-
-    objects = CommentLikeManager()
 
     class Meta:
         constraints = [

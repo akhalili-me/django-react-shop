@@ -1,6 +1,11 @@
+from typing import Iterable, Optional
 from modules.utility.models import TimeStampedModel
 from django.db.models import Sum, F
-from .managers import *
+from django.db import models
+from .managers import (
+    OrderItemManager,
+    OrderManager,
+)
 
 
 class ShoppingSession(TimeStampedModel):
@@ -9,7 +14,6 @@ class ShoppingSession(TimeStampedModel):
     )
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-    objects = ShoppingSessionManager()
 
     def update_total(self):
         total = (
@@ -28,8 +32,6 @@ class CartItem(TimeStampedModel):
     )
     product = models.ForeignKey("products.Product", on_delete=models.CASCADE)
     quantity = models.IntegerField()
-
-    objects = CartItemManager()
 
 
 class Order(TimeStampedModel):

@@ -52,37 +52,3 @@ class OrderItemManager(models.Manager):
         with transaction.atomic():
             OrderItem.objects.bulk_create(order_items)
             Product.objects.bulk_update(products, ["quantity", "sold"])
-
-
-class CartItemManager(models.Manager):
-    def create_or_update_cart_item(self, shopping_session, **kwargs):
-        from .models import CartItem
-
-        CartItem.objects.update_or_create(
-            product=kwargs["product"],
-            session=shopping_session,
-            defaults={"quantity": kwargs["quantity"]},
-        )
-
-        shopping_session.update_total()
-
-    def delete_one_cart_item(self, cart_item):
-        with transaction.atomic():
-            shopping_session = cart_item.session
-            cart_item.delete()
-            shopping_session.update_total()
-
-    def delete_all_user_cart_items(self, user):
-        from .models import CartItem, ShoppingSession
-
-        shopping_session = get_object_or_404(ShoppingSession, user=user)
-        CartItem.objects.filter(session=shopping_session).delete()
-        shopping_session.update_total()
-
-
-class ShoppingSessionManager(models.Manager):
-    def get_or_create_shopping_session(self, user):
-        from .models import ShoppingSession
-
-        shopping_session, _ = ShoppingSession.objects.get_or_create(user=user)
-        return shopping_session

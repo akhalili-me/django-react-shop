@@ -1,7 +1,6 @@
 from django.test import TestCase
-from ..models import Product, Category, Comment, ProductImage
+from ..models import Product, Category, Comment, ProductImage, CommentLike, Feature
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.contrib.auth import get_user_model
 import os
 from modules.accounts.tests.test_models import BaseUserSetUp
 
@@ -36,6 +35,15 @@ class BaseProductSetUp(BaseCategorySetUp):
             description="Test product description",
             category=self.child_category,
             quantity=24,
+        )
+
+
+class BaseCommentSetUp(BaseProductSetUp, BaseUserSetUp):
+    def setUp(self):
+        super().setUp()
+        BaseUserSetUp.setUp(self)
+        self.comment = Comment.objects.create(
+            text="Test Comment", rate=3, author=self.user, product=self.product
         )
 
 
@@ -78,7 +86,6 @@ class ProductTestCase(BaseProductSetUp, BaseUserSetUp):
                 text="Test Comment", rate=i + 1, author=self.user, product=self.product
             )
 
-        self.product.update_rate()
         self.assertEqual(self.product.rate, 1.5)
 
     def test_product_update_rate_with_no_comments(self):
@@ -99,17 +106,48 @@ class ProdutImageTestCase(BaseProductSetUp):
         self.assertTrue(self.product_image.image)
 
 
-class CommentTestCase(BaseProductSetUp, BaseUserSetUp):
-    def setUp(self):
-        super().setUp()
-        BaseUserSetUp.setUp(self)
-        self.comment = Comment.objects.create(
-            text="Test Comment", rate=3, author=self.user, product=self.product
-        )
-
+class CommentTestCase(BaseCommentSetUp):
     def test_comment_creation(self):
         self.assertEqual(Comment.objects.count(), 1)
         self.assertEqual(self.comment.text, "Test Comment")
         self.assertEqual(self.comment.rate, 3)
         self.assertEqual(self.comment.author, self.user)
         self.assertEqual(self.comment.product, self.product)
+
+    def test_update_rate_after_comment_save(self):
+        self.assertEqual(self.comment.rate, self.product.rate)
+
+
+class CommentLikeTestCase(BaseCommentSetUp):
+    def setUp(self):
+        super().setUp()
+        self.comment_like = CommentLike.objects.create(
+            comment=self.comment, user=self.user
+        )
+
+    def test_comment_like_creation(self):
+        self.assertEqual(CommentLike.objects.count(), 1)
+        self.assertEqual(self.comment_like.user, self.user)
+        self.assertEqual(self.comment_like.comment, self.comment)
+
+    def test_unique_comment_like_constraint(self):
+        """Test unique constraint for comment like model by creating an instance the same as in set up method"""
+        with self.assertRaises(Exception) as context:
+            CommentLike.objects.create(comment=self.comment, user=self.user)
+        self.assertTrue("unique_comment_like" in str(context.exception))
+
+
+class FeatureTestCase(BaseProductSetUp):
+    def setUp(self):
+        super().setUp()
+        self.feature = Feature.objects.create(
+            name="Test Feature",
+            description="Test feature description",
+            product=self.product,
+        )
+
+    def test_feature_creation(self):
+        self.assertEqual(Feature.objects.count(), 1)
+        self.assertEqual(self.feature.name, "Test Feature")
+        self.assertEqual(self.feature.description, "Test feature description")
+        self.assertEqual(self.feature.product, self.product)

@@ -1,6 +1,7 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status, generics
+from rest_framework import status
 from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
     RetrieveDestroyAPIView,
@@ -9,11 +10,21 @@ from rest_framework.generics import (
     RetrieveAPIView,
     DestroyAPIView,
 )
-from .serializers import *
-from .models import ShoppingSession
-from .helpers import *
 from modules.utility.permissions import IsSuperuserOrObjectOwner
 from modules.utility.mixins import SingleFieldUrlGetObjectMixin
+from .serializers import (
+    CartItemCreateSerializer,
+    RDCartItemSerializer,
+    CartItemsListSerializer,
+    StateCityListSerilizer,
+    PaymentSerializer,
+    OrderItemSerializer,
+    RUDOrderSerializer,
+    CreateOrderSerializer,
+    ListOrderSerializer,
+)
+from .helpers import serialize_order_and_payment_data, success_order_created_response
+from .models import ShoppingSession, CartItem, State, Order, OrderItem, Payment
 from .api_exceptions import OrderItemsEmptyException
 
 
@@ -28,18 +39,14 @@ class CreateCartItems(CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        shopping_session, _ = ShoppingSession.objects.get_or_create(user=request.user)
+        CartItem.objects.update_or_create(
+            product=serializer.validated_data["product"],
+            session=shopping_session,
+            defaults={"quantity": serializer.validated_data["quantity"]},
+        )
 
-        shopping_session = ShoppingSession.objects.get_or_create_shopping_session(
-            request.user
-        )
-        CartItem.objects.create_or_update_cart_item(
-            shopping_session, **serializer.validated_data
-        )
-
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class RUDCartItem(RetrieveDestroyAPIView):
@@ -54,11 +61,6 @@ class RUDCartItem(RetrieveDestroyAPIView):
         user = self.request.user
         productId = self.kwargs.get("pk")
         return get_object_or_404(CartItem, product__id=productId, session__user=user)
-
-    def destroy(self, request, *args, **kwargs):
-        cart_item = self.get_object()
-        CartItem.objects.delete_one_cart_item(cart_item)
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CartItemsList(RetrieveAPIView):
@@ -81,7 +83,8 @@ class DeleteAllCartItems(DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def destroy(self, request, *args, **kwargs):
-        CartItem.objects.delete_all_user_cart_items(request.user)
+        shopping_session = get_object_or_404(ShoppingSession, user=request.user)
+        CartItem.objects.filter(session=shopping_session).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

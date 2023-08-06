@@ -1,6 +1,16 @@
-from django.urls import path, include
-from rest_framework import routers
-from .views import *
+from django.urls import path
+from .views import (
+    CreateCartItems,
+    CartItemsList,
+    RUDCartItem,
+    DeleteAllCartItems,
+    StateCityList,
+    RUDOrderItemView,
+    RUDPaymentView,
+    CreateOrdersView,
+    ListUserOrdersView,
+    RUDOrderView,
+)
 
 urlpatterns = [
     path("", CartItemsList.as_view(), name="cart-items-list"),

@@ -1,16 +1,18 @@
 from rest_framework.viewsets import ModelViewSet
-from .serializers import UserSerializer
-from django.contrib.auth import get_user_model
 from rest_framework import status, generics
 from rest_framework.response import Response
-from .permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticated
-from .serializers import *
+from .serializers import (
+    UserCommentsSerializer,
+    CommentSerializer,
+    AddressSerializer,
+    UserSerializer,
+)
 from modules.products.models import Comment
+from modules.cart.models import Address
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
 from .pagination import UserCommentListPagination
-from .models import User
 from .helpers import create_user_from_serializer
 
 

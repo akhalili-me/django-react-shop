@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from .models import *
+from .models import CartItem, ShoppingSession, State, OrderItem, Payment, Order
 from modules.products.serializers import ProductImageSerializer
 from modules.products.models import Product
+
 
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
@@ -35,6 +36,7 @@ class RDCartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ["product", "quantity"]
 
+
 class CartItemsListSerializer(serializers.ModelSerializer):
     cart_items = RDCartItemSerializer(many=True)
 
@@ -60,7 +62,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = ["amount", "status", "payment_method","paid_at"]
+        fields = ["amount", "status", "payment_method", "paid_at"]
 
 
 class PaymentMethodSerializer(serializers.ModelSerializer):
@@ -68,12 +70,13 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
         model = Payment
         fields = ["payment_method"]
 
+
 class CreateOrderSerializer(serializers.ModelSerializer):
     payment = PaymentMethodSerializer()
 
     class Meta:
         model = Order
-        fields = ["id", "address", "total", "shipping_price","payment"]
+        fields = ["id", "address", "total", "shipping_price", "payment"]
 
 
 class ListOrderSerializer(serializers.ModelSerializer):
@@ -86,12 +89,14 @@ class ListOrderSerializer(serializers.ModelSerializer):
     def get_status(self, obj):
         return obj.payment.status
 
+
 class OrderItemsDetailsSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
 
-    class Meta: 
+    class Meta:
         model = OrderItem
-        fields =["quantity","product"]
+        fields = ["quantity", "product"]
+
 
 class RUDOrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemsDetailsSerializer(many=True, read_only=True)
@@ -100,8 +105,7 @@ class RUDOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ["id", "full_address",
-                  "address", "total", "payment", "order_items"]
+        fields = ["id", "full_address", "address", "total", "payment", "order_items"]
 
     def get_full_address(self, obj):
         return str(obj.address)

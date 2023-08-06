@@ -1,19 +1,31 @@
 from rest_framework.permissions import IsAuthenticated
-from .models import *
-from .serializers import *
 from .permissions import SuperuserEditOnly
 from rest_framework import generics
-from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .pagination import ProductListPagination, ProductCommentsPagination
 from django.http import Http404
-from .helpers import *
 from django.db import IntegrityError
 from modules.utility.utils.cache import get_data_from_cache
 from django.core.cache import cache
 from .api_exceptions import CommentAlreadyLikedException, SortMethodInvalidException
+from .serializers import (
+    ProductSerializer,
+    ProductCommentCreateSerializer,
+    ProductCommentListSerializer,
+    FeatureListSerilizer,
+    CategorySerializer,
+    CommentLikeSerializer,
+    TopSellingProductsByChildCategorySerializer,
+)
+from .models import Product, Comment, Feature, Category
+from .helpers import (
+    is_sort_invalid,
+    sort_products,
+    filter_products_by_availability,
+    filter_products_by_price,
+)
 
 
 class ProductListSortView(generics.ListAPIView):
@@ -91,8 +103,10 @@ class CommentsCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        Comment.objects.create_comment(
-            kwargs["product_id"], request.user, **serializer.validated_data
+        product = get_object_or_404(Product, pk=kwargs.get("product_id"))
+        Comment.objects.create_comment_and_update_product_rate()
+        Comment.objects.create(
+            product=product, user=request.user, **serializer.validated_data
         )
         return Response(status=status.HTTP_201_CREATED)
 
@@ -108,14 +122,14 @@ class CommentLikeCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        comment = get_object_or_404(Comment, pk=kwargs.get("pk"))
 
         try:
-            CommentLike.objects.like_comment(kwargs["pk"], request.user)
+            Comment.objects.create(comment=comment, user=request.user)
         except IntegrityError:
             raise CommentAlreadyLikedException()
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(status=status.HTTP_201_CREATED, headers=headers)
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class RDCommentLikeView(generics.RetrieveDestroyAPIView):
@@ -127,8 +141,8 @@ class RDCommentLikeView(generics.RetrieveDestroyAPIView):
     permission_classes = [IsAuthenticated]
     lookup_field = "comment_id"
 
-    def get_queryset(self):
-        return CommentLike.objects.filter(
+    def get_object(self):
+        return get_object_or_404(
             user=self.request.user, comment_id=self.kwargs["comment_id"]
         )
 
