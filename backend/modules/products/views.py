@@ -3,6 +3,7 @@ from .permissions import SuperuserEditOnly
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from .pagination import ProductListPagination, ProductCommentsPagination
 from django.http import Http404
@@ -19,13 +20,14 @@ from .serializers import (
     CommentLikeSerializer,
     TopSellingProductsByChildCategorySerializer,
 )
-from .models import Product, Comment, Feature, Category
+from .models import Product, Comment, Feature, Category, CommentLike
 from .helpers import (
     is_sort_invalid,
     sort_products,
     filter_products_by_availability,
     filter_products_by_price,
 )
+
 
 
 class ProductListSortView(generics.ListAPIView):
@@ -74,6 +76,16 @@ class CategoryListView(generics.ListAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
+    def list(self, request):
+        cache_key = "category_list"
+        data = get_data_from_cache(cache_key)
+
+        if not data:
+            data = super().list(request=request).data
+            cache.set(cache_key, data)
+
+        return Response(data)
+
 
 class ProductCommentsListView(generics.ListAPIView):
     """
@@ -104,9 +116,8 @@ class CommentsCreateView(generics.CreateAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         product = get_object_or_404(Product, pk=kwargs.get("product_id"))
-        Comment.objects.create_comment_and_update_product_rate()
         Comment.objects.create(
-            product=product, user=request.user, **serializer.validated_data
+            product=product, author=request.user, **serializer.validated_data
         )
         return Response(status=status.HTTP_201_CREATED)
 
@@ -125,7 +136,7 @@ class CommentLikeCreateView(generics.CreateAPIView):
         comment = get_object_or_404(Comment, pk=kwargs.get("pk"))
 
         try:
-            Comment.objects.create(comment=comment, user=request.user)
+            CommentLike.objects.create(comment=comment, user=request.user)
         except IntegrityError:
             raise CommentAlreadyLikedException()
 
@@ -156,18 +167,19 @@ class ProductsFilterListView(generics.ListAPIView):
     pagination_class = ProductListPagination
 
     def get_queryset(self):
-        category_id = self.kwargs.get("pk")
-        queryset = Product.objects.filter(category_id=category_id)
-
         # Get url query parameters
         sort = self.request.query_params.get("sort", "default")
         min_price = int(self.request.query_params.get("min", 0))
         max_price = int(self.request.query_params.get("max", 0))
         has_selling_stock = self.request.query_params.get("has_selling_stock", "false")
 
-        # Filter products
+        # Get Q objects
+        queryset = Q(category_id=self.kwargs.get("pk"))
         queryset = filter_products_by_price(queryset, min_price, max_price)
         queryset = filter_products_by_availability(queryset, has_selling_stock)
+
+        # Apply filters and sort
+        queryset = Product.objects.filter(queryset)
         queryset = sort_products(queryset, sort)
 
         return queryset

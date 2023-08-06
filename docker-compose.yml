@@ -11,6 +11,7 @@ services:
         - DB_USER=postgres
         - DB_PASSWORD=postgres
         - DB_HOST=db
+        - MEMCACHED_HOST=memcached
 
       ports:
         - '8000:8000'
@@ -38,14 +39,9 @@ services:
 
   db:
     image: postgres:14-alpine
+    
     ports:
       - '5432:5432'
-
-    environment:
-      - DB_NAME=postgres
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_HOST=db
 
     volumes:
       - ./data/db:/var/lib/postgresql/data/
