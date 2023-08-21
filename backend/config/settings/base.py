@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    "modules.core",
     "modules.accounts",
     "modules.products",
     "modules.cart",

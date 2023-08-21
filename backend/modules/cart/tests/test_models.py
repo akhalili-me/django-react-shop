@@ -160,9 +160,11 @@ class OrderTestCase(BaseOrderSetUp, BaseProductSetUp):
         self.assertEqual(order.payment.payment_method, payment_data["payment_method"])
         self.assertEqual(order.payment.status, "pending")
 
+        self.assertEqual(len(order.order_items.all()), len(order_items_data))
         for index, order_item in enumerate(order.order_items.all()):
             self.assertEqual(order_item.product, order_items_data[index]["product"])
             self.assertEqual(order_item.quantity, order_items_data[index]["quantity"])
+            self.assertEqual(self.product.quantity - order_item.quantity, 23)
 
 
 class OrderItemTestCase(BaseOrderSetUp, BaseProductSetUp):
