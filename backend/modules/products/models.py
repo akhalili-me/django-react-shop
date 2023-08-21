@@ -38,7 +38,7 @@ class Product(TimeStampedModel):
     sold = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
     category = models.ForeignKey(
-        "Category", on_delete=models.CASCADE, related_name="products"
+        "Category", on_delete=models.CASCADE, related_name="products", db_index=True
     )
 
     def __str__(self):

@@ -1,4 +1,3 @@
-from typing import Iterable, Optional
 from modules.utility.models import TimeStampedModel
 from django.db.models import Sum, F
 from django.db import models
