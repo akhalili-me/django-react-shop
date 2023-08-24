@@ -29,10 +29,8 @@ class OrderManager(models.Manager):
 class OrderItemManager(models.Manager):
     def create_order_items(self, order, order_items_data):
         from .models import OrderItem
-        from modules.products.models import Product
 
         order_items = []
-        products = []
 
         for order_item in order_items_data:
             # order items objects array
@@ -43,12 +41,5 @@ class OrderItemManager(models.Manager):
             )
             order_items.append(order_item_instance)
 
-            # product objects array
-            product_instance = Product(pk=order_item_instance.product.id)
-            product_instance.quantity = F("quantity") - order_item_instance.quantity
-            product_instance.sold = F("sold") + order_item_instance.quantity
-            products.append(product_instance)
-
         with transaction.atomic():
             OrderItem.objects.bulk_create(order_items)
-            Product.objects.bulk_update(products, ["quantity", "sold"])

@@ -20,4 +20,5 @@ RUN apk del .build-deps \
 
 COPY . /app/backend/
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000", "--settings=config.settings.local"]
+CMD ["sh", "-c", "python manage.py wait_for_db --settings=config.settings.local && python manage.py runserver 0.0.0.0:8000 --settings=config.settings.local"]
+

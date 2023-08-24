@@ -1,6 +1,4 @@
 from django.test import TestCase
-from modules.accounts.tests.test_models import BaseUserSetUp
-from modules.products.tests.test_models import BaseProductSetUp
 from ..models import (
     ShoppingSession,
     CartItem,
@@ -11,20 +9,39 @@ from ..models import (
     State,
     City,
 )
+from django.contrib.auth import get_user_model
+from modules.products.models import Product, Category
 from decimal import Decimal
 from django.db import IntegrityError
+from modules.utility.images import create_test_image
 
 
-class BaseShoppingSessionSetUp(BaseUserSetUp):
+class ShoppingSessionTestCase(TestCase):
     def setUp(self):
-        super().setUp()
+        parent_category = Category.objects.create(
+            name="Test Parent",
+            parent=None,
+            image=create_test_image(),
+        )
+
+        child_category = Category.objects.create(
+            name="Test Child",
+            parent=parent_category,
+            image=create_test_image(),
+        )
+
+        self.product = Product.objects.create(
+            name="Test Product",
+            category=child_category,
+            description="Test product description",
+            price=20.32,
+            quantity=24,
+        )
+    
+        self.user = get_user_model().objects.create_user(
+            username="testuser", email="test@gmail.com", password="testpass"
+        )
         self.shopping_session = ShoppingSession.objects.create(user=self.user)
-
-
-class ShoppingSessionTestCase(BaseShoppingSessionSetUp, BaseProductSetUp):
-    def setUp(self):
-        super().setUp()
-        BaseProductSetUp.setUp(self)
 
     def test_shopping_session_creation(self):
         self.assertEqual(ShoppingSession.objects.count(), 1)
@@ -40,11 +57,50 @@ class ShoppingSessionTestCase(BaseShoppingSessionSetUp, BaseProductSetUp):
             Decimal(self.product.price * 2).quantize(Decimal("0.00")),
         )
 
+    def test_shopping_session_update(self):
+        self.shopping_session.total = 200
+        self.shopping_session.save()
 
-class CartItemTestCase(BaseShoppingSessionSetUp, BaseProductSetUp):
+        updated_shopping_session = ShoppingSession.objects.get(
+            pk=self.shopping_session.pk
+        )
+
+        self.assertEqual(updated_shopping_session.total, 200)
+
+    def test_shopping_session_delete(self):
+        self.shopping_session.delete()
+
+        with self.assertRaises(ShoppingSession.DoesNotExist):
+            ShoppingSession.objects.get(pk=self.shopping_session.pk)
+
+
+class CartItemTestCase(TestCase):
     def setUp(self):
-        super().setUp()
-        BaseProductSetUp.setUp(self)
+        parent_category = Category.objects.create(
+            name="Test Parent",
+            parent=None,
+            image=create_test_image(),
+        )
+
+        child_category = Category.objects.create(
+            name="Test Child",
+            parent=parent_category,
+            image=create_test_image(),
+        )
+
+        self.product = Product.objects.create(
+            name="Test Product",
+            category=child_category,
+            description="Test product description",
+            price=20.32,
+            quantity=24,
+        )
+
+        user = get_user_model().objects.create_user(
+            username="testuser", email="test@gmail.com", password="testpass"
+        )
+        self.shopping_session = ShoppingSession.objects.create(user=user)
+
         self.cart_item = CartItem.objects.create(
             session=self.shopping_session, product=self.product, quantity=2
         )
@@ -55,10 +111,26 @@ class CartItemTestCase(BaseShoppingSessionSetUp, BaseProductSetUp):
         self.assertEqual(self.cart_item.product, self.product)
         self.assertEqual(self.cart_item.quantity, 2)
 
+    def test_cart_item_update(self):
+        self.cart_item.quantity = 5
+        self.cart_item.save()
 
-class BaseAddressSetUp(BaseUserSetUp):
+        updated_cart_item = CartItem.objects.get(pk=self.cart_item.pk)
+
+        self.assertEqual(updated_cart_item.quantity, 5)
+
+    def test_cart_item_delete(self):
+        self.cart_item.delete()
+
+        with self.assertRaises(CartItem.DoesNotExist):
+            CartItem.objects.get(pk=self.cart_item.pk)
+
+
+class AddressTestCase(TestCase):
     def setUp(self):
-        super().setUp()
+        self.user = get_user_model().objects.create_user(
+            username="testuser", email="test@gmail.com", password="testpass"
+        )
         self.address = Address.objects.create(
             user=self.user,
             state="Test State",
@@ -69,8 +141,6 @@ class BaseAddressSetUp(BaseUserSetUp):
             house_number="434",
         )
 
-
-class AddressTestCase(BaseAddressSetUp):
     def test_address_creation(self):
         self.assertEqual(Address.objects.count(), 1)
         self.assertEqual(self.address.user, self.user)
@@ -93,16 +163,30 @@ class AddressTestCase(BaseAddressSetUp):
                 house_number="434",
             )
 
+    def test_address_update(self):
+        self.address.state = "updated state"
+        self.address.street_address = "updated street address"
+        self.address.save()
 
-class BasePaymentSetUp(TestCase):
+        updated_address = Address.objects.get(pk=self.address.pk)
+
+        self.assertEqual(updated_address.state, "updated state")
+        self.assertEqual(updated_address.street_address, "updated street address")
+
+    def test_address_delete(self):
+        self.address.delete()
+
+        with self.assertRaises(Address.DoesNotExist):
+            Address.objects.get(pk=self.address.pk)
+
+
+class PaymentTestCase(TestCase):
     def setUp(self):
         self.payment = Payment.objects.create(
             amount=1000,
             payment_method="Test method",
         )
 
-
-class PaymentTestCase(BasePaymentSetUp):
     def test_payment_creation(self):
         self.assertEqual(Payment.objects.count(), 1)
         self.assertEqual(self.payment.amount, 1000)
@@ -110,11 +194,65 @@ class PaymentTestCase(BasePaymentSetUp):
         self.assertEqual(self.payment.status, "pending")
         self.assertEqual(self.payment.paid_at, None)
 
+    def test_payment_update(self):
+        self.payment.amount = 200
+        self.payment.payment_method = "updated method"
+        self.payment.save()
 
-class BaseOrderSetUp(BaseAddressSetUp, BasePaymentSetUp):
+        updated_payment = Payment.objects.get(pk=self.payment.pk)
+
+        self.assertEqual(updated_payment.amount, 200)
+        self.assertEqual(updated_payment.payment_method, "updated method")
+
+    def test_payment_delete(self):
+        self.payment.delete()
+
+        with self.assertRaises(Payment.DoesNotExist):
+            Payment.objects.get(pk=self.payment.pk)
+
+
+class OrderTestCase(TestCase):
     def setUp(self):
-        super().setUp()
-        BasePaymentSetUp.setUp(self)
+        # Set up product
+        parent_category = Category.objects.create(
+            name="Test Parent",
+            parent=None,
+            image=create_test_image(),
+        )
+
+        child_category = Category.objects.create(
+            name="Test Child",
+            parent=parent_category,
+            image=create_test_image(),
+        )
+
+        self.product = Product.objects.create(
+            name="Test Product",
+            category=child_category,
+            description="Test product description",
+            price=20.32,
+            quantity=24,
+        )
+        # Set up order
+        self.user = get_user_model().objects.create_user(
+            username="testuser", email="test@gmail.com", password="testpass"
+        )
+
+        self.address = Address.objects.create(
+            user=self.user,
+            state="Test State",
+            city="Test City",
+            phone="09012342134",
+            postal_code="1847382365",
+            street_address="Test street address",
+            house_number="434",
+        )
+
+        self.payment = Payment.objects.create(
+            amount=1000,
+            payment_method="Test method",
+        )
+
         self.order = Order.objects.create(
             user=self.user,
             address=self.address,
@@ -122,12 +260,6 @@ class BaseOrderSetUp(BaseAddressSetUp, BasePaymentSetUp):
             shipping_price=10,
             total=1000,
         )
-
-
-class OrderTestCase(BaseOrderSetUp, BaseProductSetUp):
-    def setUp(self):
-        super().setUp()
-        BaseProductSetUp.setUp(self)
 
     def test_order_creation(self):
         """Test default order create method"""
@@ -167,10 +299,57 @@ class OrderTestCase(BaseOrderSetUp, BaseProductSetUp):
             self.assertEqual(self.product.quantity - order_item.quantity, 23)
 
 
-class OrderItemTestCase(BaseOrderSetUp, BaseProductSetUp):
+class OrderItemTestCase(TestCase):
     def setUp(self):
-        super().setUp()
-        BaseProductSetUp.setUp(self)
+        # Set up product
+        parent_category = Category.objects.create(
+            name="Test Parent",
+            parent=None,
+            image=create_test_image(),
+        )
+
+        child_category = Category.objects.create(
+            name="Test Child",
+            parent=parent_category,
+            image=create_test_image(),
+        )
+
+        self.product = Product.objects.create(
+            name="Test Product",
+            category=child_category,
+            description="Test product description",
+            price=20.32,
+            quantity=24,
+        )
+
+        # Set up order
+        self.user = get_user_model().objects.create_user(
+            username="testuser", email="test@gmail.com", password="testpass"
+        )
+
+        self.address = Address.objects.create(
+            user=self.user,
+            state="Test State",
+            city="Test City",
+            phone="09012342134",
+            postal_code="1847382365",
+            street_address="Test street address",
+            house_number="434",
+        )
+
+        self.payment = Payment.objects.create(
+            amount=1000,
+            payment_method="Test method",
+        )
+
+        self.order = Order.objects.create(
+            user=self.user,
+            address=self.address,
+            payment=self.payment,
+            shipping_price=10,
+            total=1000,
+        )
+
         self.order_item = OrderItem.objects.create(
             order=self.order, product=self.product, quantity=1
         )
@@ -181,15 +360,58 @@ class OrderItemTestCase(BaseOrderSetUp, BaseProductSetUp):
         self.assertEqual(self.order_item.product, self.product)
         self.assertEqual(self.order_item.quantity, 1)
 
+    def test_order_item_update(self):
+        self.order_item.quantity = 3
+        self.order_item.save()
 
-class StateCityTestCase(TestCase):
+        updated_order_item = OrderItem.objects.get(pk=self.order_item.pk)
+
+        self.assertEqual(updated_order_item.quantity, 3)
+
+
+class StateTestCase(TestCase):
     def setUp(self):
         self.state = State.objects.create(name="Test state")
-        self.city = City.objects.create(state=self.state, name="Test city")
 
-    def test_state_city_creation(self):
+    def test_state_creation(self):
         self.assertEqual(State.objects.count(), 1)
-        self.assertEqual(City.objects.count(), 1)
         self.assertEqual(self.state.name, "Test state")
+
+    def test_state_update(self):
+        self.state.name = "updated name"
+        self.state.save()
+
+        updated_state = State.objects.get(pk=self.state.pk)
+
+        self.assertEqual(updated_state.name, "updated name")
+
+    def test_state_delete(self):
+        self.state.delete()
+
+        with self.assertRaises(State.DoesNotExist):
+            State.objects.get(pk=self.state.pk)
+
+
+class CityTestCase(TestCase):
+    def setUp(self):
+        self.state = State.objects.create(name="Test state")
+        self.city = City.objects.create(name="Test city", state=self.state)
+
+    def test_city_creation(self):
+        self.assertEqual(City.objects.count(), 1)
         self.assertEqual(self.city.state, self.state)
         self.assertEqual(self.city.name, "Test city")
+
+    def test_city_update(self):
+        self.city.name = "updated name"
+        self.city.save()
+
+        updated_city = City.objects.get(pk=self.city.pk)
+
+        self.assertEqual(updated_city.name, "updated name")
+
+    def test_city_delete(self):
+        self.city.delete()
+
+        with self.assertRaises(City.DoesNotExist):
+            City.objects.get(pk=self.city.pk)

@@ -2,15 +2,12 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 
-class BaseUserSetUp(TestCase):
+class UserTestCase(TestCase):
     def setUp(self):
-        self.email = "test@Gmail.com"
-        password = "testpass"
-        username = "Test Username"
-        self.user = get_user_model().objects.create_user(self.email, password, username)
+        self.user = get_user_model().objects.create_user(
+            email="test@Gmail.com", username="Test Username", password="testpass"
+        )
 
-
-class UserTestCase(BaseUserSetUp):
     def test_user_creation(self):
         self.assertEqual(get_user_model().objects.count(), 1)
         self.assertEqual(self.user.email, "test@gmail.com")
@@ -18,7 +15,7 @@ class UserTestCase(BaseUserSetUp):
         self.assertTrue(self.user.check_password("testpass"))
 
     def test_user_email_normalized(self):
-        self.assertEqual(self.user.email, self.email.lower())
+        self.assertEqual(self.user.email, "test@gmail.com")
 
     def test_user_invalid_email(self):
         with self.assertRaises(ValueError):

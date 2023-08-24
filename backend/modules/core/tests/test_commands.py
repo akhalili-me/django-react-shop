@@ -2,6 +2,7 @@ from unittest.mock import patch
 from django.test import TestCase
 from django.core.management import call_command, CommandError
 from django.db.utils import OperationalError
+from django.db import connections
 
 
 class CommandTests(TestCase):
@@ -9,7 +10,7 @@ class CommandTests(TestCase):
         """
         test waiting for db when db is available.
         """
-        with patch("django.db.utils.ConnectionHandler.__getitem__") as gi:
+        with patch.object(connections["default"], "ensure_connection") as gi:
             gi.return_value = True
             call_command("wait_for_db")
             self.assertEqual(gi.call_count, 1)
@@ -18,7 +19,7 @@ class CommandTests(TestCase):
         """
         test waiting for db
         """
-        with patch("django.db.utils.ConnectionHandler.__getitem__") as gi:
+        with patch.object(connections["default"], "ensure_connection") as gi:
             gi.side_effect = [OperationalError] * 5 + [True]
             call_command("wait_for_db")
             self.assertEqual(gi.call_count, 6)
@@ -27,7 +28,7 @@ class CommandTests(TestCase):
         """
         test waiting for db timeout
         """
-        with patch("django.db.utils.ConnectionHandler.__getitem__") as gi:
+        with patch.object(connections["default"], "ensure_connection") as gi:
             gi.side_effect = [OperationalError] * 100
             with self.assertRaises(CommandError) as ce:
                 call_command("wait_for_db", timeout=2)

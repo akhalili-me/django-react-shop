@@ -23,11 +23,10 @@ class Command(BaseCommand):
         elapsed_seconds = 0
 
         self.stdout.write("\nWaiting for database...")
-        db_connection = None
-
-        while not db_connection:
+        while True:
             try:
-                db_connection = connections["default"]
+                connections["default"].ensure_connection()
+                break
             except OperationalError:
                 self.stdout.write("Database unavailable, waiting 1 second...")
                 elapsed_seconds += 1
