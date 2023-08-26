@@ -45,7 +45,7 @@ class Order(TimeStampedModel):
     objects = OrderManager()
 
     def __str__(self):
-        return self.user.username + " | " + self.status + " | " + str(self.created_at)
+        return self.user.username + " | " + self.payment.status + " | " + str(self.created_at)
 
 
 class OrderItem(TimeStampedModel):

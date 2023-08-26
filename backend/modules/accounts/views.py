@@ -13,7 +13,6 @@ from modules.cart.models import Address
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
 from .pagination import UserCommentListPagination
-from .helpers import create_user_from_serializer
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -26,12 +25,6 @@ class UserRegisterView(generics.CreateAPIView):
     """
 
     serializer_class = UserSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        create_user_from_serializer(serializer)
-        return Response(status=status.HTTP_201_CREATED)
 
 
 class UserCommentsListView(generics.ListAPIView):

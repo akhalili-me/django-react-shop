@@ -4,21 +4,23 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from modules.products.models import CommentLike, Comment
 from modules.cart.models import Address
 from modules.products.models import Product
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer,
+    TokenRefreshSerializer,
+)
 from rest_framework import serializers
 
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['username'] = user.username
-        token['email'] = user.email
+        token["username"] = user.username
+        token["email"] = user.email
         return token
-    
-User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -36,8 +38,11 @@ class UserSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ["id", "username", "email", "password"]
+
+    def create(self, validated_data):
+        return get_user_model().objects.create_user(**validated_data)
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -56,15 +61,17 @@ class CommentSerializer(serializers.ModelSerializer):
     def get_likes(obj):
         return obj.likes.count()
 
+
 class ProductSerializer(serializers.ModelSerializer):
-    class Meta: 
+    class Meta:
         model = Product
         fields = ["id", "name"]
+
 
 class UserCommentsSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
 
-    class Meta: 
+    class Meta:
         model = Comment
         fields = ["id", "text", "rate", "likes", "product"]
 

@@ -37,7 +37,7 @@ class ShoppingSessionTestCase(TestCase):
             price=20.32,
             quantity=24,
         )
-    
+
         self.user = get_user_model().objects.create_user(
             username="testuser", email="test@gmail.com", password="testpass"
         )
@@ -69,9 +69,9 @@ class ShoppingSessionTestCase(TestCase):
 
     def test_shopping_session_delete(self):
         self.shopping_session.delete()
-
-        with self.assertRaises(ShoppingSession.DoesNotExist):
-            ShoppingSession.objects.get(pk=self.shopping_session.pk)
+        self.assertFalse(
+            ShoppingSession.objects.filter(pk=self.shopping_session.pk).exists()
+        )
 
 
 class CartItemTestCase(TestCase):
@@ -121,9 +121,7 @@ class CartItemTestCase(TestCase):
 
     def test_cart_item_delete(self):
         self.cart_item.delete()
-
-        with self.assertRaises(CartItem.DoesNotExist):
-            CartItem.objects.get(pk=self.cart_item.pk)
+        self.assertFalse(CartItem.objects.filter(pk=self.cart_item.pk).exists())
 
 
 class AddressTestCase(TestCase):
@@ -175,9 +173,7 @@ class AddressTestCase(TestCase):
 
     def test_address_delete(self):
         self.address.delete()
-
-        with self.assertRaises(Address.DoesNotExist):
-            Address.objects.get(pk=self.address.pk)
+        self.assertFalse(Address.objects.filter(pk=self.address.pk).exists())
 
 
 class PaymentTestCase(TestCase):
@@ -206,9 +202,7 @@ class PaymentTestCase(TestCase):
 
     def test_payment_delete(self):
         self.payment.delete()
-
-        with self.assertRaises(Payment.DoesNotExist):
-            Payment.objects.get(pk=self.payment.pk)
+        self.assertFalse(Payment.objects.filter(pk=self.payment.pk).exists())
 
 
 class OrderTestCase(TestCase):
@@ -368,6 +362,10 @@ class OrderItemTestCase(TestCase):
 
         self.assertEqual(updated_order_item.quantity, 3)
 
+    def test_order_item_delete(self):
+        self.order_item.delete()
+        self.assertFalse(OrderItem.objects.filter(pk=self.order_item.pk).exists())
+
 
 class StateTestCase(TestCase):
     def setUp(self):
@@ -387,9 +385,7 @@ class StateTestCase(TestCase):
 
     def test_state_delete(self):
         self.state.delete()
-
-        with self.assertRaises(State.DoesNotExist):
-            State.objects.get(pk=self.state.pk)
+        self.assertFalse(State.objects.filter(pk=self.state.pk).exists())
 
 
 class CityTestCase(TestCase):
@@ -412,6 +408,4 @@ class CityTestCase(TestCase):
 
     def test_city_delete(self):
         self.city.delete()
-
-        with self.assertRaises(City.DoesNotExist):
-            City.objects.get(pk=self.city.pk)
+        self.assertFalse(City.objects.filter(pk=self.city.pk).exists())
