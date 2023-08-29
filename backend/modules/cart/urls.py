@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     CreateCartItems,
     CartItemsList,
-    RUDCartItem,
+    RDCartItem,
     DeleteAllCartItems,
     StateCityList,
     RUDOrderItemView,
@@ -12,10 +12,12 @@ from .views import (
     RUDOrderView,
 )
 
+app_name = "cart"
+
 urlpatterns = [
     path("", CartItemsList.as_view(), name="cart-items-list"),
-    path("create", CreateCartItems.as_view(), name="create-cart-items"),
-    path("<int:pk>", RUDCartItem.as_view(), name="retrieve-update-delete-cart-item"),
+    path("create", CreateCartItems.as_view(), name="create-cart-item"),
+    path("<int:pk>", RDCartItem.as_view(), name="RD-cart-item"),
     path("removeall", DeleteAllCartItems.as_view(), name="delete-all-cart-items"),
     path("location", StateCityList.as_view(), name="state-city-list"),
     path("orderitems/<int:pk>", RUDOrderItemView.as_view(), name="rud-order-item"),

@@ -13,7 +13,6 @@ class ShoppingSession(TimeStampedModel):
     )
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-
     def update_total(self):
         total = (
             self.cart_items.aggregate(
@@ -45,7 +44,13 @@ class Order(TimeStampedModel):
     objects = OrderManager()
 
     def __str__(self):
-        return self.user.username + " | " + self.payment.status + " | " + str(self.created_at)
+        return (
+            self.user.username
+            + " | "
+            + self.payment.status
+            + " | "
+            + str(self.created_at)
+        )
 
 
 class OrderItem(TimeStampedModel):

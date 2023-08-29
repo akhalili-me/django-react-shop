@@ -223,6 +223,9 @@ class AddressViewsTests(TestCase):
             street_address="Test street address",
             house_number="434",
         )
+        self.ADDRESS_RUD_URL = reverse(
+            "accounts:address-detail", args=[self.address.pk]
+        )
 
     def test_list_user_address_api(self):
         response = self.client.get(ADDRESS_LIST_CREATE_URL)
@@ -248,10 +251,22 @@ class AddressViewsTests(TestCase):
         self.assertTrue(Address.objects.filter(phone="09012452123").exists())
 
     def test_address_retrieve_api(self):
-        pass
+        response = self.client.get(self.ADDRESS_RUD_URL)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = AddressSerializer(self.address).data
+        self.assertEqual(response.data, expected_data)
 
     def test_address_update_api(self):
-        pass
+        payload = {"state": "updated state", "city": "updated city"}
+        response = self.client.patch(self.ADDRESS_RUD_URL, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        address = Address.objects.get(pk=self.address.pk)
+        self.assertEqual(address.state, "updated state")
+        self.assertEqual(address.city, "updated city")
 
     def test_address_delete_api(self):
-        pass
+        response = self.client.delete(self.ADDRESS_RUD_URL)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Address.objects.filter(pk=self.address.pk).exists())

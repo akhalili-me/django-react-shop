@@ -49,7 +49,7 @@ class CreateCartItems(CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class RUDCartItem(RetrieveDestroyAPIView):
+class RDCartItem(RetrieveDestroyAPIView):
     """
     View for retrieve and delete cart item.
     """
@@ -130,8 +130,7 @@ class CreateOrdersView(CreateAPIView):
         order = Order.objects.create_order_with_payment_and_items(
             request.user, order_data, payment_data, order_item_serializer.validated_data
         )
-
-        return success_order_created_response(order)
+        return Response(RUDOrderSerializer(order).data, status=status.HTTP_201_CREATED)
 
 
 class RUDOrderView(SingleFieldUrlGetObjectMixin, RetrieveUpdateDestroyAPIView):
