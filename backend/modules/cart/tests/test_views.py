@@ -20,6 +20,10 @@ from ..serializers import (
     RDCartItemSerializer,
     CartItemsListSerializer,
     StateCityListSerilizer,
+    ListOrderSerializer,
+    RUDOrderSerializer,
+    PaymentSerializer,
+    OrderItemSerializer,
 )
 
 CART_ITEM_CREATE_URL = reverse("cart:create-cart-item")
@@ -27,6 +31,7 @@ CART_ITEM_LIST_URL = reverse("cart:cart-items-list")
 CART_ITEM_DELETE_ALL_URL = reverse("cart:delete-all-cart-items")
 STATE_CITY_LIST_URL = reverse("cart:state-city-list")
 ORDER_CREATE_URL = reverse("cart:create-order")
+USER_ORDERS_LIST_URL = reverse("cart:list-user-order")
 
 
 class CartItemCreateViewTests(TestCase):
@@ -202,6 +207,7 @@ class OrderTests(TestCase):
 
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
+        self.ORDER_RUD_URL = reverse("cart:rud-order", args=[self.order.pk])
 
     def test_order_create_api(self):
         payload = {
@@ -215,4 +221,189 @@ class OrderTests(TestCase):
         response = self.client.post(ORDER_CREATE_URL, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Order.objects.filter(pk=response.data["id"]).exists())
-        self.assertTrue(Payment.objects.filter(pk=response.data["payment"]["id"]).exists())
+        self.assertTrue(
+            Payment.objects.filter(pk=response.data["payment"]["id"]).exists()
+        )
+        self.assertEqual(len(response.data["order_items"]), 1)
+        for order_item in response.data["order_items"]:
+            self.assertTrue(OrderItem.objects.filter(pk=order_item["id"]).exists())
+
+    def test_user_orders_list_api(self):
+        response = self.client.get(USER_ORDERS_LIST_URL, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = ListOrderSerializer([self.order], many=True).data
+        self.assertEqual(response.data, expected_data)
+
+    def test_retrieve_order_api(self):
+        response = self.client.get(self.ORDER_RUD_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = RUDOrderSerializer(self.order).data
+        self.assertEqual(response.data, expected_data)
+
+    def test_update_order_api(self):
+        payload = {"shipping_price": 15, "total": 50}
+        response = self.client.patch(self.ORDER_RUD_URL, payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_order = Order.objects.get(pk=self.order.pk)
+        self.assertEqual(updated_order.shipping_price, 15)
+        self.assertEqual(updated_order.total, 50)
+
+    def test_delete_order_api(self):
+        response = self.client.delete(self.ORDER_RUD_URL)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Order.objects.filter(pk=self.order.pk).exists())
+
+
+class PaymentTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        parent_category = Category.objects.create(
+            name="Test Parent",
+            parent=None,
+            image=create_test_image(),
+        )
+
+        child_category = Category.objects.create(
+            name="Test Child",
+            parent=parent_category,
+            image=create_test_image(),
+        )
+
+        self.product = Product.objects.create(
+            name="Test Product",
+            category=child_category,
+            description="Test product description",
+            price=20.32,
+            quantity=24,
+        )
+
+        # Set up order
+        self.user = get_user_model().objects.create_user(
+            username="testuser", email="test@gmail.com", password="testpass"
+        )
+
+        self.address = Address.objects.create(
+            user=self.user,
+            state="Test State",
+            city="Test City",
+            phone="09012342134",
+            postal_code="1847382365",
+            street_address="Test street address",
+            house_number="434",
+        )
+
+        self.payment = Payment.objects.create(
+            amount=1000,
+            payment_method="Test method",
+        )
+
+        self.order = Order.objects.create(
+            user=self.user,
+            address=self.address,
+            payment=self.payment,
+            shipping_price=10,
+            total=1000,
+        )
+
+        tokens = generate_jwt_token(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
+        self.PAYMENT_RUD_URL = reverse("cart:rud-payment", args=[self.order.pk])
+
+    def test_retrieve_payment_api(self):
+        response = self.client.get(self.PAYMENT_RUD_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = PaymentSerializer(self.payment).data
+        self.assertEqual(response.data, expected_data)
+
+    def test_update_payment_api(self):
+        payload = {"status": "paid", "payment_method": "updated_method"}
+        response = self.client.patch(self.PAYMENT_RUD_URL, payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_payment = Payment.objects.get(pk=self.payment.pk)
+        self.assertEqual(updated_payment.status, "paid")
+        self.assertEqual(updated_payment.payment_method, "updated_method")
+
+    def test_delete_payment_api(self):
+        response = self.client.delete(self.PAYMENT_RUD_URL)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Payment.objects.filter(pk=self.payment.pk).exists())
+
+
+class OrderItemTests(TestCase):
+    def setUp(self) -> None:
+        self.client = APIClient()
+        parent_category = Category.objects.create(
+            name="Test Parent",
+            parent=None,
+            image=create_test_image(),
+        )
+
+        child_category = Category.objects.create(
+            name="Test Child",
+            parent=parent_category,
+            image=create_test_image(),
+        )
+
+        self.product = Product.objects.create(
+            name="Test Product",
+            category=child_category,
+            description="Test product description",
+            price=20.32,
+            quantity=24,
+        )
+
+        # Set up order
+        self.user = get_user_model().objects.create_user(
+            username="testuser", email="test@gmail.com", password="testpass"
+        )
+
+        self.address = Address.objects.create(
+            user=self.user,
+            state="Test State",
+            city="Test City",
+            phone="09012342134",
+            postal_code="1847382365",
+            street_address="Test street address",
+            house_number="434",
+        )
+
+        self.payment = Payment.objects.create(
+            amount=1000,
+            payment_method="Test method",
+        )
+
+        self.order = Order.objects.create(
+            user=self.user,
+            address=self.address,
+            payment=self.payment,
+            shipping_price=10,
+            total=1000,
+        )
+
+        self.order_item = OrderItem.objects.create(
+            order=self.order, product=self.product, quantity=1
+        )
+
+        tokens = generate_jwt_token(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
+        self.ORDER_ITEM_RUD_URL = reverse(
+            "cart:rud-order-item", args=[self.order_item.pk]
+        )
+
+    def test_retrieve_order_item_api(self):
+        response = self.client.get(self.ORDER_ITEM_RUD_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = OrderItemSerializer(self.order_item).data
+        self.assertEqual(response.data, expected_data)
+
+    def test_update_order_item_api(self):
+        payload = {"quantity": 6}
+        response = self.client.patch(self.ORDER_ITEM_RUD_URL, payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_order_item = OrderItem.objects.get(pk=self.order_item.pk)
+        self.assertEqual(updated_order_item.quantity, 6)
+
+    def test_delete_order_item_api(self):
+        response = self.client.delete(self.ORDER_ITEM_RUD_URL)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(OrderItem.objects.filter(pk=self.order_item.pk).exists())

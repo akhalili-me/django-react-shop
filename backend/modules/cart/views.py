@@ -23,7 +23,7 @@ from .serializers import (
     CreateOrderSerializer,
     ListOrderSerializer,
 )
-from .helpers import serialize_order_and_payment_data, success_order_created_response
+from .helpers import serialize_order_and_payment_data
 from .models import ShoppingSession, CartItem, State, Order, OrderItem, Payment
 from .api_exceptions import OrderItemsEmptyException
 

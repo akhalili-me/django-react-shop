@@ -95,7 +95,7 @@ class OrderItemsDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ["quantity", "product"]
+        fields = ["id", "quantity", "product"]
 
 
 class RUDOrderSerializer(serializers.ModelSerializer):
@@ -105,7 +105,15 @@ class RUDOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ["id", "full_address", "address", "total", "payment", "order_items"]
+        fields = [
+            "id",
+            "full_address",
+            "address",
+            "total",
+            "payment",
+            "order_items",
+            "shipping_price",
+        ]
 
     def get_full_address(self, obj):
         return str(obj.address)
