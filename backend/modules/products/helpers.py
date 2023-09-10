@@ -1,5 +1,5 @@
 from django.db.models import Q
-from modules.utility.utils.cache import delete_data_from_cache
+from django.core.cache import cache
 
 
 def filter_products_by_price(queryset, min_price, max_price):
@@ -16,17 +16,17 @@ def filter_products_by_availability(queryset, has_selling_stock):
     return queryset
 
 
-def sort_products(queryset, sort):
+def get_sort_order(sort):
     SORT_QUERIES = {
         "popular": "-rate",
         "cheapest": "price",
         "most_expensive": "-price",
-        "newest": "-created_at",
         "bestselling": "-sold",
         "most_viewed": "-views",
     }
     sort_order = SORT_QUERIES.get(sort, "-created_at")
-    return queryset.order_by(sort_order)
+
+    return sort_order
 
 
 SORT_CHOICES = ("newest", "bestselling", "most_viewed")
@@ -38,4 +38,4 @@ def is_sort_invalid(sort_method):
 
 def delete_all_product_list_caches():
     for sort_method in SORT_CHOICES:
-        delete_data_from_cache(f"product_list_{sort_method}")
+        cache.delete(f"product_list_{sort_method}")

@@ -62,28 +62,18 @@ class ProductCommentListSerializer(serializers.ModelSerializer):
         return obj.likes.count()
 
     def get_liked_by_current_user(self, obj):
-        user = self.context["request"].user
-        if user.is_authenticated and obj.likes.filter(user_id=user.id).exists():
-            return True
+        if self.context:
+            user = self.context["request"].user
+            if user.is_authenticated and obj.likes.filter(user_id=user.id).exists():
+                return True
         return False
 
 
 class ProductCommentCreateSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField()
-    likes = serializers.SerializerMethodField()
-
     class Meta:
         model = Comment
-        fields = ["id", "text", "rate", "likes", "author"]
-
-    @staticmethod
-    def get_author(obj):
-        return obj.author.username
-
-    @staticmethod
-    def get_likes(obj):
-        return obj.likes.count()
-
+        fields = ["id", "text", "rate"]
+    
 
 class TopSellingProductsByChildCategorySerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
