@@ -3,7 +3,6 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from modules.products.models import Category, Product, Feature, Comment, CommentLike
-from modules.utility.images import create_test_image
 from modules.utility.tokens import generate_jwt_token
 from django.urls import reverse
 from ..serializers import (
@@ -11,9 +10,10 @@ from ..serializers import (
     CategorySerializer,
     FeatureListSerilizer,
     ProductCommentListSerializer,
+    TopSellingProductsByChildCategorySerializer,
 )
+from time import sleep
 from django.core.cache import cache
-from datetime import datetime, timedelta
 
 PRODUCT_LIST_URL = reverse("products:product_list")
 CATEGORY_LIST_URL = reverse("products:category_list")
@@ -27,13 +27,11 @@ class ProductTests(TestCase):
         parent_category = Category.objects.create(
             name="Test Parent",
             parent=None,
-            image=create_test_image(),
         )
 
         child_category = Category.objects.create(
             name="Test Child",
             parent=parent_category,
-            image=create_test_image(),
         )
 
         self.product1 = Product.objects.create(
@@ -44,8 +42,8 @@ class ProductTests(TestCase):
             quantity=24,
             sold=55,
             views=58,
-            created_at=datetime.now() - timedelta(days=2),
         )
+        sleep(0.5)
         self.product2 = Product.objects.create(
             name="Test Product 2",
             category=child_category,
@@ -54,7 +52,6 @@ class ProductTests(TestCase):
             quantity=2,
             sold=88,
             views=45,
-            created_at=datetime.now() - timedelta(days=1),
         )
 
         self.user = get_user_model().objects.create_superuser(
@@ -71,7 +68,6 @@ class ProductTests(TestCase):
 
     def test_products_list_newest_sort(self):
         response = self.client.get(f"{PRODUCT_LIST_URL}?sort=newest")
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_data = ProductSerializer(
             [self.product2, self.product1], many=True
@@ -217,6 +213,7 @@ class ProductCommentTests(TestCase):
             author=self.user,
             product=self.product,
         )
+
         self.comment2 = Comment.objects.create(
             text="Test comment2",
             rate=2,
@@ -287,8 +284,12 @@ class CommentLikeTests(TestCase):
             author=self.user,
             product=self.product,
         )
+
         self.COMMENT_LIKE_CREATE_URL = reverse(
             "products:create_comment_like", args=[self.comment.id]
+        )
+        self.COMMENT_LIKE_DELETE_URL = reverse(
+            "products:remove_comment_like", args=[self.comment.id]
         )
 
     def test_comment_like_create_api(self):
@@ -297,3 +298,164 @@ class CommentLikeTests(TestCase):
         comment_like = CommentLike.objects.get(pk=response.data["id"])
         self.assertEqual(comment_like.user, self.user)
         self.assertEqual(comment_like.comment, self.comment)
+
+    def test_comment_like_delete_api(self):
+        CommentLike.objects.create(comment=self.comment, user=self.user)
+        response = self.client.delete(self.COMMENT_LIKE_DELETE_URL)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(
+            CommentLike.objects.filter(user=self.user, comment=self.comment).exists()
+        )
+
+
+class ProductFilterTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        parent_category = Category.objects.create(
+            name="Test Parent",
+            parent=None,
+        )
+
+        child_category = Category.objects.create(
+            name="Test Child",
+            parent=parent_category,
+        )
+
+        self.product1 = Product.objects.create(
+            name="Test Product1",
+            category=child_category,
+            description="Test product description",
+            price=20.32,
+            quantity=90,
+            rate=1,
+            sold=3,
+            views=55,
+        )
+        sleep(0.5)
+        self.product2 = Product.objects.create(
+            name="Test Product2",
+            category=child_category,
+            description="Test product description",
+            price=88.01,
+            quantity=0,
+            rate=3,
+            sold=234,
+            views=34,
+        )
+        sleep(0.5)
+        self.product3 = Product.objects.create(
+            name="Test Product 3",
+            category=child_category,
+            description="Test product description",
+            price=42.01,
+            quantity=6,
+            rate=2,
+            sold=9,
+            views=277,
+        )
+        self.PRODUCT_FILTER_URL = reverse("products:filter", args=[child_category.pk])
+
+    def test_product_price_filter(self):
+        query_params = {
+            "min": "25",
+            "max": "89",
+        }
+        response = self.client.get(self.PRODUCT_FILTER_URL, query_params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = ProductSerializer(
+            [self.product3, self.product2], many=True
+        ).data
+        self.assertEqual(response.data["results"], expected_data)
+
+    def test_product_availability_filter(self):
+        query_params = {
+            "has_selling_stock": "true",
+        }
+        response = self.client.get(self.PRODUCT_FILTER_URL, query_params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = ProductSerializer(
+            [self.product3, self.product1], many=True
+        ).data
+        self.assertEqual(response.data["results"], expected_data)
+
+    def test_product_sort_filter(self):
+        query_params = {
+            "sort": "cheapest",
+        }
+        response = self.client.get(self.PRODUCT_FILTER_URL, query_params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = ProductSerializer(
+            [self.product1, self.product3, self.product2], many=True
+        ).data
+        self.assertEqual(response.data["results"], expected_data)
+
+    def test_all_product_filters(self):
+        query_params = {
+            "has_selling_stock": "true",
+            "sort": "bestselling",
+            "min": "19",
+            "max": "50",
+        }
+        response = self.client.get(self.PRODUCT_FILTER_URL, query_params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = ProductSerializer(
+            [self.product3, self.product1], many=True
+        ).data
+        self.assertEqual(response.data["results"], expected_data)
+
+
+class TopSoldCategoryProductsTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.parent_category = Category.objects.create(
+            name="Test Parent",
+            parent=None,
+        )
+
+        self.child_category1 = Category.objects.create(
+            name="Test Child 1",
+            parent=self.parent_category,
+        )
+        child_category2 = Category.objects.create(
+            name="Test Child",
+            parent=self.parent_category,
+        )
+
+        self.product1 = Product.objects.create(
+            name="Test Product1",
+            category=self.child_category1,
+            description="Test product description",
+            price=20.32,
+            quantity=90,
+            rate=1,
+            sold=3,
+            views=55,
+        )
+        self.product2 = Product.objects.create(
+            name="Test Product2",
+            category=child_category2,
+            description="Test product description",
+            price=88.01,
+            quantity=0,
+            rate=3,
+            sold=234,
+            views=34,
+        )
+        self.TOP_SOLD_CHILD_CATEGORY_PRODUCTS = reverse(
+            "products:child_categories_top_solds", args=[self.parent_category.pk]
+        )
+
+    def test_pass_child_category_instead_of_parent(self):
+        child_category_url = reverse(
+            "products:child_categories_top_solds", args=[self.child_category1.pk]
+        )
+        response = self.client.get(child_category_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_retrieve_top_3_sold_products_of_each_child_category(self):
+        response = self.client.get(self.TOP_SOLD_CHILD_CATEGORY_PRODUCTS)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = TopSellingProductsByChildCategorySerializer(
+            self.parent_category.children.all(), many=True
+        ).data
+        self.assertEqual(response.data, expected_data)

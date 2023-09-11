@@ -30,12 +30,20 @@ urlpatterns = [
         CommentsCreateView.as_view(),
         name="create_comment",
     ),
-    path("search/<int:pk>", ProductsFilterListView.as_view()),
-    path("category/<int:pk>", TopSellingProductsEachChildCategoryView.as_view()),
+    path("search/<int:category_id>", ProductsFilterListView.as_view(), name="filter"),
+    path(
+        "category/<int:pk>",
+        TopSellingProductsEachChildCategoryView.as_view(),
+        name="child_categories_top_solds",
+    ),
     path(
         "commentlike/create/<int:comment_id>",
         CommentLikeCreateView.as_view(),
         name="create_comment_like",
     ),
-    path("commentlike/remove/<int:comment_id>", RDCommentLikeView.as_view()),
+    path(
+        "commentlike/remove/<int:comment_id>",
+        RDCommentLikeView.as_view(),
+        name="remove_comment_like",
+    ),
 ]

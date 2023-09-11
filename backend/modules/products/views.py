@@ -138,18 +138,16 @@ class CommentLikeCreateView(generics.CreateAPIView):
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 
-class RDCommentLikeView(generics.RetrieveDestroyAPIView):
+class RDCommentLikeView(generics.DestroyAPIView):
     """
-    View for retrieve and destroy comment likes.
+    View for destroy comment likes.
     """
 
-    serializer_class = CommentLikeSerializer
     permission_classes = [IsAuthenticated]
-    lookup_field = "comment_id"
 
     def get_object(self):
         return get_object_or_404(
-            user=self.request.user, comment_id=self.kwargs["comment_id"]
+            CommentLike, user=self.request.user, comment__id=self.kwargs["comment_id"]
         )
 
 
@@ -169,7 +167,7 @@ class ProductsFilterListView(generics.ListAPIView):
         has_selling_stock = self.request.query_params.get("has_selling_stock", "false")
 
         # Get Q objects
-        queryset = Q(category_id=self.kwargs.get("pk"))
+        queryset = Q(category_id=self.kwargs.get("category_id"))
         queryset = filter_products_by_price(queryset, min_price, max_price)
         queryset = filter_products_by_availability(queryset, has_selling_stock)
 
