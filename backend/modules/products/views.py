@@ -103,7 +103,7 @@ class ProductCommentsListView(generics.ListAPIView):
 
 class CommentsCreateView(generics.CreateAPIView):
     """
-    ViewSet for creating comments.
+    View for creating comments.
     """
 
     serializer_class = ProductCommentCreateSerializer

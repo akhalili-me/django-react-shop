@@ -26,6 +26,7 @@ from .serializers import (
 from .helpers import serialize_order_and_payment_data
 from .models import ShoppingSession, CartItem, State, Order, OrderItem, Payment
 from .api_exceptions import OrderItemsEmptyException
+from .tasks.order_email import send_order_info_email
 
 
 class CreateCartItems(CreateAPIView):
@@ -130,7 +131,10 @@ class CreateOrdersView(CreateAPIView):
         order = Order.objects.create_order_with_payment_and_items(
             request.user, order_data, payment_data, order_item_serializer.validated_data
         )
-        return Response(RUDOrderSerializer(order).data, status=status.HTTP_201_CREATED)
+        response_data = RUDOrderSerializer(order).data
+
+        send_order_info_email.delay(self.request.user.email, response_data)
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 class RUDOrderView(SingleFieldUrlGetObjectMixin, RetrieveUpdateDestroyAPIView):

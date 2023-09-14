@@ -33,8 +33,8 @@ export const addOrder = createAsyncThunk(
       );
 
       // Just for testing
-      dispatch(paymentSuccessfull({ paymentId: data.payment_id }));
-      navigator(`/orders/${data.order_id}?paymentSuccess=true`);
+      dispatch(paymentSuccessfull({ paymentId: data.payment.id }));
+      navigator(`/orders/${data.id}?paymentSuccess=true`);
     } catch (error) {
       const errorMessage = error.response?.data?.detail || error.message;
       dispatch(setAlarm({ message: errorMessage, type: "danger" }));
