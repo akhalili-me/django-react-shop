@@ -23,7 +23,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 STATIC_DIR = Path.joinpath(BASE_DIR, "modules/static")
 MEDIA_DIR = Path.joinpath(BASE_DIR, "modules/media")
-
+TEMPLATE_DIR = Path.joinpath(BASE_DIR,"modules/templates")
 
 SECRET_KEY = get_env_variable("SECRET_KEY")
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    "django_cleanup",
     "modules.core",
     "modules.accounts",
     "modules.products",
@@ -63,7 +64,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [TEMPLATE_DIR],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

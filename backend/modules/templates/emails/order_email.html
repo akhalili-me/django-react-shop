@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Order Confirmation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+      }
+
+      h1 {
+        color: #333;
+        text-align: center;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      p {
+        font-size: 16px;
+        color: #555;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      .total-price {
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Thank you for your order!</h1>
+      <p>
+        Your order has been successfully processed. Here are the order details:
+      </p>
+      <p><strong>Order ID:</strong> {{ order.id }}</p>
+      <p><strong>Order Date:</strong> {{ order.created_at }}</p>
+      <p><strong>Address:</strong> {{ order.full_address }}</p>
+      <p><strong>Payment status:</strong> {{ order.payment.status }}</p>
+
+      <table>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+        </tr>
+        {% for item in order.order_items %}
+        <tr>
+          <td>{{ item.product.name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>${{ item.product.price }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      <p><strong>Shipping Price:</strong> {{ order.shipping_price }}</p>
+      <p class="total-price">Total Price: ${{ order.total }}</p>
+    </div>
+  </body>
+</html>

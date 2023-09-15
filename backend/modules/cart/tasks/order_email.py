@@ -1,20 +1,16 @@
 from celery import shared_task
 from django.core.mail import send_mail
 from django.conf import settings
-from time import sleep
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
 
 @shared_task
-def send_order_info_email(email,order):
+def send_order_confirm_email(email,order):
     subject = "Thank you for your order!"
-    message = f"""
-    Your order has been successfully processed.
-    Order ID = {order["id"]}
-    Payment = {order["payment"]}
-    Items = {order["order_items"]}
-    Shipping price = {order["shipping_price"]}
-    Address = {order["full_address"]}
-    """
+    html_msg = render_to_string('emails/order_email.html',{'order': order})
+    plain_message = strip_tags(html_msg)
     from_email = settings.EMAIL_HOST_USER
-    recipient_list = ["amir.khalily487@gmail.com",]
+    recipient_list = [email,]
 
-    send_mail(subject, message, from_email, recipient_list)
+    send_mail(subject, plain_message, from_email, recipient_list, html_message=html_msg)

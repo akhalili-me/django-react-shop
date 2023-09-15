@@ -26,7 +26,7 @@ from .serializers import (
 from .helpers import serialize_order_and_payment_data
 from .models import ShoppingSession, CartItem, State, Order, OrderItem, Payment
 from .api_exceptions import OrderItemsEmptyException
-from .tasks.order_email import send_order_info_email
+from .tasks.order_email import send_order_confirm_email
 
 
 class CreateCartItems(CreateAPIView):
@@ -133,7 +133,7 @@ class CreateOrdersView(CreateAPIView):
         )
         response_data = RUDOrderSerializer(order).data
 
-        send_order_info_email.delay(self.request.user.email, response_data)
+        send_order_confirm_email.delay(self.request.user.email, response_data)
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 

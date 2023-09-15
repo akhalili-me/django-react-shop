@@ -113,6 +113,7 @@ class RUDOrderSerializer(serializers.ModelSerializer):
             "payment",
             "order_items",
             "shipping_price",
+            "created_at"
         ]
 
     def get_full_address(self, obj):
