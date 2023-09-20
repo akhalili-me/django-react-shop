@@ -12,6 +12,7 @@ services:
         - DB_PASSWORD=postgres
         - DB_HOST=db
         - MEMCACHED_HOST=memcached
+        - REDIS_HOST=redis
 
       ports:
         - '8000:8000'

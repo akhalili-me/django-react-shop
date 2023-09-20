@@ -30,6 +30,7 @@ SECRET_KEY = get_env_variable("SECRET_KEY")
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    "channels",
     "django_cleanup",
     "modules.core",
     "modules.accounts",
@@ -46,6 +48,8 @@ INSTALLED_APPS = [
     "modules.cart",
     "modules.utility",
 ]
+
+
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -155,8 +159,8 @@ CACHES = {
 
 CACHE_TIMEOUT = 3600
 
-CELERY_BROKER_URL = "redis://redis:6379"
-CELERY_RESULT_BACKEND = "redis://redis:6379"
+CELERY_BROKER_URL = f"redis://{get_env_variable('REDIS_HOST')}:6379"
+CELERY_RESULT_BACKEND = f"redis://{get_env_variable('REDIS_HOST')}:6379"
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -165,3 +169,13 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = get_env_variable("HOST_EMAIL")
 EMAIL_HOST_PASSWORD = get_env_variable("EMAIL_PASSWORD")
+
+ASGI_APPLICATION = "config.asgi.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [(get_env_variable("REDIS_HOST"), 6379)],
+        },
+    }
+}
