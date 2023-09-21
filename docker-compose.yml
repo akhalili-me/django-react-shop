@@ -29,6 +29,9 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      
+    environment:
+      - WATCHPACK_POLLING=true
 
     ports:
       - '3000:3000'

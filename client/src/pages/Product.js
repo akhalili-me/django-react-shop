@@ -30,7 +30,6 @@ const Product = () => {
         <Message variant={"danger"} message={error} />
       ) : (
         <div>
-          {" "}
           <ProductPage product={product} />
           <Nav fill variant="tabs">
             <Nav.Item>

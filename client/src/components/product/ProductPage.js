@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Col, Row, Button } from "react-bootstrap";
 import ListGroup from "react-bootstrap/ListGroup";
 import { useDispatch } from "react-redux";
@@ -7,8 +7,10 @@ import { LinkContainer } from "react-router-bootstrap";
 import Carousel from "./Carousel";
 import Rating from "../common/Rating";
 import { addItemToCart } from "../../features/cart/cartReducers";
+
 const ProductPage = ({ product }) => {
-  const { name, quantity, price, rate, description, images, num_comments } =
+  const [livePrice, setLivePrice] = useState(null);
+  const { id, name, quantity, price, rate, description, images, num_comments } =
     product;
   const [status, product_price] =
     quantity === 0 ? ["Out of Stock", "Out of Stock"] : ["In Stock", price];
@@ -17,6 +19,22 @@ const ProductPage = ({ product }) => {
   const handleAddToCart = () => {
     dispatch(addItemToCart({ item: product }));
   };
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://127.0.0.1:8000/ws/product_update/");
+
+    ws.onmessage = (event) => {
+      const content = JSON.parse(event.data);
+
+      if (content["product_id"] === id) {
+        setLivePrice(content["new_price"]);
+      }
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [id]);
 
   return (
     <Row>
@@ -32,7 +50,7 @@ const ProductPage = ({ product }) => {
               <Rating value={rate} text={<> of {num_comments} reviews</>} />
             </div>
             <div className="line">
-              <strong>Price: {product_price}</strong>{" "}
+              <strong>Price: {livePrice ? livePrice : product_price}</strong>{" "}
             </div>
             <p>
               <strong>Description:</strong> {description}
