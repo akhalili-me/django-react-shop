@@ -11,8 +11,10 @@ jobs:
     services:
       postgres:
         image: postgres:latest
-        ports: 
+        ports:
           - 5432:5432
+
+
       redis:
         image: redis:latest
         env:
@@ -40,9 +42,14 @@ jobs:
 
       - name: Set up database
         run: |
+          python manage.py wait_for_db --settings=config.settings.local 
           python manage.py migrate --settings=config.settings.local
         working-directory: backend
-        env: 
+        env:
+          DB_NAME: "postgres"
+          DB_USER: "postgres"
+          DB_PASSWORD: "postgres"
+          DB_HOST: "localhost"
           SECRET_KEY: "9+#v9b0%w8((73&vrtfxm*rc8udr+1vv*z&@xz#z%&n(nnk2y4"
 
       - name: Run tests
