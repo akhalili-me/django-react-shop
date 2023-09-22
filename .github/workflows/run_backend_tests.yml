@@ -1,2 +1,53 @@
 name: Run backend tests
-on: push
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  execute_tests:
+    runs-on: ubuntu_latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          DB_NAME: "postgres"
+          DB_USER: "postgres"
+          DB_PASSWORD: "postgres"
+          DB_HOST: "127.0.0.1"
+
+      redis:
+        image: redis:latest
+        env:
+          REDIS_HOST: "localhost"
+
+      memcached:
+        image: memcached:latest
+        env:
+          - MEMCACHED_HOST: "localhost"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: backend
+
+      - name: Set up database
+        run: |
+          python manage.py migrate --settings=config.settings.local
+        working-directory: backend
+
+      - name: Run tests
+        run: |
+          python manage.py test --settings=config.settings.local
+        working-directory: backend
