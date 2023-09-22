@@ -25,7 +25,7 @@ jobs:
       memcached:
         image: memcached:latest
         env:
-          - MEMCACHED_HOST: "localhost"
+          MEMCACHED_HOST: "localhost"
 
     steps:
       - name: Checkout code
