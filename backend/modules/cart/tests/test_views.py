@@ -6,6 +6,8 @@ from modules.products.models import Category, Product
 from modules.utility.images import create_test_image
 from modules.utility.tokens import generate_jwt_token
 from django.urls import reverse
+from unittest.mock import patch
+from ..tasks.order_email import send_order_confirm_email
 from ..models import (
     CartItem,
     ShoppingSession,
@@ -217,16 +219,17 @@ class OrderTests(TestCase):
             "shipping_price": 10,
             "order_items": [{"product": self.product.pk, "quantity": 2}],
         }
-
-        response = self.client.post(ORDER_CREATE_URL, payload, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Order.objects.filter(pk=response.data["id"]).exists())
-        self.assertTrue(
-            Payment.objects.filter(pk=response.data["payment"]["id"]).exists()
-        )
-        self.assertEqual(len(response.data["order_items"]), 1)
-        for order_item in response.data["order_items"]:
-            self.assertTrue(OrderItem.objects.filter(pk=order_item["id"]).exists())
+        with patch.object(send_order_confirm_email,'delay') as gi:
+            gi.return_value = True
+            response = self.client.post(ORDER_CREATE_URL, payload, format="json")
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertTrue(Order.objects.filter(pk=response.data["id"]).exists())
+            self.assertTrue(
+                Payment.objects.filter(pk=response.data["payment"]["id"]).exists()
+            )
+            self.assertEqual(len(response.data["order_items"]), 1)
+            for order_item in response.data["order_items"]:
+                self.assertTrue(OrderItem.objects.filter(pk=order_item["id"]).exists())
 
     def test_user_orders_list_api(self):
         response = self.client.get(USER_ORDERS_LIST_URL, format="json")
