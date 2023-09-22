@@ -11,8 +11,6 @@ jobs:
     services:
       postgres:
         image: postgres:latest
-        ports:
-          - 5432:5432
         env:
           DB_NAME: "postgres"
           DB_USER: "postgres"
