@@ -13,8 +13,12 @@ jobs:
         image: postgres:latest
         ports:
           - 5432:5432
-
-
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres  
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        
       redis:
         image: redis:latest
         env:
@@ -42,7 +46,7 @@ jobs:
 
       - name: Set up database
         run: |
-          python manage.py wait_for_db --settings=config.settings.local 
+          python manage.py wait_for_db --timeout 300 --settings=config.settings.local 
           python manage.py migrate --settings=config.settings.local
         working-directory: backend
         env:
