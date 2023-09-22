@@ -21,7 +21,7 @@ jobs:
 
       redis:
         image: redis:latest
-       ports:
+        ports:
           - 6379:6379
 
     steps:
