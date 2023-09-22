@@ -16,9 +16,9 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres  
+          POSTGRES_DB: postgres
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-        
+
       redis:
         image: redis:latest
         env:
@@ -60,3 +60,5 @@ jobs:
         run: |
           python manage.py test --settings=config.settings.local
         working-directory: backend
+        env:
+          SECRET_KEY: "9+#v9b0%w8((73&vrtfxm*rc8udr+1vv*z&@xz#z%&n(nnk2y4"
