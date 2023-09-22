@@ -11,12 +11,8 @@ jobs:
     services:
       postgres:
         image: postgres:latest
-        env:
-          DB_NAME: "postgres"
-          DB_USER: "postgres"
-          DB_PASSWORD: "postgres"
-          DB_HOST: "localhost"
-
+        ports: 
+          - 5432:5432
       redis:
         image: redis:latest
         env:
