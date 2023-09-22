@@ -6,7 +6,7 @@ on:
 
 jobs:
   execute_tests:
-    runs-on: ubuntu_latest
+    runs-on: ubuntu-latest
 
     services:
       postgres:
