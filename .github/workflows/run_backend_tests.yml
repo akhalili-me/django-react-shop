@@ -22,9 +22,6 @@ jobs:
       redis:
         image: redis:latest
 
-      memcached:
-        image: memcached:latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

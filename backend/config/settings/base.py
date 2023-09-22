@@ -152,11 +152,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
-        "LOCATION": f"{get_env_variable('MEMCACHED_HOST')}:11211",
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{get_env_variable('REDIS_HOST')}:6379",
     }
 }
-
 CACHE_TIMEOUT = 3600
 
 CELERY_BROKER_URL = f"redis://{get_env_variable('REDIS_HOST')}:6379"
