@@ -46,6 +46,8 @@ jobs:
         run: |
           python manage.py migrate --settings=config.settings.local
         working-directory: backend
+        env: 
+          SECRET_KEY: "9+#v9b0%w8((73&vrtfxm*rc8udr+1vv*z&@xz#z%&n(nnk2y4"
 
       - name: Run tests
         run: |
