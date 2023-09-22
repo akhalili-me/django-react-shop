@@ -21,13 +21,9 @@ jobs:
 
       redis:
         image: redis:latest
-        env:
-          REDIS_HOST: "localhost"
 
       memcached:
         image: memcached:latest
-        env:
-          MEMCACHED_HOST: "localhost"
 
     steps:
       - name: Checkout code
@@ -61,4 +57,10 @@ jobs:
           python manage.py test --settings=config.settings.local
         working-directory: backend
         env:
+          DB_NAME: "postgres"
+          DB_USER: "postgres"
+          DB_PASSWORD: "postgres"
+          DB_HOST: "localhost"
           SECRET_KEY: "9+#v9b0%w8((73&vrtfxm*rc8udr+1vv*z&@xz#z%&n(nnk2y4"
+          REDIS_HOST: "localhost"
+          MEMCACHED_HOST: "localhost"
