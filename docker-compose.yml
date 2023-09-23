@@ -11,7 +11,6 @@ services:
         - DB_USER=postgres
         - DB_PASSWORD=postgres
         - DB_HOST=db
-        - MEMCACHED_HOST=memcached
         - REDIS_HOST=redis
 
       ports:
@@ -22,7 +21,6 @@ services:
 
       depends_on:
         - db
-        - memcached
         - redis
 
   frontend:
@@ -51,12 +49,7 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data/
 
-  memcached: 
-    image: memcached:1.6.21-alpine
-    ports:
-      - '11211:11211'
-
   redis: 
     image: redis:7.2.1-alpine   
     ports:
-      - '6380:6379'
+      - '6379:6379'

@@ -62,4 +62,3 @@ jobs:
           DB_HOST: "localhost"
           SECRET_KEY: "9+#v9b0%w8((73&vrtfxm*rc8udr+1vv*z&@xz#z%&n(nnk2y4"
           REDIS_HOST: "localhost"
-          MEMCACHED_HOST: "localhost"
