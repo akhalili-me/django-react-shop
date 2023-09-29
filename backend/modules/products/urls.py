@@ -11,6 +11,7 @@ from .views import (
     TopSellingProductsEachChildCategoryView,
     CommentLikeCreateView,
     RDCommentLikeView,
+    ProductSearchListView
 )
 
 app_name = "products"
@@ -30,7 +31,8 @@ urlpatterns = [
         CommentsCreateView.as_view(),
         name="create_comment",
     ),
-    path("search/<int:category_id>", ProductsFilterListView.as_view(), name="filter"),
+    path("filter/<int:category_id>", ProductsFilterListView.as_view(), name="filter"),
+    path("search/<str:q>", ProductSearchListView.as_view(), name="search"),
     path(
         "category/<int:pk>",
         TopSellingProductsEachChildCategoryView.as_view(),

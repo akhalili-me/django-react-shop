@@ -26,6 +26,7 @@ import { getCategories } from "./features/category/categorySlice";
 import { refreshAndSetAccessToken } from "./features/auth/token/tokenReducers";
 import OrderDetails from "./components/profile/order/OrderDetails";
 import { getCartItems } from "./features/cart/cartOperations";
+import ProductSearch from "./pages/ProductSearch";
 
 function App() {
   const dispatch = useDispatch();
@@ -70,6 +71,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/product/:id/*" element={<Product />} />
             <Route path="/product/filter/:id" element={<ProductFilter />} />
+            <Route path="/product/search/:q" element={<ProductSearch />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/category/:id" element={<ParentCategory />} />
             <Route

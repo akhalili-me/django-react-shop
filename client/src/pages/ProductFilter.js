@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
 import Filter from "../components/Filter";
 import { useParams } from "react-router-dom";

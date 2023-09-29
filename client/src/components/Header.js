@@ -14,13 +14,15 @@ import {
   Container,
 } from "react-bootstrap";
 import CategorySidebar from "./category/CategorySidebar";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [cartBadge, setCartBadge] = useState(0);
   const cartItemCount = useSelector((state) => state.cart.items?.length);
-  const {authenticated} = useSelector(state => state.login)
+  const { authenticated } = useSelector((state) => state.login);
   const [showCategories, setShowCategories] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setCartBadge(cartItemCount);
@@ -29,6 +31,12 @@ const Header = () => {
   const handleLogout = async () => {
     dispatch(logout());
     dispatch(clearAllItmesInCart());
+  };
+
+  const handleSearchProducts = (e) => {
+    e.preventDefault();
+    const q = e.target.elements.search.value;
+    navigate(`/product/search/${q}`);
   };
 
   const handleCloseCategories = () => setShowCategories(false);
@@ -41,7 +49,7 @@ const Header = () => {
           <Offcanvas.Title>Product Categories</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <CategorySidebar closeSidebar={handleCloseCategories}/>
+          <CategorySidebar closeSidebar={handleCloseCategories} />
         </Offcanvas.Body>
       </Offcanvas>
 
@@ -95,14 +103,17 @@ const Header = () => {
 
               <Nav.Link onClick={handleShowCategories}>Categories</Nav.Link>
             </Nav>
-            <Form className="d-flex">
+            <Form className="d-flex" onSubmit={handleSearchProducts}>
               <Form.Control
                 type="search"
+                name="search"
                 placeholder="Search"
                 className="me-2"
                 aria-label="Search"
               />
-              <Button variant="outline-success">Search</Button>
+              <Button type="submit" variant="outline-success">
+                Search
+              </Button>
             </Form>
           </Navbar.Collapse>
         </Container>

@@ -192,3 +192,14 @@ class TopSellingProductsEachChildCategoryView(generics.ListAPIView):
             raise Http404()
 
         return category.children.all()
+
+
+class ProductSearchListView(generics.ListAPIView):
+
+    serializer_class = ProductSerializer
+    pagination_class = ProductListPagination
+
+    def get_queryset(self):
+        q = self.kwargs.get("q")
+        return Product.objects.filter(name__icontains=q)
+    
