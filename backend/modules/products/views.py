@@ -1,5 +1,5 @@
 from rest_framework.permissions import IsAuthenticated
-from .permissions import SuperuserEditOnly
+from modules.utility.permissions import IsSuperUserOrObjectOwner,SuperUserOnly
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
@@ -51,7 +51,7 @@ class ProductListSortView(generics.ListAPIView):
 
 class RUDProductView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductSerializer
-    permission_classes = [SuperuserEditOnly]
+    permission_classes = [SuperUserOnly]
     queryset = Product.objects.all()
 
 
@@ -143,12 +143,11 @@ class RDCommentLikeView(generics.DestroyAPIView):
     View for destroy comment likes.
     """
 
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        return get_object_or_404(
-            CommentLike, user=self.request.user, comment__id=self.kwargs["comment_id"]
-        )
+    permission_classes = [IsSuperUserOrObjectOwner]
+    queryset = CommentLike.objects.all()
+    lookup_field = "comment__id"
+    lookup_url_kwarg = "comment_id"
+    
 
 
 class ProductsFilterListView(generics.ListAPIView):
@@ -201,5 +200,5 @@ class ProductSearchListView(generics.ListAPIView):
 
     def get_queryset(self):
         q = self.kwargs.get("q")
-        return Product.objects.filter(name__icontains=q)
+        return Product.objects.filter(name__icontains=q).order_by("-views")
     

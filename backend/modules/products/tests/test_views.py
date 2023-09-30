@@ -61,6 +61,7 @@ class ProductTests(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
 
         self.RUD_PRODUCT_URL = reverse("products:rud_product", args=[self.product1.pk])
+        self.PRODUCT_SEARCH_URL = reverse("products:search", args=["Test product 2"])
 
     def test_product_list_fail(self):
         response = self.client.get(PRODUCT_LIST_URL)
@@ -112,6 +113,12 @@ class ProductTests(TestCase):
         response = self.client.delete(self.RUD_PRODUCT_URL)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Product.objects.filter(pk=self.product1.pk).exists())
+
+    def test_product_search_api(self):
+        response = self.client.get(self.PRODUCT_SEARCH_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = ProductSerializer([self.product2], many=True).data
+        self.assertEqual(response.data["results"], expected_data)
 
 
 class CategoryTests(TestCase):

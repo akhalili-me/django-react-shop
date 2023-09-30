@@ -1,13 +1,20 @@
 from rest_framework.permissions import BasePermission
+from functools import reduce
 
-class IsSuperuserOrObjectOwner(BasePermission):
+class IsSuperUserOrObjectOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
-
-        if not request.user.is_authenticated:
-            return False
-
-        if request.user.is_superuser: 
+        if request.user and request.user.is_superuser:
             return True
 
-        # Check if the user on the model is equal to the request.user
-        return obj.user == request.user
+        user_field = getattr(view, "user_field", "user")
+
+        if user_field == "user":
+            return request.user == getattr(obj, user_field)
+
+        object_owner = reduce(getattr, user_field.split("."), obj)
+        return request.user == object_owner
+
+
+class SuperUserOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_superuser

@@ -10,8 +10,7 @@ from rest_framework.generics import (
     RetrieveAPIView,
     DestroyAPIView,
 )
-from modules.utility.permissions import IsSuperuserOrObjectOwner
-from modules.utility.mixins import SingleFieldUrlGetObjectMixin
+from modules.utility.permissions import IsSuperUserOrObjectOwner
 from .serializers import (
     CartItemCreateSerializer,
     RDCartItemSerializer,
@@ -56,12 +55,11 @@ class RDCartItem(RetrieveDestroyAPIView):
     """
 
     serializer_class = RDCartItemSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        user = self.request.user
-        productId = self.kwargs.get("pk")
-        return get_object_or_404(CartItem, product__id=productId, session__user=user)
+    permission_classes = [IsSuperUserOrObjectOwner]
+    queryset = CartItem.objects.all()
+    user_field = "session.user"
+    lookup_field = "product__id"
+    lookup_url_kwarg = "product_id"
 
 
 class CartItemsList(RetrieveAPIView):
@@ -137,20 +135,23 @@ class CreateOrdersView(CreateAPIView):
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 
-class RUDOrderView(SingleFieldUrlGetObjectMixin, RetrieveUpdateDestroyAPIView):
+class RUDOrderView(RetrieveUpdateDestroyAPIView):
     serializer_class = RUDOrderSerializer
-    permission_classes = [IsSuperuserOrObjectOwner]
-    model = Order
+    permission_classes = [IsSuperUserOrObjectOwner]
+    queryset = Order.objects.all()
 
 
-class RUDOrderItemView(SingleFieldUrlGetObjectMixin, RetrieveUpdateDestroyAPIView):
+class RUDOrderItemView(RetrieveUpdateDestroyAPIView):
     serializer_class = OrderItemSerializer
-    permission_classes = [IsSuperuserOrObjectOwner]
-    model = OrderItem
+    permission_classes = [IsSuperUserOrObjectOwner]
+    queryset = OrderItem.objects.all()
+    user_field = "order.user"
 
 
-class RUDPaymentView(SingleFieldUrlGetObjectMixin, RetrieveUpdateDestroyAPIView):
+class RUDPaymentView(RetrieveUpdateDestroyAPIView):
     serializer_class = PaymentSerializer
-    permission_classes = [IsSuperuserOrObjectOwner]
-    model = Payment
-    filter_field = "order__id"
+    permission_classes = [IsSuperUserOrObjectOwner]
+    queryset = Payment.objects.all()
+    user_field = "order.user"
+    lookup_field = "order__id"
+    lookup_url_kwarg = "order_id"

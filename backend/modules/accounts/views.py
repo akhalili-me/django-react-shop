@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import status, generics
-from rest_framework.response import Response
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from modules.utility.permissions import IsSuperUserOrObjectOwner
 from .serializers import (
     UserCommentsSerializer,
     CommentSerializer,
@@ -46,12 +46,10 @@ class RUDCommentsView(generics.RetrieveUpdateDestroyAPIView):
     """
 
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperUserOrObjectOwner]
+    queryset = Comment.objects.all()
+    user_field = "author"
 
-    def get_queryset(self):
-        return Comment.objects.filter(
-            id=self.kwargs.get("pk"), author=self.request.user
-        )
 
 
 class AddressViewSet(ModelViewSet):

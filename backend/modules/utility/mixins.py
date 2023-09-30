@@ -17,8 +17,8 @@ from django.shortcuts import get_object_or_404
 #         return obj
 
 
-class SingleFieldUrlGetObjectMixin:
+class SingleFieldLookupMixin:
     def get_object(self):
-        field = getattr(self, "filter_field", "id")
-        url_keyword = getattr(self, "url_keyword", "pk")
-        return get_object_or_404(self.model, **{field: self.kwargs.get(url_keyword)})
+        get_object_by = getattr(self, "get_object_by", "id")
+        url_parameter = getattr(self, "url_parameter", "pk")
+        return get_object_or_404(self.model, **{get_object_by: self.kwargs.get(url_parameter)})
