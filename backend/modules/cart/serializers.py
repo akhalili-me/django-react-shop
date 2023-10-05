@@ -29,16 +29,15 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
         return data
 
 
-class RDCartItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
+class CartItemDetailsSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
 
-    class Meta:
-        model = CartItem
-        fields = ["product", "quantity"]
+    class Meta(CartItemCreateSerializer.Meta):
+        pass
 
 
-class CartItemsListSerializer(serializers.ModelSerializer):
-    cart_items = RDCartItemSerializer(many=True)
+class SessionAndCartItemsListSerializer(serializers.ModelSerializer):
+    cart_items = CartItemDetailsSerializer(many=True)
 
     class Meta:
         model = ShoppingSession
@@ -65,21 +64,24 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = ["id", "amount", "status", "payment_method", "paid_at"]
 
 
-class PaymentMethodSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Payment
-        fields = ["payment_method"]
-
-
-class CreateOrderSerializer(serializers.ModelSerializer):
-    payment = PaymentMethodSerializer()
+class OrderCreateSerializer(serializers.ModelSerializer):
+    payment_method = serializers.CharField(max_length=200)
+    order_items = OrderItemSerializer(many=True,required=True)
 
     class Meta:
         model = Order
-        fields = ["id", "address", "total", "shipping_price", "payment"]
+        fields = [
+            "id",
+            "address",
+            "total",
+            "shipping_price",
+            "payment_method",
+            "order_items",
+        ]
 
 
-class ListOrderSerializer(serializers.ModelSerializer):
+
+class OrdersListSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
 
     class Meta:
@@ -90,7 +92,7 @@ class ListOrderSerializer(serializers.ModelSerializer):
         return obj.payment.status
 
 
-class OrderItemsDetailsSerializer(serializers.ModelSerializer):
+class OrderItemsSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
 
     class Meta:
@@ -98,8 +100,8 @@ class OrderItemsDetailsSerializer(serializers.ModelSerializer):
         fields = ["id", "quantity", "product"]
 
 
-class RUDOrderSerializer(serializers.ModelSerializer):
-    order_items = OrderItemsDetailsSerializer(many=True, read_only=True)
+class OrderDetailsSerializer(serializers.ModelSerializer):
+    order_items = OrderItemsSerializer(many=True, read_only=True)
     payment = PaymentSerializer(read_only=True)
     full_address = serializers.SerializerMethodField()
 
@@ -113,7 +115,7 @@ class RUDOrderSerializer(serializers.ModelSerializer):
             "payment",
             "order_items",
             "shipping_price",
-            "created_at"
+            "created_at",
         ]
 
     def get_full_address(self, obj):

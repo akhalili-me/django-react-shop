@@ -1,28 +1,36 @@
 from django.urls import path
 from .views import (
-    CreateCartItems,
-    CartItemsList,
-    RDCartItem,
+    ListCreateUpdateCartItem,
+    DestroyCartItem,
     DeleteAllCartItems,
     StateCityList,
-    RUDOrderItemView,
-    RUDPaymentView,
-    CreateOrdersView,
-    ListUserOrdersView,
-    RUDOrderView,
+    OrderRetrieveUpdateDestroyView,
+    OrderItemRetrieveUpdateDestroyView,
+    PaymentRetrieveUpdateDestroyView,
+    ListCreateOrderView,
 )
 
 app_name = "cart"
 
 urlpatterns = [
-    path("", CartItemsList.as_view(), name="cart-items-list"),
-    path("create", CreateCartItems.as_view(), name="create-cart-item"),
-    path("<int:product_id>", RDCartItem.as_view(), name="RD-cart-item"),
+    path("", ListCreateUpdateCartItem.as_view(), name="cart-items-list-create-update"),
+    path("<int:product_id>", DestroyCartItem.as_view(), name="cart-item-delete"),
     path("removeall", DeleteAllCartItems.as_view(), name="delete-all-cart-items"),
     path("location", StateCityList.as_view(), name="state-city-list"),
-    path("orderitems/<int:pk>", RUDOrderItemView.as_view(), name="rud-order-item"),
-    path("payment/<int:order_id>", RUDPaymentView.as_view(), name="rud-payment"),
-    path("orders/create", CreateOrdersView.as_view(), name="create-order"),
-    path("orders/", ListUserOrdersView.as_view(), name="list-user-order"),
-    path("orders/<int:pk>", RUDOrderView.as_view(), name="rud-order"),
+    path(
+        "orderitems/<int:pk>",
+        OrderItemRetrieveUpdateDestroyView.as_view(),
+        name="order-item-retrieve-update-destroy",
+    ),
+    path(
+        "payment/<int:order_id>",
+        PaymentRetrieveUpdateDestroyView.as_view(),
+        name="payment-retrieve-update-destroy",
+    ),
+    path("orders/", ListCreateOrderView.as_view(), name="order-create-list"),
+    path(
+        "orders/<int:pk>",
+        OrderRetrieveUpdateDestroyView.as_view(),
+        name="order-retrieve-update-destroy",
+    ),
 ]

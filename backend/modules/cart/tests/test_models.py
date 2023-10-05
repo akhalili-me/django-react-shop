@@ -270,20 +270,23 @@ class OrderTestCase(TestCase):
         and order items data and create all of them in database.
         """
 
-        order_data = {"address": self.address, "shipping_price": 10, "total": 1000}
-        payment_data = {"amount": 1000, "payment_method": "Test payment method"}
         order_items_data = [{"product": self.product, "quantity": 1}]
-        order = Order.objects.create_order_with_payment_and_items(
-            self.user, order_data, payment_data, order_items_data
-        )
+        data = {
+            "address": self.address,
+            "shipping_price": 10,
+            "total": 1000,
+            "payment_method": "Test payment method",
+            "order_items": order_items_data,
+        }
+        order = Order.objects.create_order_with_payment_and_items(self.user, data)
 
         self.assertEqual(Order.objects.count(), 2)
         self.assertEqual(order.user, self.user)
         self.assertEqual(order.address, self.address)
         self.assertEqual(order.shipping_price, 10)
         self.assertEqual(order.total, 1000)
-        self.assertEqual(order.payment.amount, payment_data["amount"])
-        self.assertEqual(order.payment.payment_method, payment_data["payment_method"])
+        self.assertEqual(order.payment.amount, data["total"])
+        self.assertEqual(order.payment.payment_method, data["payment_method"])
         self.assertEqual(order.payment.status, "pending")
 
         self.assertEqual(len(order.order_items.all()), len(order_items_data))

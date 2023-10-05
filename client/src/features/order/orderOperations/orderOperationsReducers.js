@@ -17,7 +17,7 @@ export const addOrder = createAsyncThunk(
     { dispatch }
   ) => {
     try {
-      const { data } = await authAxios.post(`/cart/orders/create`, {
+      const { data } = await authAxios.post(`/cart/orders/`, {
         address: addressId,
         total: totalPrice,
         shipping_price: shippingPrice,

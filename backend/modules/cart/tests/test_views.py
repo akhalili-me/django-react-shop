@@ -19,21 +19,18 @@ from ..models import (
     Payment,
 )
 from ..serializers import (
-    RDCartItemSerializer,
-    CartItemsListSerializer,
+    SessionAndCartItemsListSerializer,
     StateCityListSerilizer,
-    ListOrderSerializer,
-    RUDOrderSerializer,
+    OrderDetailsSerializer,
     PaymentSerializer,
     OrderItemSerializer,
+    OrdersListSerializer,
 )
 
-CART_ITEM_CREATE_URL = reverse("cart:create-cart-item")
-CART_ITEM_LIST_URL = reverse("cart:cart-items-list")
+CART_ITEM_CREATE_LIST_UPDATE_URL = reverse("cart:cart-items-list-create-update")
 CART_ITEM_DELETE_ALL_URL = reverse("cart:delete-all-cart-items")
 STATE_CITY_LIST_URL = reverse("cart:state-city-list")
-ORDER_CREATE_URL = reverse("cart:create-order")
-USER_ORDERS_LIST_URL = reverse("cart:list-user-order")
+ORDER_CREATE_LIST_URL = reverse("cart:order-create-list")
 
 
 class CartItemCreateViewTests(TestCase):
@@ -67,7 +64,7 @@ class CartItemCreateViewTests(TestCase):
 
     def test_cart_item_create_api(self):
         payload = {"product": self.product.pk, "quantity": 2}
-        response = self.client.post(CART_ITEM_CREATE_URL, payload)
+        response = self.client.post(CART_ITEM_CREATE_LIST_UPDATE_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(CartItem.objects.count(), 1)
         user_shopping_session = ShoppingSession.objects.get(user=self.user)
@@ -110,23 +107,19 @@ class CartItemRDTests(TestCase):
         )
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
-        self.CART_ITEM_RD_URL = reverse("cart:RD-cart-item", args=[self.product.pk])
-
-    def test_retrieve_cart_item_api(self):
-        response = self.client.get(self.CART_ITEM_RD_URL)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        expected_data = RDCartItemSerializer(self.cart_item).data
-        self.assertEqual(response.data, expected_data)
+        self.CART_ITEM_DELETE_URL = reverse(
+            "cart:cart-item-delete", args=[self.product.pk]
+        )
 
     def test_delete_cart_item_api(self):
-        response = self.client.delete(self.CART_ITEM_RD_URL)
+        response = self.client.delete(self.CART_ITEM_DELETE_URL)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(CartItem.objects.filter(pk=self.cart_item.pk).exists())
 
     def test_cart_item_list_api(self):
-        response = self.client.get(CART_ITEM_LIST_URL)
+        response = self.client.get(CART_ITEM_CREATE_LIST_UPDATE_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        expected_data = CartItemsListSerializer(self.shopping_session).data
+        expected_data = SessionAndCartItemsListSerializer(self.shopping_session).data
         self.assertEqual(response.data, expected_data)
 
     def test_cart_item_delete_all_api(self):
@@ -209,19 +202,22 @@ class OrderTests(TestCase):
 
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
-        self.ORDER_RUD_URL = reverse("cart:rud-order", args=[self.order.pk])
+        self.ORDER_RUD_URL = reverse(
+            "cart:order-retrieve-update-destroy", args=[self.order.pk]
+        )
 
     def test_order_create_api(self):
         payload = {
             "address": self.address.pk,
             "total": 24,
-            "payment": {"payment_method": "test method"},
+            "payment_method": "test method",
             "shipping_price": 10,
             "order_items": [{"product": self.product.pk, "quantity": 2}],
         }
-        with patch.object(send_order_confirm_email,'delay') as gi:
+
+        with patch.object(send_order_confirm_email, "delay") as gi:
             gi.return_value = True
-            response = self.client.post(ORDER_CREATE_URL, payload, format="json")
+            response = self.client.post(ORDER_CREATE_LIST_URL, payload, format="json")
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
             self.assertTrue(Order.objects.filter(pk=response.data["id"]).exists())
             self.assertTrue(
@@ -231,16 +227,29 @@ class OrderTests(TestCase):
             for order_item in response.data["order_items"]:
                 self.assertTrue(OrderItem.objects.filter(pk=order_item["id"]).exists())
 
+    def test_order_items_empty_exception(self):
+        payload = {
+            "address": self.address.pk,
+            "total": 24,
+            "payment_method": "test method",
+            "shipping_price": 10,
+        }
+
+        with patch.object(send_order_confirm_email, "delay") as gi:
+            gi.return_value = True
+            response = self.client.post(ORDER_CREATE_LIST_URL, payload, format="json")
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_user_orders_list_api(self):
-        response = self.client.get(USER_ORDERS_LIST_URL, format="json")
+        response = self.client.get(ORDER_CREATE_LIST_URL, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        expected_data = ListOrderSerializer([self.order], many=True).data
+        expected_data = OrdersListSerializer([self.order], many=True).data
         self.assertEqual(response.data, expected_data)
 
     def test_retrieve_order_api(self):
         response = self.client.get(self.ORDER_RUD_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        expected_data = RUDOrderSerializer(self.order).data
+        expected_data = OrderDetailsSerializer(self.order).data
         self.assertEqual(response.data, expected_data)
 
     def test_update_order_api(self):
@@ -310,7 +319,7 @@ class PaymentTests(TestCase):
 
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
-        self.PAYMENT_RUD_URL = reverse("cart:rud-payment", args=[self.order.pk])
+        self.PAYMENT_RUD_URL = reverse("cart:payment-retrieve-update-destroy", args=[self.order.pk])
 
     def test_retrieve_payment_api(self):
         response = self.client.get(self.PAYMENT_RUD_URL)
@@ -390,7 +399,7 @@ class OrderItemTests(TestCase):
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
         self.ORDER_ITEM_RUD_URL = reverse(
-            "cart:rud-order-item", args=[self.order_item.pk]
+            "cart:order-item-retrieve-update-destroy", args=[self.order_item.pk]
         )
 
     def test_retrieve_order_item_api(self):
