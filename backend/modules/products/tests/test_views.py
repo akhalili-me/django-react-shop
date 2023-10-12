@@ -100,20 +100,6 @@ class ProductTests(TestCase):
         expected_data = ProductSerializer(self.product1).data
         self.assertEqual(response.data, expected_data)
 
-    def test_product_update_api(self):
-        payload = {"name": "updated name", "price": 45}
-        response = self.client.patch(self.RUD_PRODUCT_URL, payload)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        updated_product = Product.objects.get(pk=self.product1.pk)
-        self.assertEqual(updated_product.name, "updated name")
-        self.assertEqual(updated_product.price, 45)
-
-    def test_product_delete_api(self):
-        response = self.client.delete(self.RUD_PRODUCT_URL)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Product.objects.filter(pk=self.product1.pk).exists())
-
     def test_product_search_api(self):
         response = self.client.get(self.PRODUCT_SEARCH_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

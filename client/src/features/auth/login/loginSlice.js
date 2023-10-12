@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, register, logoutReducer, clearLoginErrorsReducer } from "./loginReducers";
+import { login, logoutReducer, clearLoginErrorsReducer } from "./loginReducers";
 
 export const loginSlice = createSlice({
 	name: "login",

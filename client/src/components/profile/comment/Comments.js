@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Row, Col, ListGroup, ButtonGroup } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import DeleteModal from "../../common/DeleteModal";
 import Rating from "../../common/Rating";
 import EditModal from "./EditCommentModal";
 import { Link } from "react-router-dom";

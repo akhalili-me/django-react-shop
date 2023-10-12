@@ -1,6 +1,6 @@
 from rest_framework.permissions import IsAuthenticated
-from modules.utility.permissions import IsSuperUserOrObjectOwner,SuperUserOnly
-from rest_framework import generics
+from modules.utility.permissions import IsSuperUserOrObjectOwner
+from rest_framework.generics import RetrieveAPIView,ListAPIView,CreateAPIView,DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
@@ -28,7 +28,7 @@ from .helpers import (
 )
 
 
-class ProductListSortView(generics.ListAPIView):
+class ProductListSortView(ListAPIView):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
 
@@ -49,13 +49,12 @@ class ProductListSortView(generics.ListAPIView):
         return Response(data)
 
 
-class RUDProductView(generics.RetrieveUpdateDestroyAPIView):
+class RUDProductView(RetrieveAPIView):
     serializer_class = ProductSerializer
-    permission_classes = [SuperUserOnly]
     queryset = Product.objects.all()
 
 
-class ProductFeatureListView(generics.ListAPIView):
+class ProductFeatureListView(ListAPIView):
     """
     Return features associated with a particular product id.
     """
@@ -66,7 +65,7 @@ class ProductFeatureListView(generics.ListAPIView):
         return Feature.objects.filter(product_id=self.kwargs["product_id"])
 
 
-class CategoryListView(generics.ListAPIView):
+class CategoryListView(ListAPIView):
     """
     Listing the product categories.
     """
@@ -85,27 +84,14 @@ class CategoryListView(generics.ListAPIView):
         return Response(data)
 
 
-class ProductCommentsListView(generics.ListAPIView):
-    """
-    ViewSet for listing product comments.
-    """
-
+class ProductCommentsListView(ListAPIView):
     serializer_class = ProductCommentListSerializer
     pagination_class = ProductCommentsPagination
-
-    def get_queryset(self):
-        """
-        Return the comments associated with a particular product id.
-        """
-        product_id = self.kwargs["product_id"]
-        return Comment.objects.filter(product_id=product_id).order_by("-created_at")
+    queryset = Comment.objects.all().order_by('-created_at')
+    lookup_field = "product_id"
 
 
-class CommentsCreateView(generics.CreateAPIView):
-    """
-    View for creating comments.
-    """
-
+class CommentsCreateView(CreateAPIView):
     serializer_class = ProductCommentCreateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -121,11 +107,7 @@ class CommentsCreateView(generics.CreateAPIView):
         )
 
 
-class CommentLikeCreateView(generics.CreateAPIView):
-    """
-    View for creating comment likes.
-    """
-
+class CommentLikeCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
@@ -138,19 +120,14 @@ class CommentLikeCreateView(generics.CreateAPIView):
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 
-class RDCommentLikeView(generics.DestroyAPIView):
-    """
-    View for destroy comment likes.
-    """
-
+class CommentLikeDestroyView(DestroyAPIView):
     permission_classes = [IsSuperUserOrObjectOwner]
     queryset = CommentLike.objects.all()
     lookup_field = "comment__id"
     lookup_url_kwarg = "comment_id"
-    
 
 
-class ProductsFilterListView(generics.ListAPIView):
+class ProductsFilterListView(ListAPIView):
     """
     Get products by category and apply filters on it.
     """
@@ -177,10 +154,7 @@ class ProductsFilterListView(generics.ListAPIView):
         return queryset
 
 
-class TopSellingProductsEachChildCategoryView(generics.ListAPIView):
-    """
-    A view to fetch the top 3 selling product of a child category.
-    """
+class TopSellingProductsEachChildCategoryView(ListAPIView):
 
     serializer_class = TopSellingProductsByChildCategorySerializer
 
@@ -193,7 +167,7 @@ class TopSellingProductsEachChildCategoryView(generics.ListAPIView):
         return category.children.all()
 
 
-class ProductSearchListView(generics.ListAPIView):
+class ProductSearchListView(ListAPIView):
 
     serializer_class = ProductSerializer
     pagination_class = ProductListPagination

@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission,SAFE_METHODS
 from functools import reduce
 
 class IsSuperUserOrObjectOwner(BasePermission):
@@ -15,6 +15,9 @@ class IsSuperUserOrObjectOwner(BasePermission):
         return request.user == object_owner
 
 
-class SuperUserOnly(BasePermission):
+class IsSuperUserOrReadOnly(BasePermission):
     def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+        
         return request.user and request.user.is_superuser

@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Modal, Button } from "react-bootstrap";
 import { deleteComment } from "../../../features/comment/commentOperations/commentOperationReducers";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserComments } from "../../../features/comment/commentsList/commentsListReducers";
-import { setAlarm } from "../../../features/alert/alarmSlice";
 import Loader from "../../common/Loader";
 
 const DeleteCommentModal = ({ show, commentId, onClose }) => {

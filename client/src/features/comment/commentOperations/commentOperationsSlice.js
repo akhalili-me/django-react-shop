@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   addComment,
-  deleteComment,
   likeComment,
   deleteLikeComment,
   updateComment,

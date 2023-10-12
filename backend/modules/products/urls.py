@@ -10,7 +10,7 @@ from .views import (
     ProductsFilterListView,
     TopSellingProductsEachChildCategoryView,
     CommentLikeCreateView,
-    RDCommentLikeView,
+    CommentLikeDestroyView,
     ProductSearchListView
 )
 
@@ -45,7 +45,7 @@ urlpatterns = [
     ),
     path(
         "commentlike/remove/<int:comment_id>",
-        RDCommentLikeView.as_view(),
+        CommentLikeDestroyView.as_view(),
         name="remove_comment_like",
     ),
 ]

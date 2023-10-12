@@ -7,6 +7,7 @@ services:
         dockerfile: Dockerfile
         
       environment:
+        - SECRET_KEY=9+#v9b0%w8((73&vrtfxm*rc8udr+1vv*z&@xz#z%&n(nnk2y4
         - DB_NAME=postgres
         - DB_USER=postgres
         - DB_PASSWORD=postgres
@@ -45,6 +46,11 @@ services:
     
     ports:
       - '5432:5432'
+      
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
 
     volumes:
       - ./data/db:/var/lib/postgresql/data/
