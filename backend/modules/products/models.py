@@ -72,30 +72,6 @@ class Category(TimeStampedModel):
         return f"{self.name}"
 
 
-class Comment(TimeStampedModel):
-    product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name="comments"
-    )
-    author = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
-    text = models.TextField(max_length=500)
-    rate = models.IntegerField(validators=[MaxValueValidator(5)])
-
-    def __str__(self):
-        return f"{self.text}"
-
-
-class CommentLike(TimeStampedModel):
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="likes")
-    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["user", "comment"], name="unique_comment_like"
-            )
-        ]
-
-
 class Feature(TimeStampedModel):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="features"

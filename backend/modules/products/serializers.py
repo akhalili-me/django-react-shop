@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, ProductImage, Category, Comment, CommentLike, Feature
+from .models import Product, ProductImage, Category, Feature
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -16,25 +16,26 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
-    category = serializers.StringRelatedField()
-    num_comments = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = [
-            "id",
-            "name",
+        fields = ["id", "name", "price", "quantity", "images"]
+
+
+class ProductDetailsSerializer(ProductSerializer):
+    category = serializers.StringRelatedField()
+    total_comments = serializers.SerializerMethodField()
+
+    class Meta(ProductSerializer.Meta):
+        fields = ProductSerializer.Meta.fields + [
             "description",
             "category",
-            "price",
-            "quantity",
-            "images",
             "rate",
-            "num_comments",
+            "total_comments",
         ]
 
     @staticmethod
-    def get_num_comments(obj):
+    def get_total_comments(obj):
         return obj.comments.count()
 
 
@@ -44,58 +45,20 @@ class FeatureListSerilizer(serializers.ModelSerializer):
         fields = ["name", "description"]
 
 
-class ProductCommentListSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField()
-    likes = serializers.SerializerMethodField()
-    liked_by_current_user = serializers.SerializerMethodField()
+# class TopSellingProductsByChildCategorySerializer(serializers.ModelSerializer):
+#     products = serializers.SerializerMethodField()
+#     parent = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Comment
-        fields = ["id", "text", "rate", "likes", "author", "liked_by_current_user"]
+#     class Meta:
+#         model = Category
+#         fields = ["name", "products", "parent"]
 
-    @staticmethod
-    def get_author(obj):
-        return obj.author.username
+#     @staticmethod
+#     def get_products(obj):
+#         products = obj.products.order_by("-sold")[:3]
+#         product_serializer = ProductSerializer(products, many=True)
+#         return product_serializer.data
 
-    @staticmethod
-    def get_likes(obj):
-        return obj.likes.count()
-
-    def get_liked_by_current_user(self, obj):
-        if self.context:
-            user = self.context["request"].user
-            if user.is_authenticated and obj.likes.filter(user_id=user.id).exists():
-                return True
-        return False
-
-
-class ProductCommentCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = ["id", "text", "rate"]
-    
-
-class TopSellingProductsByChildCategorySerializer(serializers.ModelSerializer):
-    products = serializers.SerializerMethodField()
-    parent = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Category
-        fields = ["name", "products", "parent"]
-
-    @staticmethod
-    def get_products(obj):
-        products = obj.products.order_by("-sold")[:3]
-        product_serializer = ProductSerializer(products, many=True)
-        return product_serializer.data
-
-    @staticmethod
-    def get_parent(obj):
-        return obj.parent.name
-
-
-class CommentLikeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentLike
-        fields = ["id", "comment", "user"]
-        extra_kwargs = {"user": {"read_only": True}, "comment": {"read_only": True}}
+#     @staticmethod
+#     def get_parent(obj):
+#         return obj.parent.name

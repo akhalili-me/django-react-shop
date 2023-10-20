@@ -1,10 +1,12 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from modules.products.models import Category, Product, Comment
+from modules.products.models import Category, Product
 from django.core.cache import cache
 from channels.testing import WebsocketCommunicator
 from ..consumers import ProductConsumer
 from asgiref.sync import sync_to_async
+from modules.reviews.models import Comment
+
 
 class ProductSignalTests(TestCase):
     def setUp(self):
@@ -71,11 +73,13 @@ class ProductSignalTests(TestCase):
             self.assertIsNone(cache.get(f"product_list_{sort}"))
 
     async def test_price_update_singal_channel_layers_message(self):
-        communicator = WebsocketCommunicator(ProductConsumer.as_asgi(), "/ws/product_update")
-        connected,_ = await communicator.connect()
+        communicator = WebsocketCommunicator(
+            ProductConsumer.as_asgi(), "/ws/product_update"
+        )
+        connected, _ = await communicator.connect()
         self.assertTrue(connected)
         self.product.price = 50
         await sync_to_async(self.product.save)()
         response = await communicator.receive_json_from()
-        self.assertEqual(response["product_id"],self.product.pk)
-        self.assertEqual(response["new_price"],float(50))
+        self.assertEqual(response["product_id"], self.product.pk)
+        self.assertEqual(response["new_price"], float(50))

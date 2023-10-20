@@ -1,12 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from django.core.validators import MinLengthValidator, RegexValidator
-from modules.products.models import CommentLike, Comment
-from modules.cart.models import Address
-from modules.products.models import Product
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer,
-    TokenRefreshSerializer,
 )
 from rest_framework import serializers
 
@@ -43,55 +39,3 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return get_user_model().objects.create_user(**validated_data)
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField()
-    likes = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Comment
-        fields = ["id", "text", "rate", "likes", "author"]
-
-    @staticmethod
-    def get_author(obj):
-        return obj.author.username
-
-    @staticmethod
-    def get_likes(obj):
-        return obj.likes.count()
-
-
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ["id", "name"]
-
-
-class UserCommentsSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
-
-    class Meta:
-        model = Comment
-        fields = ["id", "text", "rate", "likes", "product"]
-
-
-class CommentLikeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentLike
-        fields = ["id", "comment", "user"]
-        extra_kwargs = {"user": {"read_only": True}, "comment": {"read_only": True}}
-
-
-class AddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Address
-        fields = [
-            "id",
-            "state",
-            "city",
-            "phone",
-            "postal_code",
-            "street_address",
-            "house_number",
-        ]

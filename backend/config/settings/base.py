@@ -23,7 +23,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 STATIC_DIR = Path.joinpath(BASE_DIR, "modules/static")
 MEDIA_DIR = Path.joinpath(BASE_DIR, "modules/media")
-TEMPLATE_DIR = Path.joinpath(BASE_DIR,"modules/templates")
+TEMPLATE_DIR = Path.joinpath(BASE_DIR, "modules/templates")
 
 SECRET_KEY = get_env_variable("SECRET_KEY")
 
@@ -46,9 +46,15 @@ INSTALLED_APPS = [
     "modules.accounts",
     "modules.products",
     "modules.cart",
+    "modules.checkout",
+    "modules.orders",
+    "modules.discounts",
+    "modules.reviews",
+    "modules.search",
+    "modules.shipment",
+    "modules.notifications",
     "modules.utility",
 ]
-
 
 
 MIDDLEWARE = [
@@ -162,8 +168,8 @@ CELERY_BROKER_URL = f"redis://{get_env_variable('REDIS_HOST')}:6379"
 CELERY_RESULT_BACKEND = f"redis://{get_env_variable('REDIS_HOST')}:6379"
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = get_env_variable("HOST_EMAIL")
@@ -171,10 +177,10 @@ EMAIL_HOST_PASSWORD = get_env_variable("EMAIL_PASSWORD")
 
 ASGI_APPLICATION = "config.asgi.application"
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [(get_env_variable("REDIS_HOST"), 6379)],
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(get_env_variable("REDIS_HOST"), 6379)],
         },
     }
 }

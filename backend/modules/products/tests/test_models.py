@@ -1,21 +1,18 @@
 from django.test import TestCase
-from ..models import Product, Category, Comment, ProductImage, CommentLike, Feature
+from ..models import Product, Category, ProductImage, Feature
 from django.contrib.auth import get_user_model
 from modules.utility.images import create_test_image
+from modules.reviews.models import Comment
 
 
 class CategoryTestCase(TestCase):
     def setUp(self):
         self.parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-            image=create_test_image(),
+            name="Test Parent", parent=None, image=create_test_image()
         )
 
         self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=self.parent_category,
-            image=create_test_image(),
+            name="Test Child", parent=self.parent_category, image=create_test_image()
         )
 
     def test_category_creation(self):
@@ -50,13 +47,11 @@ class ProductTestCase(TestCase):
         parent_category = Category.objects.create(
             name="Test Parent",
             parent=None,
-            image=create_test_image(),
         )
 
         self.child_category = Category.objects.create(
             name="Test Child",
             parent=parent_category,
-            image=create_test_image(),
         )
 
         self.user = get_user_model().objects.create_user(
@@ -117,13 +112,11 @@ class ProdutImageTestCase(TestCase):
         parent_category = Category.objects.create(
             name="Test Parent",
             parent=None,
-            image=create_test_image(),
         )
 
         self.child_category = Category.objects.create(
             name="Test Child",
             parent=parent_category,
-            image=create_test_image(),
         )
 
         self.product = Product.objects.create(
@@ -158,134 +151,6 @@ class ProdutImageTestCase(TestCase):
 
         with self.assertRaises(ProductImage.DoesNotExist):
             ProductImage.objects.get(pk=self.product_image.pk)
-
-
-class CommentTestCase(TestCase):
-    def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-            image=create_test_image(),
-        )
-
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-            image=create_test_image(),
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=self.child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.comment = Comment.objects.create(
-            text="Test comment",
-            rate=3,
-            author=self.user,
-            product=self.product,
-        )
-
-    def test_comment_creation(self):
-        self.assertEqual(Comment.objects.count(), 1)
-        self.assertEqual(self.comment.text, "Test comment")
-        self.assertEqual(self.comment.rate, 3)
-        self.assertEqual(self.comment.author, self.user)
-        self.assertEqual(self.comment.product, self.product)
-
-    def test_product_update_rate(self):
-        self.assertEqual(self.comment.rate, self.product.rate)
-
-    def test_comment_update(self):
-        self.comment.text = "updated text"
-        self.comment.rate = 4
-        self.comment.save()
-
-        updated_comment = Comment.objects.get(pk=self.comment.pk)
-
-        self.assertEqual(updated_comment.text, "updated text")
-        self.assertEqual(updated_comment.rate, 4)
-
-    def test_comment_delete(self):
-        self.comment.delete()
-
-        with self.assertRaises(Comment.DoesNotExist):
-            Comment.objects.get(pk=self.comment.pk)
-
-
-class CommentLikeTestCase(TestCase):
-    def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-            image=create_test_image(),
-        )
-
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-            image=create_test_image(),
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=self.child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.comment = Comment.objects.create(
-            text="Test comment",
-            rate=3,
-            author=self.user,
-            product=self.product,
-        )
-
-        self.comment_like = CommentLike.objects.create(
-            comment=self.comment, user=self.user
-        )
-
-    def test_comment_like_creation(self):
-        self.assertEqual(CommentLike.objects.count(), 1)
-        self.assertEqual(self.comment_like.user, self.user)
-        self.assertEqual(self.comment_like.comment, self.comment)
-
-    def test_unique_comment_like_constraint(self):
-        """Test unique constraint for comment like model by creating an instance the same as in set up method"""
-        with self.assertRaises(Exception) as context:
-            for i in range(2):
-                CommentLike.objects.create(comment=self.comment, user=self.user)
-        self.assertTrue("unique_comment_like" in str(context.exception))
-
-    def test_comment_like_update(self):
-        new_user = get_user_model().objects.create_user(
-            email="test@test.com", username="testuser", password="testpass"
-        )
-
-        self.comment_like.user = new_user
-        self.comment_like.save()
-
-        updated_comment_like = CommentLike.objects.get(pk=self.comment_like.pk)
-
-        self.assertEqual(updated_comment_like.user, new_user)
-
-    def test_comment_like_delete(self):
-        self.comment_like.delete()
-
-        with self.assertRaises(CommentLike.DoesNotExist):
-            CommentLike.objects.get(pk=self.comment_like.pk)
 
 
 class FeatureTestCase(TestCase):

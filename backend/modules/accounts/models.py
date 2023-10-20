@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from modules.accounts.managers import UserManager
+from modules.utility.models import TimeStampedModel
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, db_index=True)
@@ -18,3 +20,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class Ban(TimeStampedModel):
+    BAN_TYPE_CHOICES = (("comment", "Comment"), ("report", "Report"))
+
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
+    ban_type = models.CharField(max_length=20, choices=BAN_TYPE_CHOICES)
+    reason = models.TextField(null=True, blank=True)
+    banned_until = models.DateTimeField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "ban_type"], name="unique_ban")
+        ]
