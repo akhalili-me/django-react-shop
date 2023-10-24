@@ -11,6 +11,7 @@ from .serializers import (
     OrderItemSerializer,
 )
 from .models import Order, OrderItem
+from modules.discounts.models import DiscountUsage
 
 
 class ListCreateOrderView(APIView):
@@ -22,10 +23,15 @@ class ListCreateOrderView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        serilizer = OrderCreateSerializer(data=request.data)
-        serilizer.is_valid(raise_exception=True)
+        serializer = OrderCreateSerializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
         order = Order.objects.create_order_with_payment_and_items(
-            request.user, serilizer.validated_data
+            request.user, serializer.validated_data
+        )
+        DiscountUsage.objects.check_and_create_discount_usage(
+            request.user, serializer.validated_data["discount"], order
         )
         response_data = OrderDetailsSerializer(order).data
         # send_order_confirm_email.delay(self.request.user.email, response_data)

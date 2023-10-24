@@ -28,6 +28,7 @@ urlpatterns = [
     path("api/checkout/", include("modules.checkout.urls")),
     path("api/reviews/", include("modules.reviews.urls")),
     path("api/search/", include("modules.search.urls")),
+    path("api/discounts/", include("modules.discounts.urls")),
 ]
 
 if settings.DEBUG:

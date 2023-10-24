@@ -52,5 +52,6 @@ class DeleteAllCartItems(DestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         shopping_session = get_object_or_404(ShoppingSession, user=request.user)
-        CartItem.objects.filter(session=shopping_session).delete()
+        shopping_session.clear_session()
+        # CartItem.objects.filter(session=shopping_session).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

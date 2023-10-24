@@ -44,18 +44,14 @@ class OrderItemSignalTests(TestCase):
             street_address="Test street address",
             house_number="434",
         )
-
-        self.payment = Payment.objects.create(
-            amount=1000,
-            payment_method="Test method",
-        )
-
         self.order = Order.objects.create(
             user=self.user,
             address=self.address,
-            payment=self.payment,
             shipping_price=10,
             total=1000,
+        )
+        self.payment = Payment.objects.create(
+            amount=1000, method="Test method", order=self.order, is_main_payment=True
         )
 
         self.order_item = OrderItem.objects.create(

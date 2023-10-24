@@ -1,28 +1,30 @@
 from django.db import models, transaction
-from django.shortcuts import get_object_or_404
-from django.db.models import F
+from modules.discounts.services import DiscountService
 
 
 class OrderManager(models.Manager):
     def create_order_with_payment_and_items(self, user, data):
-        from .models import Payment, OrderItem
+        from .models import OrderItem
+        from modules.checkout.models import Payment
+        from modules.discounts.models import Discount
 
         with transaction.atomic():
-            # Create the payment
-            payment = Payment.objects.create(
-                amount=data["total"], payment_method=data["payment_method"]
-            )
-
-            # Create the order
             order = self.create(
                 user=user,
-                payment=payment,
                 address=data["address"],
                 shipping_price=data["shipping_price"],
                 total=data["total"],
             )
 
-            # Create the order items
+            if data["discount"]:
+                discount = Discount.objects.get(code=data["discount"])
+                payment_amount = DiscountService.apply_discount(discount, order.total)
+            else:
+                payment_amount = order.total
+
+            Payment.objects.create(
+                amount=payment_amount, method=data["payment_method"], order=order
+            )
             OrderItem.objects.create_order_items(order, data["order_items"])
 
             return order
@@ -37,4 +39,3 @@ class OrderItemManager(models.Manager):
             for item in order_items_data
         ]
         self.bulk_create(order_items)
-

@@ -2,6 +2,7 @@ from modules.utility.models import TimeStampedModel
 from django.db.models import Sum, F
 from django.db import models
 
+
 class ShoppingSession(TimeStampedModel):
     user = models.OneToOneField(
         "accounts.User", on_delete=models.CASCADE, related_name="shopping_session"
@@ -16,6 +17,11 @@ class ShoppingSession(TimeStampedModel):
             or 0
         )
         self.total = total
+        self.save()
+
+    def clear_session(self):
+        self.total = 0
+        self.cart_items.all().delete()
         self.save()
 
 

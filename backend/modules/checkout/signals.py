@@ -5,7 +5,7 @@ from .models import Payment
 
 @receiver(post_save, sender=Payment)
 def update_product_quantity_on_payment_success(sender, instance, **kwargs):
-    if instance.status == "paid":
+    if instance.status == "paid" and instance.is_main_payment == True:
         # print(instance.status)
         order = instance.order
 

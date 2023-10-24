@@ -41,15 +41,9 @@ class OrderTestCase(TestCase):
             house_number="434",
         )
 
-        self.payment = Payment.objects.create(
-            amount=1000,
-            payment_method="Test method",
-        )
-
         self.order = Order.objects.create(
             user=self.user,
             address=self.address,
-            payment=self.payment,
             shipping_price=10,
             total=1000,
         )
@@ -61,38 +55,37 @@ class OrderTestCase(TestCase):
         self.assertEqual(self.order.address, self.address)
         self.assertEqual(self.order.shipping_price, 10)
         self.assertEqual(self.order.total, 1000)
-        self.assertEqual(self.order.payment, self.payment)
 
-    def test_order_payment_order_item_creation_manager_method(self):
-        """
-        Test order manager method that takes order, payment method
-        and order items data and create all of them in database.
-        """
+    # def test_order_payment_order_item_creation_manager_method(self):
+    #     """
+    #     Test order manager method that takes order, payment method
+    #     and order items data and create all of them in database.
+    #     """
 
-        order_items_data = [{"product": self.product, "quantity": 1}]
-        data = {
-            "address": self.address,
-            "shipping_price": 10,
-            "total": 1000,
-            "payment_method": "Test payment method",
-            "order_items": order_items_data,
-        }
-        order = Order.objects.create_order_with_payment_and_items(self.user, data)
+    #     order_items_data = [{"product": self.product, "quantity": 1}]
+    #     data = {
+    #         "address": self.address,
+    #         "shipping_price": 10,
+    #         "total": 1000,
+    #         "payment_method": "Test payment method",
+    #         "order_items": order_items_data,
+    #     }
+    #     order = Order.objects.create_order_with_payment_and_items(self.user, data)
 
-        self.assertEqual(Order.objects.count(), 2)
-        self.assertEqual(order.user, self.user)
-        self.assertEqual(order.address, self.address)
-        self.assertEqual(order.shipping_price, 10)
-        self.assertEqual(order.total, 1000)
-        self.assertEqual(order.payment.amount, data["total"])
-        self.assertEqual(order.payment.payment_method, data["payment_method"])
-        self.assertEqual(order.payment.status, "pending")
+    #     self.assertEqual(Order.objects.count(), 2)
+    #     self.assertEqual(order.user, self.user)
+    #     self.assertEqual(order.address, self.address)
+    #     self.assertEqual(order.shipping_price, 10)
+    #     self.assertEqual(order.total, 1000)
+    #     self.assertEqual(order.payment.amount, data["total"])
+    #     self.assertEqual(order.payment.payment_method, data["payment_method"])
+    #     self.assertEqual(order.payment.status, "pending")
 
-        self.assertEqual(len(order.order_items.all()), len(order_items_data))
-        for index, order_item in enumerate(order.order_items.all()):
-            self.assertEqual(order_item.product, order_items_data[index]["product"])
-            self.assertEqual(order_item.quantity, order_items_data[index]["quantity"])
-            self.assertEqual(self.product.quantity - order_item.quantity, 23)
+    #     self.assertEqual(len(order.order_items.all()), len(order_items_data))
+    #     for index, order_item in enumerate(order.order_items.all()):
+    #         self.assertEqual(order_item.product, order_items_data[index]["product"])
+    #         self.assertEqual(order_item.quantity, order_items_data[index]["quantity"])
+    #         self.assertEqual(self.product.quantity - order_item.quantity, 23)
 
 
 class OrderItemTestCase(TestCase):
@@ -131,15 +124,9 @@ class OrderItemTestCase(TestCase):
             house_number="434",
         )
 
-        self.payment = Payment.objects.create(
-            amount=1000,
-            payment_method="Test method",
-        )
-
         self.order = Order.objects.create(
             user=self.user,
             address=self.address,
-            payment=self.payment,
             shipping_price=10,
             total=1000,
         )

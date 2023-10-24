@@ -3,6 +3,9 @@ from .models import OrderItem, Order
 from modules.products.serializers import ProductImageSerializer
 from modules.products.models import Product
 from modules.checkout.serializers import PaymentSerializer
+from modules.discounts.models import Discount
+from modules.discounts.services import DiscountService
+
 
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
@@ -20,7 +23,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderCreateSerializer(serializers.ModelSerializer):
     payment_method = serializers.CharField(max_length=200)
-    order_items = OrderItemSerializer(many=True,required=True)
+    order_items = OrderItemSerializer(many=True, required=True)
+    discount = serializers.CharField(allow_null=True, required=False)
 
     class Meta:
         model = Order
@@ -31,19 +35,20 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             "shipping_price",
             "payment_method",
             "order_items",
+            "discount",
         ]
 
+    def validate_discount(self, value):
+        user = self.context["request"].user
+        DiscountService.validate_discount(value, user)
+        return value
 
 
 class OrdersListSerializer(serializers.ModelSerializer):
-    status = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
         fields = ["id", "status", "total", "created_at"]
-
-    def get_status(self, obj):
-        return obj.payment.status
 
 
 class OrderItemsSerializer(serializers.ModelSerializer):
@@ -56,7 +61,7 @@ class OrderItemsSerializer(serializers.ModelSerializer):
 
 class OrderDetailsSerializer(serializers.ModelSerializer):
     order_items = OrderItemsSerializer(many=True, read_only=True)
-    payment = PaymentSerializer(read_only=True)
+    payments = PaymentSerializer(many=True, read_only=True)
     full_address = serializers.SerializerMethodField()
 
     class Meta:
@@ -66,7 +71,7 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
             "full_address",
             "address",
             "total",
-            "payment",
+            "payments",
             "order_items",
             "shipping_price",
             "created_at",

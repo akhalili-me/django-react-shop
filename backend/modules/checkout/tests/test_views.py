@@ -51,20 +51,15 @@ class PaymentTests(TestCase):
             street_address="Test street address",
             house_number="434",
         )
-
-        self.payment = Payment.objects.create(
-            amount=1000,
-            payment_method="Test method",
-        )
-
         self.order = Order.objects.create(
             user=self.user,
             address=self.address,
-            payment=self.payment,
             shipping_price=10,
             total=1000,
         )
-
+        self.payment = Payment.objects.create(
+            amount=1000, method="Test method", order=self.order
+        )
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
         self.PAYMENT_RETRIEVE_UPDATE_DELETE_URL = reverse(
@@ -78,12 +73,12 @@ class PaymentTests(TestCase):
         self.assertEqual(response.data, expected_data)
 
     def test_update_payment_api(self):
-        payload = {"status": "paid", "payment_method": "updated_method"}
+        payload = {"status": "paid", "method": "updated_method"}
         response = self.client.patch(self.PAYMENT_RETRIEVE_UPDATE_DELETE_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_payment = Payment.objects.get(pk=self.payment.pk)
         self.assertEqual(updated_payment.status, "paid")
-        self.assertEqual(updated_payment.payment_method, "updated_method")
+        self.assertEqual(updated_payment.method, "updated_method")
 
     def test_delete_payment_api(self):
         response = self.client.delete(self.PAYMENT_RETRIEVE_UPDATE_DELETE_URL)

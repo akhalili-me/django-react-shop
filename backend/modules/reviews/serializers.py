@@ -63,6 +63,7 @@ class ReportSerializer(serializers.ModelSerializer):
         fields = ["id", "comment", "reason"]
 
     def validate(self, attrs):
+        super().validate(attrs)
         comment = attrs.get("comment")
         user = self.context["request"].user
 
