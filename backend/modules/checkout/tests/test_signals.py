@@ -63,3 +63,4 @@ class OrderItemSignalTests(TestCase):
         self.payment.save()
         updated_product = Product.objects.get(pk=self.product.pk)
         self.assertEqual(updated_product.quantity, 23)
+        self.assertEqual(self.payment.order.status, "completed")

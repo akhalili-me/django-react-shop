@@ -40,6 +40,10 @@ class Discount(TimeStampedModel):
         if self.type == "percentage" and self.value > 100:
             raise ValidationError("Percentage discount cannot be greater than 100%.")
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
 
 class DiscountUsage(TimeStampedModel):
     user = models.ForeignKey(

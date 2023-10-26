@@ -85,34 +85,34 @@ class OrderTests(TestCase):
             "orders:order-retrieve-update-destroy", args=[self.order.pk]
         )
 
-    # def test_order_create_api(self):
-    #     payload = {
-    #         "address": self.address.pk,
-    #         "total": 24,
-    #         "payment_method": "test method",
-    #         "shipping_price": 10,
-    #         "order_items": [{"product": self.product.pk, "quantity": 2}],
-    #         "discount": self.discount.code,
-    #     }
+    def test_order_create_api(self):
+        payload = {
+            "address": self.address.pk,
+            "total": 24,
+            "payment_method": "test method",
+            "shipping_price": 10,
+            "order_items": [{"product": self.product.pk, "quantity": 2}],
+            "discount": self.discount.code,
+        }
 
-    #     with patch.object(send_order_confirm_email, "delay") as gi:
-    #         gi.return_value = True
-    #         response = self.client.post(ORDER_CREATE_LIST_URL, payload, format="json")
-    #         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    #         self.assertTrue(Order.objects.filter(pk=response.data["id"]).exists())
-    #         self.assertTrue(
-    #             Payment.objects.filter(pk=response.data["payment"]["id"]).exists()
-    #         )
-    #         self.assertEqual(len(response.data["order_items"]), 1)
-    #         for order_item in response.data["order_items"]:
-    #             self.assertTrue(OrderItem.objects.filter(pk=order_item["id"]).exists())
-    #         self.assertTrue(
-    #             DiscountUsage.objects.filter(
-    #                 user=self.user,
-    #                 discount_id=self.discount,
-    #                 order_id=response.data["id"],
-    #             ).exists()
-    #         )
+        with patch.object(send_order_confirm_email, "delay") as gi:
+            gi.return_value = True
+            response = self.client.post(ORDER_CREATE_LIST_URL, payload, format="json")
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertTrue(Order.objects.filter(pk=response.data["id"]).exists())
+            self.assertTrue(
+                Payment.objects.filter(pk=response.data["payments"][0]["id"]).exists()
+            )
+            self.assertEqual(len(response.data["order_items"]), 1)
+            for order_item in response.data["order_items"]:
+                self.assertTrue(OrderItem.objects.filter(pk=order_item["id"]).exists())
+            self.assertTrue(
+                DiscountUsage.objects.filter(
+                    user=self.user,
+                    discount_id=self.discount,
+                    order_id=response.data["id"],
+                ).exists()
+            )
 
     def test_order_items_empty_exception(self):
         payload = {

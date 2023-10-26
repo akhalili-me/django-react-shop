@@ -14,7 +14,7 @@ class DiscountUsageManager(models.Manager):
 
             return DiscountUsage.objects.create(
                 order=order,
-                discount_id=discount,
+                discount=discount,
                 user=user,
                 amount=discount_amount,
             )
