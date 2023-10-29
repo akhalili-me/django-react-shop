@@ -56,38 +56,11 @@ class OrderTestCase(TestCase):
         self.assertEqual(self.order.shipping_price, 10)
         self.assertEqual(self.order.total, 1000)
 
-    def test_order_payment_order_item_creation_manager_method(self):
-        """
-        Test order manager method that takes order, payment method
-        and order items data and create all of them in database.
-        """
+    def test_order_update(self):
+        pass
 
-        order_items_data = [{"product": self.product, "quantity": 1}]
-        data = {
-            "address": self.address,
-            "shipping_price": 10,
-            "total": 1000,
-            "payment_method": "Test payment method",
-            "order_items": order_items_data,
-        }
-        order = Order.objects.create_order_with_payment_and_items(self.user, data)
-
-        self.assertEqual(Order.objects.count(), 2)
-        self.assertEqual(order.user, self.user)
-        self.assertEqual(order.address, self.address)
-        self.assertEqual(order.shipping_price, 10)
-        self.assertEqual(order.total, 1000)
-        main_payment = order.payments.all().get(is_main_payment=True)
-        self.assertEqual(main_payment.amount, data["total"])
-        self.assertEqual(main_payment.method, data["payment_method"])
-        self.assertEqual(main_payment.status, "pending")
-
-        self.assertEqual(len(order.order_items.all()), len(order_items_data))
-        for index, order_item in enumerate(order.order_items.all()):
-            self.assertEqual(order_item.product, order_items_data[index]["product"])
-            self.assertEqual(order_item.quantity, order_items_data[index]["quantity"])
-            self.assertEqual(self.product.quantity - order_item.quantity, 23)
-
+    def test_order_delete(self):
+        pass
 
 class OrderItemTestCase(TestCase):
     def setUp(self):

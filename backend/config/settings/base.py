@@ -184,3 +184,5 @@ CHANNEL_LAYERS = {
         },
     }
 }
+
+SLUG_ALLOW_UNICODE = False

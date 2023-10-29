@@ -41,6 +41,7 @@ class ProductListSortView(ListAPIView):
 class ProductRetrieveView(RetrieveAPIView):
     serializer_class = ProductDetailsSerializer
     queryset = Product.objects.all()
+    lookup_field = "slug"
 
 
 class ProductFeatureListView(ListAPIView):

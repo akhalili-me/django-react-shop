@@ -8,13 +8,13 @@ from django.urls import reverse
 from ..serializers import (
     CategorySerializer,
     FeatureListSerilizer,
-    ProductDetailsSerializer
+    ProductDetailsSerializer,
 )
 from time import sleep
 from django.core.cache import cache
 
-PRODUCT_LIST_URL = reverse("products:product_list")
-CATEGORY_LIST_URL = reverse("products:category_list")
+PRODUCT_LIST_URL = reverse("products:list")
+CATEGORY_LIST_URL = reverse("products:category-list")
 
 
 class ProductTests(TestCase):
@@ -58,9 +58,9 @@ class ProductTests(TestCase):
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
 
-        self.PRODUCT_RETRIEVE_UPDATE_DELETE_URL = reverse(
-            "products:product_retrieve_update_delete", args=[self.product1.pk]
-        )
+        # self.PRODUCT_RETRIEVE_UPDATE_DELETE_URL = reverse(
+        #     "products:product_retrieve_update_delete", args=[self.product1.slug]
+        # )
 
     def test_product_list_fail(self):
         response = self.client.get(PRODUCT_LIST_URL)
@@ -92,7 +92,7 @@ class ProductTests(TestCase):
         self.assertEqual(response.data, expected_data)
 
     def test_product_retrieve_api(self):
-        response = self.client.get(self.PRODUCT_RETRIEVE_UPDATE_DELETE_URL)
+        response = self.client.get(self.product1.get_absolute_url())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_data = ProductDetailsSerializer(self.product1).data
         self.assertEqual(response.data, expected_data)
@@ -154,7 +154,7 @@ class FeatureTests(TestCase):
             product=self.product,
         )
         self.PRODUCT_FEATURES_LIST_URL = reverse(
-            "products:features", args=[self.product.pk]
+            "products:features-list", args=[self.product.pk]
         )
 
     def test_product_features_list_api(self):

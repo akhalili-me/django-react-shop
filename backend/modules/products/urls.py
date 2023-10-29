@@ -10,16 +10,15 @@ app_name = "products"
 
 urlpatterns = [
     path(
-        "<int:pk>", ProductRetrieveView.as_view(), name="product_retrieve_update_delete"
+        "<slug:slug>",
+        ProductRetrieveView.as_view(),
+        name="detail",
     ),
-    path("list", ProductListSortView.as_view(), name="product_list"),
-    path("categories", CategoryListView.as_view(), name="category_list"),
     path(
-        "<int:product_id>/features", ProductFeatureListView.as_view(), name="features"
+        "<int:product_id>/features/",
+        ProductFeatureListView.as_view(),
+        name="features-list",
     ),
-    # path(
-    #     "category/<int:pk>",
-    #     TopSellingProductsEachChildCategoryView.as_view(),
-    #     name="child_categories_top_solds",
-    # ),
+    path("list/", ProductListSortView.as_view(), name="list"),
+    path("categories/", CategoryListView.as_view(), name="category-list"),
 ]

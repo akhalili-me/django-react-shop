@@ -2,7 +2,6 @@ from django.db import models
 from modules.utility.models import TimeStampedModel
 from .managers import (
     OrderItemManager,
-    OrderManager,
 )
 from modules.shipment.models import Address
 
@@ -22,7 +21,6 @@ class Order(TimeStampedModel):
     status = models.CharField(
         max_length=30, choices=STATUS_CHOICES, default="pending_payment"
     )
-    objects = OrderManager()
 
     def __str__(self):
         return (

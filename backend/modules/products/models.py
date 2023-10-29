@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from modules.utility.models import TimeStampedModel
 from django.core.validators import MaxValueValidator
 import os
@@ -5,6 +6,8 @@ from uuid import uuid4
 from django.utils.deconstruct import deconstructible
 from django.db.models import Avg
 from django.db import models
+from modules.utility.custom_fields import AutoSlugField
+from django.urls import reverse
 
 
 @deconstructible
@@ -40,6 +43,9 @@ class Product(TimeStampedModel):
     category = models.ForeignKey(
         "Category", on_delete=models.CASCADE, related_name="products", db_index=True
     )
+    slug = AutoSlugField(
+        populate_from="name", max_length=128, unique=True, db_index=True
+    )
 
     def __str__(self):
         return self.name
@@ -48,6 +54,9 @@ class Product(TimeStampedModel):
         comment_rates = self.comments.filter(rate__gt=0).aggregate(Avg("rate"))
         self.rate = comment_rates["rate__avg"] or 0
         self.save()
+
+    def get_absolute_url(self):
+        return reverse("products:detail", kwargs={"slug": self.slug})
 
 
 class ProductImage(TimeStampedModel):
@@ -67,6 +76,9 @@ class Category(TimeStampedModel):
         "self", null=True, blank=True, on_delete=models.CASCADE, related_name="children"
     )
     image = models.ImageField(upload_to=category_image)
+    slug = AutoSlugField(
+        populate_from="name", max_length=128, unique=True, db_index=True
+    )
 
     def __str__(self):
         return f"{self.name}"

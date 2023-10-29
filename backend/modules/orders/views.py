@@ -12,6 +12,7 @@ from .serializers import (
 )
 from .models import Order, OrderItem
 from modules.discounts.models import DiscountUsage
+from .services import OrderService
 
 
 class ListCreateOrderView(APIView):
@@ -27,7 +28,7 @@ class ListCreateOrderView(APIView):
             data=request.data, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
-        order = Order.objects.create_order_with_payment_and_items(
+        order = OrderService.process_order_and_payment(
             request.user, serializer.validated_data
         )
         DiscountUsage.objects.check_and_create_discount_usage(
