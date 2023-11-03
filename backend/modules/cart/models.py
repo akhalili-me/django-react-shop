@@ -1,6 +1,8 @@
 from modules.utility.models import TimeStampedModel
 from django.db.models import Sum, F
 from django.db import models
+from uuid import uuid4
+from django.urls import reverse
 
 
 class ShoppingSession(TimeStampedModel):
@@ -30,4 +32,8 @@ class CartItem(TimeStampedModel):
         ShoppingSession, null=True, on_delete=models.CASCADE, related_name="cart_items"
     )
     product = models.ForeignKey("products.Product", on_delete=models.CASCADE)
-    quantity = models.IntegerField()
+    quantity = models.PositiveIntegerField()
+    uuid = models.UUIDField(default=uuid4, editable=False, db_index=True)
+
+    def get_absolute_url(self):
+        return reverse("cart:cart-item-detail", kwargs={"uuid": self.uuid})
