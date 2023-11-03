@@ -11,9 +11,11 @@ from .serializers import (
     CommentSerializer,
     LikeSerializer,
     ReportSerializer,
+    ReportCreateSerializer,
 )
 from .models import Comment, Like, Report
 from .pagination import CommentsPagination
+from rest_framework.permissions import IsAdminUser
 from modules.utility.permissions import IsSuperUserOrObjectOwner
 from django.shortcuts import get_object_or_404
 from modules.accounts.mixins import BanCheckMixin
@@ -34,7 +36,7 @@ class ProductCommentsListView(ListAPIView):
 
     def get_queryset(self):
         return Comment.objects.filter(
-            product_id=self.kwargs.get("product_id")
+            product__slug=self.kwargs.get("product_slug")
         ).order_by("-created_at")
 
 
@@ -51,6 +53,7 @@ class CommentRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
     user_field = "author"
+    lookup_field = "uuid"
 
 
 class LikeCreateView(CreateAPIView):
@@ -65,15 +68,14 @@ class LikeDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        like = get_object_or_404(
-            Like, comment_id=self.kwargs["comment_id"], user=self.request.user
-        )
+        comment = get_object_or_404(Comment, uuid=self.kwargs["comment_uuid"])
+        like = get_object_or_404(Like, comment=comment, user=self.request.user)
         return like
 
 
 class ReportCreateView(BanCheckMixin, CreateAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = ReportSerializer
+    serializer_class = ReportCreateSerializer
     ban_type = "report"
 
     def perform_create(self, serializer):
@@ -81,6 +83,7 @@ class ReportCreateView(BanCheckMixin, CreateAPIView):
 
 
 class ReportRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsSuperUserOrObjectOwner]
+    permission_classes = [IsAdminUser]
     serializer_class = ReportSerializer
     queryset = Report.objects.all()
+    lookup_field = "uuid"

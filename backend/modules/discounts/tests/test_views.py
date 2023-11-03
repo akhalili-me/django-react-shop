@@ -1,6 +1,5 @@
 from rest_framework.test import APIClient
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from rest_framework import status
 from modules.utility.tokens import generate_jwt_token
 from django.urls import reverse
@@ -9,9 +8,13 @@ from ..serializers import (
     DiscountSerializer,
 )
 from datetime import timedelta
-from modules.cart.models import ShoppingSession
 from django.utils import timezone
 from decimal import Decimal
+from modules.utility.factories import (
+    SuperUserFactory,
+    DiscountFactory,
+    ShoppingSessionFactory,
+)
 
 DISCOUNT_CREATE_URL = reverse("discounts:discount-create")
 APPLY_DISCOUNT_URL = reverse("discounts:discount-apply")
@@ -20,18 +23,10 @@ APPLY_DISCOUNT_URL = reverse("discounts:discount-apply")
 class DiscountViewsTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_superuser(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
+        self.user = SuperUserFactory()
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
-        self.discount = Discount.objects.create(
-            name="test",
-            type="percentage",
-            value=20,
-            code="TESTCODE",
-            expire_at=timezone.now() + timedelta(1),
-        )
+        self.discount = DiscountFactory(value=20, user=None)
         self.DISCOUNT_RETRIEVE_UPDATE_DELETE_URL = reverse(
             "discounts:discount-retrieve-update-delete", args=[self.discount.pk]
         )
@@ -80,7 +75,7 @@ class DiscountViewsTests(TestCase):
         self.assertFalse(Discount.objects.filter(pk=self.discount.pk).exists())
 
     def test_apply_discount_view(self):
-        ShoppingSession.objects.create(user=self.user, total=658)
+        ShoppingSessionFactory(user=self.user, total=658)
         payload = {"code": self.discount.code}
         response = self.client.post(APPLY_DISCOUNT_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

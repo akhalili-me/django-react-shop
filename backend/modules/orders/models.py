@@ -3,7 +3,8 @@ from modules.utility.models import TimeStampedModel
 from .managers import (
     OrderItemManager,
 )
-from modules.shipment.models import Address
+from django.urls import reverse
+from uuid import uuid4
 
 
 class Order(TimeStampedModel):
@@ -15,21 +16,25 @@ class Order(TimeStampedModel):
     )
 
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
-    address = models.ForeignKey(Address, null=True, on_delete=models.CASCADE)
+    billing_address = models.ForeignKey(
+        "shipment.BillingAddress",
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="order",
+    )
     shipping_price = models.DecimalField(max_digits=10, decimal_places=2)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(
         max_length=30, choices=STATUS_CHOICES, default="pending_payment"
     )
+    uuid = models.UUIDField(default=uuid4, db_index=True, editable=False)
 
-    def __str__(self):
-        return (
-            self.user.username
-            + " | "
-            + self.payment.status
-            + " | "
-            + str(self.created_at)
-        )
+    def update_status(self, status):
+        self.status = status
+        self.save()
+
+    def get_absolute_url(self):
+        return reverse("orders:detail", kwargs={"uuid": self.uuid})
 
 
 class OrderItem(TimeStampedModel):
@@ -41,5 +46,9 @@ class OrderItem(TimeStampedModel):
         on_delete=models.CASCADE,
     )
     quantity = models.IntegerField(default=1)
+    uuid = models.UUIDField(default=uuid4, db_index=True, editable=False)
 
     objects = OrderItemManager()
+
+    def get_absolute_url(self):
+        return reverse("orders:order-item-detail", kwargs={"uuid": self.uuid})

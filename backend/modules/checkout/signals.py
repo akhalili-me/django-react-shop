@@ -10,9 +10,8 @@ def update_product_quantity_and_order_status_on_payment_success(
     if instance.status == "paid" and instance.is_main_payment == True:
         # print(instance.status)
         order = instance.order
-        order.status = "completed"
-        order.save()
-        
+        order.update_status("complete")
+
         order_items = order.order_items.all()
         for order_item in order_items:
             order_item.product.quantity -= order_item.quantity

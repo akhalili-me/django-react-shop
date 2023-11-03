@@ -9,12 +9,24 @@ from .api_exceptions import (
 )
 from django.utils import timezone
 from modules.accounts.api_exceptions import UserBannedForThisActionException
+from django.shortcuts import get_object_or_404
+from modules.utility.loading import get_model
+
+Product = get_model("products", "Product")
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    product = serializers.SlugField()
+
     class Meta:
         model = Comment
-        fields = ["id", "text", "rate", "product"]
+        fields = ["uuid", "text", "rate", "product"]
+
+    def create(self, validated_data):
+        product_slug = validated_data.pop("product")
+        product_inst = get_object_or_404(Product, slug=product_slug)
+        validated_data["product"] = product_inst
+        return super().create(validated_data)
 
 
 class CommentDetailsSerializer(serializers.ModelSerializer):
@@ -23,7 +35,7 @@ class CommentDetailsSerializer(serializers.ModelSerializer):
 
     class Meta(CommentSerializer.Meta):
         fields = [
-            "id",
+            "uuid",
             "text",
             "rate",
             "author",
@@ -43,12 +55,14 @@ class UserCommentsListSerializer(serializers.ModelSerializer):
 
 
 class LikeSerializer(serializers.ModelSerializer):
+    comment = serializers.UUIDField()
+
     class Meta:
         model = Like
-        fields = ["id", "comment"]
+        fields = ["uuid", "comment"]
 
     def validate(self, attrs):
-        comment = attrs.get("comment")
+        comment = get_object_or_404(Comment, uuid=attrs["comment"])
         user = self.context["request"].user
 
         if Like.objects.filter(comment=comment, user=user).exists():
@@ -56,15 +70,27 @@ class LikeSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    def create(self, validated_data):
+        comment_inst = get_object_or_404(Comment, uuid=validated_data["comment"])
+        validated_data["comment"] = comment_inst
+        return super().create(validated_data)
+
 
 class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
-        fields = ["id", "comment", "reason"]
+        fields = ["uuid", "comment", "reason"]
+
+
+class ReportCreateSerializer(serializers.ModelSerializer):
+    comment = serializers.UUIDField()
+
+    class Meta(ReportSerializer.Meta):
+        pass
 
     def validate(self, attrs):
         super().validate(attrs)
-        comment = attrs.get("comment")
+        comment = get_object_or_404(Comment, uuid=attrs.get("comment"))
         user = self.context["request"].user
 
         self.check_for_existing_report(comment, user)
@@ -72,6 +98,11 @@ class ReportSerializer(serializers.ModelSerializer):
         self.check_max_daily_reports(user)
 
         return attrs
+
+    def create(self, validated_data):
+        comment_inst = get_object_or_404(Comment, uuid=validated_data["comment"])
+        validated_data["comment"] = comment_inst
+        return super().create(validated_data)
 
     def check_for_existing_report(self, comment, user):
         if Report.objects.filter(comment=comment, user=user).exists():

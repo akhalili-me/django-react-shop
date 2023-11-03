@@ -1,58 +1,18 @@
-# from rest_framework.test import APIClient
 from django.test import TestCase
 from ..services import DiscountService
 from ..models import Discount, DiscountUsage
 from django.utils import timezone
 from datetime import timedelta
-from django.contrib.auth import get_user_model
 from ..api_exceptions import DiscountInvalidException
 from decimal import Decimal
 from django.test import TestCase
-from modules.products.models import Category, Product
-from django.contrib.auth import get_user_model
-from modules.shipment.models import Address
-from modules.orders.models import Order
+from modules.utility.factories import OrderFactory, UserFactory
 
 
 class DiscountServicesTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_superuser(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.address = Address.objects.create(
-            user=self.user,
-            state="Test State",
-            city="Test City",
-            phone="09012342134",
-            postal_code="1847382365",
-            street_address="Test street address",
-            house_number="434",
-        )
-        self.order = Order.objects.create(
-            user=self.user,
-            address=self.address,
-            shipping_price=10,
-            total=1000,
-        )
-
+        self.user = UserFactory()
+        self.order = OrderFactory(user=self.user)
         self.validated_discount = Discount.objects.create(
             name="test",
             type="percentage",
@@ -86,9 +46,7 @@ class DiscountServicesTests(TestCase):
             )
 
     def test_verify_user_validity_user(self):
-        new_user = get_user_model().objects.create_superuser(
-            username="testtestuser", email="testtest@gmail.com", password="testpass"
-        )
+        new_user = UserFactory()
         user_discount = Discount.objects.create(
             name="test",
             type="percentage",

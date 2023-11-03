@@ -43,6 +43,7 @@ class OrderRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     serializer_class = OrderDetailsSerializer
     permission_classes = [IsSuperUserOrObjectOwner]
     queryset = Order.objects.all()
+    lookup_field = "uuid"
 
 
 class OrderItemRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
@@ -50,3 +51,4 @@ class OrderItemRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsSuperUserOrObjectOwner]
     queryset = OrderItem.objects.all()
     user_field = "order.user"
+    lookup_field = "uuid"

@@ -1,17 +1,22 @@
 from rest_framework.test import APIClient
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from rest_framework import status
-from modules.products.models import Category, Product, Feature
 from modules.utility.tokens import generate_jwt_token
 from django.urls import reverse
 from ..serializers import (
     CategorySerializer,
-    FeatureListSerilizer,
+    FeatureSerilizer,
     ProductDetailsSerializer,
 )
 from time import sleep
 from django.core.cache import cache
+from modules.utility.factories import (
+    ProductFactory,
+    UserFactory,
+    ChildCategoryFactory,
+    FeatureFactory,
+    SuperUserFactory,
+)
 
 PRODUCT_LIST_URL = reverse("products:list")
 CATEGORY_LIST_URL = reverse("products:category-list")
@@ -21,46 +26,12 @@ class ProductTests(TestCase):
     def setUp(self):
         cache.clear()
         self.client = APIClient()
-
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product1 = Product.objects.create(
-            name="Test Product 1",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-            sold=55,
-            views=58,
-        )
+        self.product1 = ProductFactory(sold=78, views=333)
         sleep(0.5)
-        self.product2 = Product.objects.create(
-            name="Test Product 2",
-            category=child_category,
-            description="Test product description",
-            price=5,
-            quantity=2,
-            sold=88,
-            views=45,
-        )
-
-        self.user = get_user_model().objects.create_superuser(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
+        self.product2 = ProductFactory(sold=255, views=34)
+        self.user = UserFactory()
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
-
-        # self.PRODUCT_RETRIEVE_UPDATE_DELETE_URL = reverse(
-        #     "products:product_retrieve_update_delete", args=[self.product1.slug]
-        # )
 
     def test_product_list_fail(self):
         response = self.client.get(PRODUCT_LIST_URL)
@@ -102,16 +73,8 @@ class CategoryTests(TestCase):
     def setUp(self):
         cache.clear()
         self.client = APIClient()
-
-        self.parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=self.parent_category,
-        )
+        self.child_category = ChildCategoryFactory()
+        self.parent_category = self.child_category.parent
 
     def test_category_list_api(self):
         response = self.client.get(CATEGORY_LIST_URL)
@@ -125,99 +88,23 @@ class CategoryTests(TestCase):
 class FeatureTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
+        self.product = ProductFactory()
+        self.feature1 = FeatureFactory(product=self.product)
+        self.feature2 = FeatureFactory(product=self.product)
+        self.PRODUCT_FEATURES_LIST_CREATE_URL = reverse(
+            "products:features-list", args=[self.product.slug]
         )
 
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=self.child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.feature1 = Feature.objects.create(
-            name="Test Feature 1",
-            description="Test feature 1 description",
-            product=self.product,
-        )
-        self.feature2 = Feature.objects.create(
-            name="Test Feature 2",
-            description="Test feature 2 description",
-            product=self.product,
-        )
-        self.PRODUCT_FEATURES_LIST_URL = reverse(
-            "products:features-list", args=[self.product.pk]
-        )
-
-    def test_product_features_list_api(self):
-        response = self.client.get(self.PRODUCT_FEATURES_LIST_URL)
+    def test_features_list_api(self):
+        response = self.client.get(self.PRODUCT_FEATURES_LIST_CREATE_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        expected_data = FeatureListSerilizer(
-            [self.feature1, self.feature2], many=True
-        ).data
+        expected_data = FeatureSerilizer([self.feature1, self.feature2], many=True).data
         self.assertEqual(response.data, expected_data)
 
-
-# class TopSoldCategoryProductsTests(TestCase):
-#     def setUp(self):
-#         self.client = APIClient()
-#         self.parent_category = Category.objects.create(
-#             name="Test Parent",
-#             parent=None,
-#         )
-
-#         self.child_category1 = Category.objects.create(
-#             name="Test Child 1",
-#             parent=self.parent_category,
-#         )
-#         child_category2 = Category.objects.create(
-#             name="Test Child",
-#             parent=self.parent_category,
-#         )
-
-#         self.product1 = Product.objects.create(
-#             name="Test Product1",
-#             category=self.child_category1,
-#             description="Test product description",
-#             price=20.32,
-#             quantity=90,
-#             rate=1,
-#             sold=3,
-#             views=55,
-#         )
-#         self.product2 = Product.objects.create(
-#             name="Test Product2",
-#             category=child_category2,
-#             description="Test product description",
-#             price=88.01,
-#             quantity=0,
-#             rate=3,
-#             sold=234,
-#             views=34,
-#         )
-#         self.TOP_SOLD_CHILD_CATEGORY_PRODUCTS = reverse(
-#             "products:child_categories_top_solds", args=[self.parent_category.pk]
-#         )
-
-#     def test_pass_child_category_instead_of_parent(self):
-#         child_category_url = reverse(
-#             "products:child_categories_top_solds", args=[self.child_category1.pk]
-#         )
-#         response = self.client.get(child_category_url)
-#         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-#     def test_retrieve_top_3_sold_products_of_each_child_category(self):
-#         response = self.client.get(self.TOP_SOLD_CHILD_CATEGORY_PRODUCTS)
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         expected_data = TopSellingProductsByChildCategorySerializer(
-#             self.parent_category.children.all(), many=True
-#         ).data
-#         self.assertEqual(response.data, expected_data)
+    def test_feature_create_api(self):
+        self.superuser = SuperUserFactory()
+        tokens = generate_jwt_token(self.superuser)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
+        payload = {"name": "test feature 3", "description": "test description 3"}
+        response = self.client.post(self.PRODUCT_FEATURES_LIST_CREATE_URL, payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)

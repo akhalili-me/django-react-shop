@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import State,Address
+from .models import State, UserAddress
 
 
 class StateCityListSerilizer(serializers.ModelSerializer):
@@ -9,9 +9,10 @@ class StateCityListSerilizer(serializers.ModelSerializer):
         model = State
         fields = ["name", "cities"]
 
+
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Address
+        model = UserAddress
         fields = [
             "id",
             "state",

@@ -1,49 +1,20 @@
 from django.test import TestCase
-from modules.products.models import Category, Product
 from modules.orders.models import Order, OrderItem
-from modules.checkout.models import Payment
-from modules.shipment.models import Address
-from django.contrib.auth import get_user_model
+from modules.utility.factories import (
+    UserFactory,
+    BillingAddressFactory,
+    OrderFactory,
+    ProductFactory,
+)
 
 
 class OrderTestCase(TestCase):
     def setUp(self):
-        # Set up product
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-        # Set up order
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.address = Address.objects.create(
-            user=self.user,
-            state="Test State",
-            city="Test City",
-            phone="09012342134",
-            postal_code="1847382365",
-            street_address="Test street address",
-            house_number="434",
-        )
-
+        self.user = UserFactory()
+        self.address = BillingAddressFactory()
         self.order = Order.objects.create(
             user=self.user,
-            address=self.address,
+            billing_address=self.address,
             shipping_price=10,
             total=1000,
         )
@@ -52,7 +23,7 @@ class OrderTestCase(TestCase):
         """Test default order create method"""
         self.assertEqual(Order.objects.count(), 1)
         self.assertEqual(self.order.user, self.user)
-        self.assertEqual(self.order.address, self.address)
+        self.assertEqual(self.order.billing_address, self.address)
         self.assertEqual(self.order.shipping_price, 10)
         self.assertEqual(self.order.total, 1000)
 
@@ -62,49 +33,11 @@ class OrderTestCase(TestCase):
     def test_order_delete(self):
         pass
 
+
 class OrderItemTestCase(TestCase):
     def setUp(self):
-        # Set up product
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        # Set up order
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.address = Address.objects.create(
-            user=self.user,
-            state="Test State",
-            city="Test City",
-            phone="09012342134",
-            postal_code="1847382365",
-            street_address="Test street address",
-            house_number="434",
-        )
-
-        self.order = Order.objects.create(
-            user=self.user,
-            address=self.address,
-            shipping_price=10,
-            total=1000,
-        )
-
+        self.order = OrderFactory()
+        self.product = ProductFactory()
         self.order_item = OrderItem.objects.create(
             order=self.order, product=self.product, quantity=1
         )

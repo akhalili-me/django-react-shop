@@ -1,35 +1,15 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase
-from modules.products.models import Category, Product
 from ..models import Comment, Like, Report
 from datetime import timedelta
 from django.utils import timezone
 
+from modules.utility.factories import ProductFactory, UserFactory, CommentFactory
+
 
 class CommentModelTests(TestCase):
     def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=self.child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
+        self.product = ProductFactory()
+        self.user = UserFactory()
         self.comment = Comment.objects.create(
             text="Test comment",
             rate=3,
@@ -63,35 +43,9 @@ class CommentModelTests(TestCase):
 
 class LikeModelTests(TestCase):
     def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=self.child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.comment = Comment.objects.create(
-            text="Test comment",
-            rate=3,
-            author=self.user,
-            product=self.product,
-        )
-
+        self.product = ProductFactory()
+        self.user = UserFactory()
+        self.comment = CommentFactory(author=self.user, product=self.product)
         self.like = Like.objects.create(comment=self.comment, user=self.user)
 
     def test_like_creation(self):
@@ -107,9 +61,7 @@ class LikeModelTests(TestCase):
         self.assertTrue("unique_like" in str(context.exception))
 
     def test_like_update(self):
-        new_user = get_user_model().objects.create_user(
-            email="test@test.com", username="testuser", password="testpass"
-        )
+        new_user = UserFactory()
 
         self.like.user = new_user
         self.like.save()
@@ -127,41 +79,10 @@ class LikeModelTests(TestCase):
 
 class ReportModelTests(TestCase):
     def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=self.child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.comment1 = Comment.objects.create(
-            text="Test comment1",
-            rate=3,
-            author=self.user,
-            product=self.product,
-        )
-        self.comment2 = Comment.objects.create(
-            text="Test comment2",
-            rate=3,
-            author=self.user,
-            product=self.product,
-        )
-
+        self.product = ProductFactory()
+        self.user = UserFactory()
+        self.comment1 = CommentFactory(author=self.user, product=self.product)
+        self.comment2 = CommentFactory(author=self.user, product=self.product)
         self.report = Report.objects.create(
             comment=self.comment1, user=self.user, reason="spam"
         )

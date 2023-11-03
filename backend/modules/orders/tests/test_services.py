@@ -1,80 +1,30 @@
 from django.test import TestCase
-from modules.products.models import Category, Product
-from modules.orders.models import Order, OrderItem
-from modules.checkout.models import Payment
-from modules.shipment.models import Address
-from django.contrib.auth import get_user_model
+from modules.orders.models import Order
 from ..services import OrderService
+from modules.utility.factories import UserFactory, UserAddressFactory, ProductFactory
 
 
 class OrderTestCase(TestCase):
     def setUp(self):
         # Set up product
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
+        self.user = UserFactory()
+        self.address = UserAddressFactory(user=self.user)
+        self.product = ProductFactory()
+        self.product_quantity_org = self.product.quantity
 
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-        # Set up order
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.address = Address.objects.create(
-            user=self.user,
-            state="Test State",
-            city="Test City",
-            phone="09012342134",
-            postal_code="1847382365",
-            street_address="Test street address",
-            house_number="434",
-        )
-
-        self.order = Order.objects.create(
-            user=self.user,
-            address=self.address,
-            shipping_price=10,
-            total=1000,
-        )
-
-    def test_order_creation(self):
-        """Test default order create method"""
-        self.assertEqual(Order.objects.count(), 1)
-        self.assertEqual(self.order.user, self.user)
-        self.assertEqual(self.order.address, self.address)
-        self.assertEqual(self.order.shipping_price, 10)
-        self.assertEqual(self.order.total, 1000)
-
-    def test_order_payment_order_item_creation_manager_method(self):
-        """
-        Test order manager method that takes order, payment method
-        and order items data and create all of them in database.
-        """
-
+    def test_proccess_order_method(self):
         order_items_data = [{"product": self.product, "quantity": 1}]
         data = {
-            "address": self.address,
+            "address": self.address.uuid,
             "shipping_price": 10,
             "total": 1000,
             "payment_method": "Test payment method",
             "order_items": order_items_data,
         }
         order = OrderService.process_order_and_payment(self.user, data)
-        
-        self.assertEqual(Order.objects.count(), 2)
+
+        self.assertEqual(Order.objects.count(), 1)
         self.assertEqual(order.user, self.user)
-        self.assertEqual(order.address, self.address)
         self.assertEqual(order.shipping_price, 10)
         self.assertEqual(order.total, 1000)
         main_payment = order.payments.all().get(is_main_payment=True)
@@ -86,4 +36,3 @@ class OrderTestCase(TestCase):
         for index, order_item in enumerate(order.order_items.all()):
             self.assertEqual(order_item.product, order_items_data[index]["product"])
             self.assertEqual(order_item.quantity, order_items_data[index]["quantity"])
-            self.assertEqual(self.product.quantity - order_item.quantity, 23)

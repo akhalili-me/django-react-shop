@@ -1,4 +1,4 @@
-from .models import State, Address
+from .models import State, UserAddress
 from rest_framework.generics import (
     ListCreateAPIView,
     ListAPIView,
@@ -19,12 +19,13 @@ class LocationListView(ListAPIView):
     def get_queryset(self):
         return State.objects.all()
 
+
 class UserAddressListView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AddressSerializer
 
     def get_queryset(self):
-        return Address.objects.filter(user=self.request.user)
+        return UserAddress.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -33,4 +34,5 @@ class UserAddressListView(ListCreateAPIView):
 class AddressRetrieveUpdateDeleteView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsSuperUserOrObjectOwner]
     serializer_class = AddressSerializer
-    queryset = Address.objects.all()
+    queryset = UserAddress.objects.all()
+    lookup_field = "uuid"

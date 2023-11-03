@@ -8,15 +8,15 @@ from .views import (
 app_name = "orders"
 
 urlpatterns = [
-    path("", ListCreateOrderView.as_view(), name="order-create-list"),
+    path("", ListCreateOrderView.as_view(), name="create-list"),
     path(
-        "orders/<int:pk>",
+        "<uuid:uuid>",
         OrderRetrieveUpdateDestroyView.as_view(),
-        name="order-retrieve-update-destroy",
+        name="detail",
     ),
     path(
-        "items/<int:pk>",
+        "items/<uuid:uuid>",
         OrderItemRetrieveUpdateDestroyView.as_view(),
-        name="order-item-retrieve-update-destroy",
+        name="order-item-detail",
     ),
 ]

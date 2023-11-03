@@ -13,8 +13,8 @@ urlpatterns = [
         "user-addresses", UserAddressListView.as_view(), name="user-address-create-list"
     ),
     path(
-        "address/<int:pk>",
+        "address/<uuid:uuid>",
         AddressRetrieveUpdateDeleteView.as_view(),
-        name="address-retrieve-update-delete",
+        name="user-address-detail",
     ),
 ]

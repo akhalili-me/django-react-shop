@@ -3,37 +3,18 @@ from ..models import (
     ShoppingSession,
     CartItem,
 )
-from django.contrib.auth import get_user_model
-from modules.products.models import Product, Category
 from decimal import Decimal
-from modules.utility.images import create_test_image
+from modules.utility.factories import (
+    ProductFactory,
+    UserFactory,
+    ShoppingSessionFactory,
+)
 
 
 class ShoppingSessionTestCase(TestCase):
     def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-            image=create_test_image(),
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-            image=create_test_image(),
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
+        self.product = ProductFactory()
+        self.user = UserFactory()
         self.shopping_session = ShoppingSession.objects.create(user=self.user)
 
     def test_shopping_session_creation(self):
@@ -69,30 +50,8 @@ class ShoppingSessionTestCase(TestCase):
 
 class CartItemTestCase(TestCase):
     def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-            image=create_test_image(),
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-            image=create_test_image(),
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-        self.shopping_session = ShoppingSession.objects.create(user=user)
+        self.product = ProductFactory()
+        self.shopping_session = ShoppingSessionFactory()
 
         self.cart_item = CartItem.objects.create(
             session=self.shopping_session, product=self.product, quantity=2

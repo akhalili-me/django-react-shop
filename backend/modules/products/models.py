@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from modules.utility.models import TimeStampedModel
 from django.core.validators import MaxValueValidator
 import os
@@ -65,6 +64,7 @@ class ProductImage(TimeStampedModel):
     )
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to=product_image)
+    uuid = models.UUIDField(default=uuid4, editable=False)
 
     def __str__(self):
         return f"{self.image.url}"
@@ -90,6 +90,7 @@ class Feature(TimeStampedModel):
     )
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=500)
+    uuid = models.UUIDField(default=uuid4, editable=False)
 
     def __str__(self):
         return f"{self.name}"

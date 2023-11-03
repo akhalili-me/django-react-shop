@@ -1,8 +1,5 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
-from modules.products.models import Category, Product
-from django.contrib.auth import get_user_model
-from modules.shipment.models import Address
 from modules.checkout.models import Payment
 from modules.orders.models import Order, OrderItem
 from modules.utility.tokens import generate_jwt_token
@@ -14,80 +11,34 @@ from ..serializers import (
     OrderItemSerializer,
     OrdersListSerializer,
 )
-from modules.discounts.models import Discount, DiscountUsage
+from modules.discounts.models import DiscountUsage
 from modules.notifications.tasks.order_email import send_order_confirm_email
-from django.utils import timezone
-from datetime import timedelta
+from modules.utility.factories import (
+    UserFactory,
+    OrderFactory,
+    OrderItemFactory,
+    DiscountFactory,
+    UserAddressFactory,
+)
 
-ORDER_CREATE_LIST_URL = reverse("orders:order-create-list")
+ORDER_CREATE_LIST_URL = reverse("orders:create-list")
 
 
 class OrderTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        # Set up order
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.address = Address.objects.create(
-            user=self.user,
-            state="Test State",
-            city="Test City",
-            phone="09012342134",
-            postal_code="1847382365",
-            street_address="Test street address",
-            house_number="434",
-        )
-
-        self.order = Order.objects.create(
-            user=self.user,
-            address=self.address,
-            shipping_price=10,
-            total=1000,
-        )
-        self.payment = Payment.objects.create(
-            amount=1000, method="Test method", order=self.order
-        )
-        self.order_item = OrderItem.objects.create(
-            order=self.order, product=self.product, quantity=1
-        )
-
-        self.discount = Discount.objects.create(
-            name="test",
-            value=20,
-            type="fixed",
-            expire_at=timezone.now() + timedelta(2),
-            code="TEST",
-        )
-
+        self.user = UserFactory()
+        self.user_address = UserAddressFactory(user=self.user)
+        self.order = OrderFactory(user=self.user)
+        self.order_item = OrderItemFactory(order=self.order)
+        self.product = self.order_item.product
+        self.discount = DiscountFactory(user=None)
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
-        self.ORDER_RUD_URL = reverse(
-            "orders:order-retrieve-update-destroy", args=[self.order.pk]
-        )
 
     def test_order_create_api(self):
         payload = {
-            "address": self.address.pk,
+            "address": self.user_address.uuid,
             "total": 24,
             "payment_method": "test method",
             "shipping_price": 10,
@@ -116,7 +67,7 @@ class OrderTests(TestCase):
 
     def test_order_items_empty_exception(self):
         payload = {
-            "address": self.address.pk,
+            "address": self.user_address.uuid,
             "total": 24,
             "method": "test method",
             "shipping_price": 10,
@@ -134,21 +85,21 @@ class OrderTests(TestCase):
         self.assertEqual(response.data, expected_data)
 
     def test_retrieve_order_api(self):
-        response = self.client.get(self.ORDER_RUD_URL)
+        response = self.client.get(self.order.get_absolute_url())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_data = OrderDetailsSerializer(self.order).data
         self.assertEqual(response.data, expected_data)
 
     def test_update_order_api(self):
         payload = {"shipping_price": 15, "total": 50}
-        response = self.client.patch(self.ORDER_RUD_URL, payload)
+        response = self.client.patch(self.order.get_absolute_url(), payload)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_order = Order.objects.get(pk=self.order.pk)
         self.assertEqual(updated_order.shipping_price, 15)
         self.assertEqual(updated_order.total, 50)
 
     def test_delete_order_api(self):
-        response = self.client.delete(self.ORDER_RUD_URL)
+        response = self.client.delete(self.order.get_absolute_url())
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Order.objects.filter(pk=self.order.pk).exists())
 
@@ -156,73 +107,26 @@ class OrderTests(TestCase):
 class OrderItemTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        # Set up order
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.address = Address.objects.create(
-            user=self.user,
-            state="Test State",
-            city="Test City",
-            phone="09012342134",
-            postal_code="1847382365",
-            street_address="Test street address",
-            house_number="434",
-        )
-        self.order = Order.objects.create(
-            user=self.user,
-            address=self.address,
-            shipping_price=10,
-            total=1000,
-        )
-
-        self.payment = Payment.objects.create(
-            amount=1000, method="Test method", order=self.order
-        )
-
-        self.order_item = OrderItem.objects.create(
-            order=self.order, product=self.product, quantity=1
-        )
-
+        self.user = UserFactory()
+        self.order = OrderFactory(user=self.user)
+        self.order_item = OrderItemFactory(order=self.order)
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
-        self.ORDER_ITEM_RUD_URL = reverse(
-            "orders:order-item-retrieve-update-destroy", args=[self.order_item.pk]
-        )
 
     def test_retrieve_order_item_api(self):
-        response = self.client.get(self.ORDER_ITEM_RUD_URL)
+        response = self.client.get(self.order_item.get_absolute_url())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_data = OrderItemSerializer(self.order_item).data
         self.assertEqual(response.data, expected_data)
 
     def test_update_order_item_api(self):
         payload = {"quantity": 6}
-        response = self.client.patch(self.ORDER_ITEM_RUD_URL, payload)
+        response = self.client.patch(self.order_item.get_absolute_url(), payload)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_order_item = OrderItem.objects.get(pk=self.order_item.pk)
         self.assertEqual(updated_order_item.quantity, 6)
 
     def test_delete_order_item_api(self):
-        response = self.client.delete(self.ORDER_ITEM_RUD_URL)
+        response = self.client.delete(self.order_item.get_absolute_url())
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(OrderItem.objects.filter(pk=self.order_item.pk).exists())

@@ -1,15 +1,15 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from ..models import Address, State, City
+from ..models import UserAddress, State, City
 from django.db import IntegrityError
+
+from modules.utility.factories import UserFactory
 
 
 class AddressTestCase(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-        self.address = Address.objects.create(
+        self.user = UserFactory()
+        self.address = UserAddress.objects.create(
             user=self.user,
             state="Test State",
             city="Test City",
@@ -20,7 +20,7 @@ class AddressTestCase(TestCase):
         )
 
     def test_address_creation(self):
-        self.assertEqual(Address.objects.count(), 1)
+        self.assertEqual(UserAddress.objects.count(), 1)
         self.assertEqual(self.address.user, self.user)
         self.assertEqual(self.address.state, "Test State")
         self.assertEqual(self.address.city, "Test City")
@@ -31,7 +31,7 @@ class AddressTestCase(TestCase):
 
     def test_phone_unique_constraint(self):
         with self.assertRaises(IntegrityError):
-            Address.objects.create(
+            UserAddress.objects.create(
                 user=self.user,
                 state="Test State",
                 city="Test City",
@@ -46,14 +46,14 @@ class AddressTestCase(TestCase):
         self.address.street_address = "updated street address"
         self.address.save()
 
-        updated_address = Address.objects.get(pk=self.address.pk)
+        updated_address = UserAddress.objects.get(pk=self.address.pk)
 
         self.assertEqual(updated_address.state, "updated state")
         self.assertEqual(updated_address.street_address, "updated street address")
 
     def test_address_delete(self):
         self.address.delete()
-        self.assertFalse(Address.objects.filter(pk=self.address.pk).exists())
+        self.assertFalse(UserAddress.objects.filter(pk=self.address.pk).exists())
 
 
 class StateTestCase(TestCase):

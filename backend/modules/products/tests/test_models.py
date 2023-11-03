@@ -1,25 +1,30 @@
 from django.test import TestCase
 from ..models import Product, Category, ProductImage, Feature
-from django.contrib.auth import get_user_model
-from modules.utility.images import create_test_image
 from modules.reviews.models import Comment
+from modules.utility.factories import ChildCategoryFactory, ProductFactory
+
+from modules.utility.factories import (
+    ParentCategoryFactory,
+    ChildCategoryFactory,
+    ProductImageFactory,
+    UserFactory
+)
 
 
 class CategoryTestCase(TestCase):
     def setUp(self):
-        self.parent_category = Category.objects.create(
-            name="Test Parent", parent=None, image=create_test_image()
+        self.parent_category = ParentCategoryFactory(
+            name="Test Parent",
+            parent=None,
         )
-
-        self.child_category = Category.objects.create(
-            name="Test Child", parent=self.parent_category, image=create_test_image()
+        self.child_category = ChildCategoryFactory(
+            name="Test Child",
+            parent=self.parent_category,
         )
 
     def test_category_creation(self):
-        # Assert counts
         self.assertEqual(Category.objects.count(), 2)
 
-        # Assert properties of objects
         self.assertEqual(self.parent_category.name, "Test Parent")
         self.assertEqual(self.parent_category.parent, None)
         self.assertEqual(self.child_category.name, "Test Child")
@@ -44,20 +49,8 @@ class CategoryTestCase(TestCase):
 
 class ProductTestCase(TestCase):
     def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
+        self.child_category = ChildCategoryFactory()
+        self.user = UserFactory()
         self.product = Product.objects.create(
             name="Test Product",
             category=self.child_category,
@@ -109,27 +102,9 @@ class ProductTestCase(TestCase):
 
 class ProdutImageTestCase(TestCase):
     def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=self.child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.product_image = ProductImage.objects.create(
+        self.product = ProductFactory()
+        self.product_image = ProductImageFactory(
             name="Test image",
-            image=create_test_image(),
             product=self.product,
         )
 
@@ -155,26 +130,7 @@ class ProdutImageTestCase(TestCase):
 
 class FeatureTestCase(TestCase):
     def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-            image=create_test_image(),
-        )
-
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-            image=create_test_image(),
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=self.child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
+        self.product = ProductFactory()
         self.feature = Feature.objects.create(
             name="Test Feature",
             description="Test feature description",

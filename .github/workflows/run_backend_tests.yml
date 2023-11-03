@@ -53,7 +53,7 @@ jobs:
 
       - name: Run tests
         run: |
-          python manage.py test --settings=config.settings.local
+          python manage.py test --settings=config.settings.test
         working-directory: backend
         env:
           DB_NAME: "postgres"

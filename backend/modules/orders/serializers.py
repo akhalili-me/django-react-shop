@@ -3,8 +3,11 @@ from .models import OrderItem, Order
 from modules.products.serializers import ProductImageSerializer
 from modules.products.models import Product
 from modules.checkout.serializers import PaymentSerializer
-from modules.discounts.models import Discount
 from modules.discounts.services import DiscountService
+from django.shortcuts import get_object_or_404
+from modules.utility.loading import get_model
+
+UserAddress = get_model("shipment", "UserAddress")
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -25,6 +28,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     payment_method = serializers.CharField(max_length=200)
     order_items = OrderItemSerializer(many=True, required=True)
     discount = serializers.CharField(allow_null=True, required=False)
+    address = serializers.UUIDField()
 
     class Meta:
         model = Order
@@ -43,9 +47,12 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         DiscountService.validate_discount(value, user)
         return value
 
+    def validate_address(self, value):
+        get_object_or_404(UserAddress, uuid=value)
+        return value
+
 
 class OrdersListSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Order
         fields = ["id", "status", "total", "created_at"]
@@ -69,7 +76,6 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "full_address",
-            "address",
             "total",
             "payments",
             "order_items",
@@ -78,4 +84,4 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
         ]
 
     def get_full_address(self, obj):
-        return str(obj.address)
+        return str(obj.billing_address)

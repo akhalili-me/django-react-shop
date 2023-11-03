@@ -2,7 +2,6 @@ from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from django.core.cache import cache
 from .models import Category, Product
-from .helpers import delete_all_product_list_caches
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 

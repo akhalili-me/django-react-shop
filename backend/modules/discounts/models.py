@@ -1,7 +1,6 @@
 from modules.utility.models import TimeStampedModel
 from django.db import models
 from .managers import DiscountUsageManager
-from modules.orders.models import Order
 from django.core.exceptions import ValidationError
 
 
@@ -52,7 +51,7 @@ class DiscountUsage(TimeStampedModel):
         related_name="discount_usages",
     )
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="discount_usages"
+        "orders.Order", on_delete=models.CASCADE, related_name="discount_usages"
     )
     discount = models.ForeignKey(
         Discount, on_delete=models.CASCADE, related_name="discount_usages"

@@ -1,13 +1,14 @@
 from rest_framework.generics import (
-    RetrieveAPIView,
+    RetrieveUpdateDestroyAPIView,
     ListAPIView,
+    ListCreateAPIView,
 )
 from rest_framework.response import Response
 from django.core.cache import cache
 from .api_exceptions import SortMethodInvalidException
 from .serializers import (
     ProductDetailsSerializer,
-    FeatureListSerilizer,
+    FeatureSerilizer,
     CategorySerializer,
 )
 from .models import Product, Feature, Category
@@ -15,6 +16,8 @@ from .helpers import (
     is_sort_invalid,
     get_sort_order,
 )
+from modules.utility.permissions import IsSuperUserOrReadOnly
+from django.shortcuts import get_object_or_404
 
 
 class ProductListSortView(ListAPIView):
@@ -38,21 +41,23 @@ class ProductListSortView(ListAPIView):
         return Response(data)
 
 
-class ProductRetrieveView(RetrieveAPIView):
+class ProductReadUpdateDeleteView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsSuperUserOrReadOnly]
     serializer_class = ProductDetailsSerializer
     queryset = Product.objects.all()
     lookup_field = "slug"
 
 
-class ProductFeatureListView(ListAPIView):
-    """
-    Return features associated with a particular product id.
-    """
-
-    serializer_class = FeatureListSerilizer
+class FeatureListCreateView(ListCreateAPIView):
+    permission_classes = [IsSuperUserOrReadOnly]
+    serializer_class = FeatureSerilizer
 
     def get_queryset(self):
-        return Feature.objects.filter(product_id=self.kwargs["product_id"])
+        return Feature.objects.filter(product__slug=self.kwargs["product_slug"])
+
+    def perform_create(self, serializer):
+        product = get_object_or_404(Product, slug=self.kwargs["product_slug"])
+        serializer.save(product=product)
 
 
 class CategoryListView(ListAPIView):

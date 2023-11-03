@@ -1,10 +1,7 @@
 from rest_framework.test import APIClient
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from rest_framework import status
-from modules.products.models import Category, Product
 from modules.accounts.models import Ban
-from modules.utility.tokens import generate_jwt_token
 from django.urls import reverse
 from time import sleep
 from ..models import Comment, Like, Report
@@ -13,6 +10,15 @@ from ..serializers import (
     CommentDetailsSerializer,
     CommentSerializer,
 )
+from modules.utility.factories import (
+    ProductFactory,
+    UserFactory,
+    CommentFactory,
+    LikeFactory,
+    SuperUserFactory,
+    ReportFactory,
+)
+from modules.utility.tokens import apply_jwt_token_credentials_to_client
 
 USER_COMMENTS_LIST_URL = reverse("reviews:user_comments")
 COMMENT_CREATE_URL = reverse("reviews:comment_create")
@@ -23,46 +29,12 @@ REPORT_CREATE_URL = reverse("reviews:report_create")
 class CommentViewsTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.comment1 = Comment.objects.create(
-            text="Test comment 1",
-            rate=4,
-            author=self.user,
-            product=self.product,
-        )
+        self.product = ProductFactory()
+        self.user = UserFactory()
+        self.comment1 = CommentFactory(product=self.product, author=self.user)
         sleep(0.5)
-        self.comment2 = Comment.objects.create(
-            text="Test comment 2",
-            rate=2,
-            author=self.user,
-            product=self.product,
-        )
-        tokens = generate_jwt_token(self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
-        self.COMMENT_1_RETRIEVE_UPDATE_DELETE_URL = reverse(
-            "reviews:comment_retrieve_update_delete", args=[self.comment1.pk]
-        )
+        self.comment2 = CommentFactory(product=self.product, author=self.user)
+        apply_jwt_token_credentials_to_client(self.client, self.user)
 
     def test_user_comments_list_api(self):
         response = self.client.get(USER_COMMENTS_LIST_URL)
@@ -75,7 +47,7 @@ class CommentViewsTests(TestCase):
 
     def test_product_comments_list_api(self):
         PRODUCT_COMMENTS_LIST_URL = reverse(
-            "reviews:product_comments", args=[self.product.pk]
+            "reviews:product_comments", args=[self.product.slug]
         )
         response = self.client.get(PRODUCT_COMMENTS_LIST_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -85,88 +57,52 @@ class CommentViewsTests(TestCase):
         self.assertEqual(response.data["results"], expected_data)
 
     def test_comment_create_api(self):
-        payload = {"text": "test comment", "rate": 3, "product": self.product.pk}
+        payload = {"text": "test comment", "rate": 3, "product": self.product.slug}
         response = self.client.post(COMMENT_CREATE_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Comment.objects.filter(pk=response.data["id"]).exists())
+        self.assertTrue(Comment.objects.filter(uuid=response.data["uuid"]).exists())
 
     def test_comment_retrieve_api(self):
-        response = self.client.get(self.COMMENT_1_RETRIEVE_UPDATE_DELETE_URL)
+        response = self.client.get(self.comment1.get_absolute_url())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_data = CommentSerializer(self.comment1).data
         self.assertEqual(response.data, expected_data)
 
     def test_comment_update_api(self):
         payload = {"rate": 5}
-        response = self.client.patch(self.COMMENT_1_RETRIEVE_UPDATE_DELETE_URL, payload)
+        response = self.client.patch(self.comment1.get_absolute_url(), payload)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # TODO
 
     def test_comment_delete_api(self):
-        response = self.client.delete(self.COMMENT_1_RETRIEVE_UPDATE_DELETE_URL)
+        response = self.client.delete(self.comment1.get_absolute_url())
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Comment.objects.filter(pk=self.comment1.pk).exists())
 
     def test_comment_owner_permission(self):
-        new_user = get_user_model().objects.create_user(
-            username="testtestuser", email="testtest@gmail.com", password="testpass"
-        )
-        tokens = generate_jwt_token(new_user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
-        response = self.client.delete(self.COMMENT_1_RETRIEVE_UPDATE_DELETE_URL)
+        new_user = UserFactory()
+        apply_jwt_token_credentials_to_client(self.client, new_user)
+        response = self.client.delete(self.comment1.get_absolute_url())
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class LikeViewsTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.comment1 = Comment.objects.create(
-            text="Test comment1",
-            rate=3,
-            author=self.user,
-            product=self.product,
-        )
-        self.comment2 = Comment.objects.create(
-            text="Test comment2",
-            rate=3,
-            author=self.user,
-            product=self.product,
-        )
-
-        self.like = Like.objects.create(comment=self.comment2, user=self.user)
-        tokens = generate_jwt_token(self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
+        self.user = UserFactory()
+        self.comment1 = CommentFactory()
+        self.comment2 = CommentFactory()
+        self.like = LikeFactory(comment=self.comment2, user=self.user)
+        apply_jwt_token_credentials_to_client(self.client, self.user)
 
     def test_like_create_api(self):
-        payload = {"comment": self.comment1.pk}
+        payload = {"comment": self.comment1.uuid}
         response = self.client.post(LIKE_CREATE_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Like.objects.filter(pk=response.data["id"]).exists())
+        self.assertTrue(Like.objects.filter(uuid=response.data["uuid"]).exists())
 
     def test_like_delete_api(self):
-        Like_DELETE_URL = reverse("reviews:like_delete", args=[self.comment2.pk])
+        Like_DELETE_URL = reverse("reviews:like_delete", args=[self.comment2.uuid])
         response = self.client.delete(Like_DELETE_URL)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(
@@ -174,7 +110,7 @@ class LikeViewsTests(TestCase):
         )
 
     def test_unique_like_validation(self):
-        payload = {"comment": self.comment2.pk}
+        payload = {"comment": self.comment2.uuid}
         response = self.client.post(LIKE_CREATE_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -185,65 +121,38 @@ class LikeViewsTests(TestCase):
 class ReportViewTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-        tokens = generate_jwt_token(self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
-
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-        self.child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=self.child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
+        self.user = UserFactory()
+        self.superuser = SuperUserFactory()
+        apply_jwt_token_credentials_to_client(self.client, self.superuser)
 
         for i in range(20):
-            comment = Comment.objects.create(
-                text="Test comment",
-                rate=4,
-                author=self.user,
-                product=self.product,
-            )
+            comment = CommentFactory()
             setattr(self, f"comment{i+1}", comment)
 
-        self.report = Report.objects.create(
-            comment=self.comment1, user=self.user, reason="spam"
-        )
-        self.REPORT_RETRIEVE_UPDATE_DESTROY_URL = reverse(
-            "reviews:report_retrieve_update_delete", args=[self.report.pk]
-        )
+        self.report = ReportFactory(comment=self.comment1, user=self.user)
 
     def test_report_create_api(self):
-        payload = {"comment": self.comment2.pk, "reason": "spam"}
+        apply_jwt_token_credentials_to_client(self.client, self.user)
+        payload = {"comment": self.comment2.uuid, "reason": "spam"}
         response = self.client.post(REPORT_CREATE_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Report.objects.filter(pk=response.data["id"]).exists())
+        self.assertTrue(Report.objects.filter(uuid=response.data["uuid"]).exists())
 
     def test_report_update_api(self):
         payload = {"reason": "inappropriate content"}
-        response = self.client.patch(self.REPORT_RETRIEVE_UPDATE_DESTROY_URL, payload)
+        response = self.client.patch(self.report.get_absolute_url(), payload)
         updated_report = Report.objects.get(pk=self.report.pk)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(updated_report.reason, "inappropriate content")
 
     def test_report_delete_api(self):
-        response = self.client.delete(self.REPORT_RETRIEVE_UPDATE_DESTROY_URL)
+        response = self.client.delete(self.report.get_absolute_url())
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Report.objects.filter(pk=self.report.pk).exists())
 
     def test_unique_report(self):
-        payload = {"comment": self.comment1.pk, "reason": "spam"}
+        apply_jwt_token_credentials_to_client(self.client, self.user)
+        payload = {"comment": self.comment1.uuid, "reason": "spam"}
         response = self.client.post(REPORT_CREATE_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -251,10 +160,12 @@ class ReportViewTests(TestCase):
         )
 
     def test_max_daily_report_limit(self):
+        apply_jwt_token_credentials_to_client(self.client, self.user)
         for i in range(4):
             comment = getattr(self, f"comment{i+2}")
             Report.objects.create(comment=comment, user=self.user, reason="spam")
-        payload = {"comment": self.comment8.pk, "reason": "spam"}
+
+        payload = {"comment": self.comment8.uuid, "reason": "spam"}
         response = self.client.post(REPORT_CREATE_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(
@@ -262,10 +173,11 @@ class ReportViewTests(TestCase):
         )
 
     def test_user_ban_after_report_limit_reach(self):
+        apply_jwt_token_credentials_to_client(self.client, self.user)
         for i in range(15):
             comment = getattr(self, f"comment{i+2}")
             Report.objects.create(comment=comment, user=self.user, reason="spam")
-        payload = {"comment": self.comment20.pk, "reason": "spam"}
+        payload = {"comment": self.comment20.uuid, "reason": "spam"}
         response = self.client.post(REPORT_CREATE_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.data["detail"], "User is banned for report actions.")

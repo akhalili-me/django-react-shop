@@ -1,13 +1,7 @@
 from django.test import TestCase
-from modules.products.models import Category, Product
-from modules.orders.models import Order, OrderItem
-from modules.checkout.models import Payment
-from modules.shipment.models import Address
-from django.contrib.auth import get_user_model
-from ..models import Discount, DiscountUsage
+from ..models import Discount
 from django.utils import timezone
 from datetime import timedelta
-from django.db import IntegrityError
 
 from django.core.exceptions import ValidationError
 class DiscountModelTests(TestCase):

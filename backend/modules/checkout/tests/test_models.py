@@ -1,51 +1,10 @@
 from django.test import TestCase
 from ..models import Payment
-from modules.orders.models import Order
-from modules.products.models import Category, Product
-from django.contrib.auth import get_user_model
-from modules.shipment.models import Address
-
+from modules.utility.factories import OrderFactory 
 
 class PaymentTestCase(TestCase):
     def setUp(self):
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-        # Set up order
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-
-        self.address = Address.objects.create(
-            user=self.user,
-            state="Test State",
-            city="Test City",
-            phone="09012342134",
-            postal_code="1847382365",
-            street_address="Test street address",
-            house_number="434",
-        )
-
-        self.order = Order.objects.create(
-            user=self.user,
-            address=self.address,
-            shipping_price=10,
-            total=1000,
-        )
+        self.order = OrderFactory()
         self.payment = Payment.objects.create(
             amount=1000, method="Test method", order=self.order
         )

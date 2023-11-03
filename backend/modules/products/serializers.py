@@ -5,7 +5,7 @@ from .models import Product, ProductImage, Category, Feature
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ["id", "name", "image"]
+        fields = ["uuid", "name", "image"]
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -39,26 +39,7 @@ class ProductDetailsSerializer(ProductSerializer):
         return obj.comments.count()
 
 
-class FeatureListSerilizer(serializers.ModelSerializer):
+class FeatureSerilizer(serializers.ModelSerializer):
     class Meta:
         model = Feature
-        fields = ["name", "description"]
-
-
-# class TopSellingProductsByChildCategorySerializer(serializers.ModelSerializer):
-#     products = serializers.SerializerMethodField()
-#     parent = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = Category
-#         fields = ["name", "products", "parent"]
-
-#     @staticmethod
-#     def get_products(obj):
-#         products = obj.products.order_by("-sold")[:3]
-#         product_serializer = ProductSerializer(products, many=True)
-#         return product_serializer.data
-
-#     @staticmethod
-#     def get_parent(obj):
-#         return obj.parent.name
+        fields = ["uuid", "name", "description"]

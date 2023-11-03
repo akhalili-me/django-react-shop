@@ -1,9 +1,6 @@
 from rest_framework.test import APIClient
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from rest_framework import status
-from modules.products.models import Category, Product
-from modules.utility.images import create_test_image
 from modules.utility.tokens import generate_jwt_token
 from django.urls import reverse
 from ..models import (
@@ -13,6 +10,7 @@ from ..models import (
 from ..serializers import (
     SessionAndCartItemsListSerializer,
 )
+from modules.utility.factories import ProductFactory, UserFactory, CartItemFactory
 
 CART_ITEM_CREATE_LIST_UPDATE_URL = reverse("cart:cart-items-list-create-update")
 CART_ITEM_DELETE_ALL_URL = reverse("cart:delete-all-cart-items")
@@ -21,29 +19,8 @@ CART_ITEM_DELETE_ALL_URL = reverse("cart:delete-all-cart-items")
 class CartItemCreateViewTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-            image=create_test_image(),
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-            image=create_test_image(),
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
+        self.product = ProductFactory()
+        self.user = UserFactory()
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
 
@@ -63,33 +40,10 @@ class CartItemCreateViewTests(TestCase):
 class CartItemDestroyTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-
-        parent_category = Category.objects.create(
-            name="Test Parent",
-            parent=None,
-            image=create_test_image(),
-        )
-
-        child_category = Category.objects.create(
-            name="Test Child",
-            parent=parent_category,
-            image=create_test_image(),
-        )
-
-        self.product = Product.objects.create(
-            name="Test Product",
-            category=child_category,
-            description="Test product description",
-            price=20.32,
-            quantity=24,
-        )
-        self.user = get_user_model().objects.create_user(
-            username="testuser", email="test@gmail.com", password="testpass"
-        )
-        self.shopping_session = ShoppingSession.objects.create(user=self.user)
-        self.cart_item = CartItem.objects.create(
-            product=self.product, quantity=1, session=self.shopping_session
-        )
+        self.cart_item = CartItemFactory()
+        self.product = self.cart_item.product
+        self.shopping_session = self.cart_item.session
+        self.user = self.cart_item.session.user
         tokens = generate_jwt_token(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {tokens["access"]}')
         self.CART_ITEM_DELETE_URL = reverse(

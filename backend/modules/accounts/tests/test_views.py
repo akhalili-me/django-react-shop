@@ -3,6 +3,7 @@ from django.test import TestCase
 from rest_framework import status
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from modules.utility.factories import UserFactory
 
 USER_CREATE_URL = reverse("accounts:register")
 TOKEN_OBTAIN_URL = reverse("accounts:token_obtain")
@@ -70,12 +71,10 @@ class UserRegisterAPITests(TestCase):
 class JwtTokenObtainPairTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            email="test@gmail.com", username="testuser", password="Test123@"
-        )
+        self.user = UserFactory()
 
     def test_jwt_token_obtain_success(self):
-        payload = {"email": "test@gmail.com", "password": "Test123@"}
+        payload = {"email": self.user.email, "password": "testpass"}
         response = self.client.post(TOKEN_OBTAIN_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -84,13 +83,13 @@ class JwtTokenObtainPairTests(TestCase):
         self.assertIn("refresh", response.data)
 
     def test_jwt_token_obtain_invalid_credentials(self):
-        payload = {"email": "test@gmail.com", "password": "test1234"}
+        payload = {"email": self.user.email, "password": "wrongpass1234"}
         response = self.client.post(TOKEN_OBTAIN_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_jwt_token_obtan_missing_field(self):
-        payload = {"email": "test@gmail.com"}
+        payload = {"email": self.user.email}
         response = self.client.post(TOKEN_OBTAIN_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -100,12 +99,10 @@ class JwtTokenObtainPairTests(TestCase):
 class JwtRefreshTokenTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            email="test@gmail.com", username="testuser", password="Test123@"
-        )
+        self.user = UserFactory()
 
     def test_jwt_refresh_token_success(self):
-        payload = {"email": "test@gmail.com", "password": "Test123@"}
+        payload = {"email": self.user.email, "password": "testpass"}
         jwt_tokens = self.client.post(TOKEN_OBTAIN_URL, payload).data
 
         response = self.client.post(
