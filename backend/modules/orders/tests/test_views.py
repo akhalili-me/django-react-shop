@@ -52,7 +52,7 @@ class OrderTests(TestCase):
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
             self.assertTrue(Order.objects.filter(pk=response.data["id"]).exists())
             self.assertTrue(
-                Payment.objects.filter(pk=response.data["payments"][0]["id"]).exists()
+                Payment.objects.filter(uuid=response.data["payments"][0]["uuid"]).exists()
             )
             self.assertEqual(len(response.data["order_items"]), 1)
             for order_item in response.data["order_items"]:

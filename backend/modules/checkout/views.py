@@ -11,3 +11,4 @@ class PaymentRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsSuperUserOrObjectOwner]
     user_field = "order.user"
     queryset = Payment.objects.all()
+    lookup_field = "uuid"

@@ -1,5 +1,7 @@
 from django.db import models
 from modules.utility.models import TimeStampedModel
+from uuid import uuid4
+from django.urls import reverse
 
 
 class Payment(TimeStampedModel):
@@ -19,3 +21,7 @@ class Payment(TimeStampedModel):
     paid_at = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     is_main_payment = models.BooleanField(default=False)
     description = models.TextField(max_length=300, null=True, blank=True)
+    uuid = models.UUIDField(default=uuid4, editable=False, db_index=True)
+
+    def get_absolute_url(self):
+        return reverse("checkout:payment-detail", kwargs={"uuid": self.uuid})

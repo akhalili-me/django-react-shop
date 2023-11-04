@@ -7,8 +7,8 @@ app_name = "checkout"
 
 urlpatterns = [
     path(
-        "payment/<int:pk>",
+        "payment/<uuid:uuid>",
         PaymentRetrieveUpdateDestroyAPIView.as_view(),
-        name="payment-retrieve-update-destroy",
+        name="payment-detail",
     ),
 ]
